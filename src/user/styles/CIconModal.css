@@ -1,0 +1,21 @@
+/* Ensure modal looks good on mobile */
+@media (max-width: 576px) {
+  .appointmentForm .modal-dialog {
+    max-width: 95%;
+    margin: 1rem auto;
+  }
+
+  .appointmentForm .modal-content {
+    padding: 1rem;
+  }
+
+  .appointmentForm .modal-footer button {
+    font-size: 0.9rem;
+    padding: 0.5rem;
+  }
+
+  #whatsappBtn {
+    font-size: 0.9rem;
+    padding: 0.5rem;
+  }
+}
