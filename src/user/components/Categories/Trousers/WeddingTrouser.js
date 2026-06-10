@@ -3,7 +3,8 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FaShoppingCart } from "react-icons/fa";
 import logo from "../../../../shared/assets/images/HC Black.png";     
-import weddingVideo from "../../../../shared/assets/video/WeddingPage/WeddingPageVideo.mp4"; 
+import weddingVideo from "../../../../shared/assets/video/WeddingPage/WeddingPageVideo.mp4";
+import "../../../styles/CarouselCategoryPages.css"; 
 
 import leftImg from "../../../../shared/assets/images/WeddingPage/WeddingLeftImage.jpeg";
 import centerVideo from "../../../../shared/assets/video/WeddingPage/WeddingCenterVideo.mp4";
@@ -145,28 +146,23 @@ For the Men Who Wear Royalty, Not Just Suits.
     <section className="container-fluid my-0 px-0">
   <div className="row g-0">
     {/* Left Image */}
-    <div className="col-md-4">
+    <div className="col-12 col-md-4">
       <img
         src={leftImg}
         alt="Left"
-        className="img-fluid shadow-sm"
+        className="img-fluid shadow-sm w-100"
         style={{
-          width: "100%",
-          height: "520.39px",
           objectFit: "cover",
-          borderRadius: "0px",
         }}
       />
     </div>
     {/* Center Video */}
-    <div className="col-md-4">
+    <div className="col-12 col-md-4">
       <video
         src={centerVideo}
         className="w-100 shadow-sm"
         style={{
-          height: "520.39px",
           objectFit: "cover",
-          borderRadius: "0px",
         }}
         autoPlay
         loop
@@ -177,16 +173,13 @@ For the Men Who Wear Royalty, Not Just Suits.
     </div>
 
     {/* Right Image */}
-    <div className="col-md-4">
+    <div className="col-12 col-md-4">
       <img
         src={rightImg}
         alt="Right"
-        className="img-fluid shadow-sm"
+        className="img-fluid shadow-sm w-100"
         style={{
-          width: "100%",
-          height: "520.39px",
           objectFit: "cover",
-          borderRadius: "0px",
         }}
       />
     </div>
@@ -203,7 +196,6 @@ For the Men Who Wear Royalty, Not Just Suits.
             src={sliderImg1}
             className="d-block w-100"
             alt="Slide 1"
-            style={{ height: "500px", objectFit: "cover" }}
           />
         </div>
         <div className="carousel-item">
@@ -211,7 +203,6 @@ For the Men Who Wear Royalty, Not Just Suits.
             src={sliderImg2}
             className="d-block w-100"
             alt="Slide 2"
-            style={{ height: "500px", objectFit: "cover" }}
           />
         </div>
         <div className="carousel-item">
@@ -219,7 +210,6 @@ For the Men Who Wear Royalty, Not Just Suits.
             src={sliderImg3}
             className="d-block w-100"
             alt="Slide 3"
-            style={{ height: "500px", objectFit: "cover" }}
           />
         </div>
       </div>
@@ -247,7 +237,7 @@ For the Men Who Wear Royalty, Not Just Suits.
   </div>
 
   {/* Right Side: Description */}
-  <div className="col-md-6 d-flex align-items-center p-4">
+  <div className="col-12 col-md-6 d-flex align-items-center p-4 description-section">
     <div>
       <h3>Regal Black & Gold Hand-Embroidered Tuxedo</h3>
       <p>
@@ -270,11 +260,11 @@ For the Men Who Wear Royalty, Not Just Suits.
 {/* ===== NEW ROW: 75% Video – 25% Image ===== */}
 <div className="row g-0 mt-1 mx-0">
   {/* Left Side: Video (75%) */}
-  <div className="col-md-9 p-0">
+  <div className="col-12 col-md-9 p-0">
     <video
       src={LabelVideo} 
       className="w-100"
-      style={{ height: "500px", objectFit: "cover" }}
+      style={{ objectFit: "cover" }}
       autoPlay
       loop
       muted
@@ -283,12 +273,12 @@ For the Men Who Wear Royalty, Not Just Suits.
   </div>
 
   {/* Right Side: Image (25%) */}
-  <div className="col-md-3 p-0">
+  <div className="col-12 col-md-3 p-0">
     <img
       src={LabelImage} 
       alt="Right Side"
-      className="img-fluid"
-      style={{ height: "500px", width: "100%", objectFit: "cover" }}
+      className="img-fluid w-100"
+      style={{ objectFit: "cover" }}
     />
   </div>
 </div>

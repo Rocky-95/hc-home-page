@@ -60,26 +60,24 @@ const HomeFooter = () => {
             <h6 className="fw-bold text-uppercase">Quick Links</h6>
             <ul className="list-unstyled">
               <li>
-                <a href="/aboutUs" className="text-white text-decoration-none">
+                <Link to="/about-us" className="text-white text-decoration-none">
                   About Us
-                </a>
+                </Link>
               </li>
               <li>
-               <Link to="/contact-us" className="text-white text-decoration-none">
-  Contact Us
-</Link>
+                <Link to="/contact-us" className="text-white text-decoration-none">
+                  Contact Us
+                </Link>
               </li>
               <li>
-               <Link to="/privacy-policy" className="text-white text-decoration-none">
-  Privacy Policy
-</Link>
+                <Link to="/privacy-policy" className="text-white text-decoration-none">
+                  Privacy Policy
+                </Link>
               </li>
               <li>
-
-<Link to="/terms-and-conditions" className="text-white text-decoration-none">
-  Terms & Conditions
-</Link>
-
+                <Link to="/terms-and-conditions" className="text-white text-decoration-none">
+                  Terms & Conditions
+                </Link>
               </li>
             </ul>
           </div>
@@ -89,28 +87,24 @@ const HomeFooter = () => {
             <h6 className="fw-bold text-uppercase">Support</h6>
             <ul className="list-unstyled">
               <li>
-                            <Link to="/FAQs" className="text-white text-decoration-none">
- Help Center
-</Link>
+                <Link to="/contact-us" className="text-white text-decoration-none">
+                  Help Center
+                </Link>
               </li>
               <li>
-                     <Link to="/FAQs" className="text-white text-decoration-none">
- FAQs
-</Link>
+                <Link to="/faqs" className="text-white text-decoration-none">
+                  FAQs
+                </Link>
               </li>
               <li>
-                <a
-                  href="/Policies"
-                  className="text-light text-decoration-none"
-                >
+                <Link to="/policies" className="text-white text-decoration-none">
                   Shipping, Returns & Cancellation
-                </a>
+                </Link>
               </li>
               <li>
-                          <Link to="/FAQs" className="text-white text-decoration-none">
- Track Order
-
-</Link>
+                <Link to="/contact-us" className="text-white text-decoration-none">
+                  Track Order
+                </Link>
               </li>
             </ul>
           </div>

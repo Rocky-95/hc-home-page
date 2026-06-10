@@ -1,0 +1,295 @@
+/* ===== CAROUSEL CATEGORY PAGES (Shared Styles) ===== */
+
+/* Header */
+.category-header {
+  background-color: white;
+  border-bottom: 1px solid #eee;
+  padding: 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.category-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.category-header .back-button {
+  background: none;
+  border: 1px solid #333;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.category-header .back-button:hover {
+  background: #333;
+  color: white;
+}
+
+/* Hero video section */
+.hero-video-section {
+  position: relative;
+  width: 100%;
+  height: 60vh;
+  overflow: hidden;
+}
+
+.hero-video-section video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Carousel heights — flexible on mobile */
+.carousel-item img,
+.carousel-item video {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  display: block;
+}
+
+/* Default desktop carousel height */
+@media (min-width: 769px) {
+  .carousel-item img,
+  .carousel-item video {
+    height: 500px;
+  }
+}
+
+/* Tablet carousel height */
+@media (max-width: 768px) {
+  .carousel-item img,
+  .carousel-item video {
+    height: 350px;
+  }
+}
+
+/* Mobile carousel height */
+@media (max-width: 576px) {
+  .carousel-item img,
+  .carousel-item video {
+    height: 280px;
+  }
+}
+
+/* Image/Video pair section (3 columns) */
+.row.g-0 > .col-12.col-md-4 img,
+.row.g-0 > .col-12.col-md-4 video {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  display: block;
+}
+
+@media (min-width: 769px) {
+  .row.g-0 > .col-12.col-md-4 img,
+  .row.g-0 > .col-12.col-md-4 video {
+    height: 520px;
+  }
+}
+
+@media (max-width: 768px) {
+  .row.g-0 > .col-12.col-md-4 img,
+  .row.g-0 > .col-12.col-md-4 video {
+    height: 380px;
+  }
+}
+
+@media (max-width: 576px) {
+  .row.g-0 > .col-12.col-md-4 img,
+  .row.g-0 > .col-12.col-md-4 video {
+    height: 280px;
+  }
+}
+
+/* 75/25 layout for video and image */
+@media (min-width: 769px) {
+  .row.g-0.mt-1 > .col-12.col-md-9 video,
+  .row.g-0.mt-1 > .col-12.col-md-3 img {
+    height: 500px;
+  }
+}
+
+@media (max-width: 768px) {
+  .row.g-0.mt-1 > .col-12.col-md-9 video,
+  .row.g-0.mt-1 > .col-12.col-md-3 img {
+    height: 380px;
+  }
+}
+
+@media (max-width: 576px) {
+  .row.g-0.mt-1 > .col-12.col-md-9 video,
+  .row.g-0.mt-1 > .col-12.col-md-3 img {
+    height: 280px;
+  }
+}
+
+/* Product card with video/image */
+.product-card {
+  cursor: pointer;
+  transition: transform 0.4s ease;
+  border: none;
+  border-radius: 0;
+  overflow: hidden;
+}
+
+.product-card:hover {
+  transform: scale(1.05);
+}
+
+.product-card img,
+.product-card video {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  display: block;
+  aspect-ratio: 421.66 / 527.06;
+}
+
+/* Category overlay */
+.category-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 1rem 1.5rem;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.product-card:hover .category-overlay {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* Running text bar */
+.marquee-track {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  animation: marquee 15s linear infinite;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+/* Grid responsive stacking */
+@media (max-width: 768px) {
+  .row.g-0 {
+    gap: 1rem !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .row.g-2 {
+    gap: 0.5rem !important;
+  }
+  
+  /* Stack all cols to single column on mobile */
+  .col-12.col-md-4,
+  .col-12.col-md-6,
+  .col-12.col-md-9,
+  .col-12.col-md-3 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
+/* Left-right image-video pairs */
+.image-video-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+
+.image-video-pair img,
+.image-video-pair video {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  display: block;
+}
+
+/* Desktop pair heights */
+@media (min-width: 769px) {
+  .image-video-pair img,
+  .image-video-pair video {
+    height: 520px;
+  }
+}
+
+/* Tablet pair heights */
+@media (max-width: 768px) {
+  .image-video-pair img,
+  .image-video-pair video {
+    height: 380px;
+  }
+}
+
+/* Mobile — stack vertically */
+@media (max-width: 576px) {
+  .image-video-pair {
+    grid-template-columns: 1fr;
+  }
+  
+  .image-video-pair img,
+  .image-video-pair video {
+    height: 280px;
+  }
+}
+
+/* Description section responsive padding */
+@media (max-width: 768px) {
+  .description-section {
+    padding: 1.5rem 1rem !important;
+  }
+  
+  .description-section h3 {
+    font-size: 1.3rem;
+  }
+  
+  .description-section p {
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+}
+
+@media (max-width: 576px) {
+  .description-section {
+    padding: 1rem !important;
+  }
+  
+  .description-section h3 {
+    font-size: 1.1rem;
+  }
+  
+  .description-section p {
+    font-size: 0.9rem;
+  }
+}
+
+/* Fade in-out animation */
+.fade-in-out-text {
+  display: inline-block;
+  animation: fadeInOut 7s ease-in-out infinite;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  25% { opacity: 1; }
+  75% { opacity: 1; }
+  100% { opacity: 0; }
+}

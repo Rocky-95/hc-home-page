@@ -96,7 +96,7 @@ export default function About() {
             Committed to outstanding quality and timeless craft.
             </p>
 
-            <Link to="/about-us" className="aboutus-btn">
+            <Link to="/about-designer" className="aboutus-btn">
   KNOW MORE
 </Link>
 
