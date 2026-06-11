@@ -10,6 +10,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
 }
 
 *, *::before, *::after {
@@ -35,11 +36,58 @@ video {
   }
 }
 
+@media (max-width: 480px) {
+  .carousel-inner .carousel-item img {
+    max-height: 45vh;
+  }
+}
+
 button,
 input,
 textarea,
 select {
   max-width: 100%;
+  font-size: inherit;
+}
+
+/* Prevent iOS zoom on input focus */
+@media (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="date"],
+  input[type="time"],
+  input[type="number"],
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}
+
+/* Ensure container padding on mobile */
+@media (max-width: 576px) {
+  .container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
+
+/* Touch-friendly tap targets */
+@media (max-width: 768px) {
+  a, button, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Exception for inline links and small utility buttons */
+  .btn-sm,
+  .accordion-button,
+  p a,
+  li a,
+  .dropdown-item {
+    min-height: unset;
+    min-width: unset;
+  }
 }
 
 code {

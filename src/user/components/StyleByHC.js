@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import img1 from "../../shared/assets/images/Designer.jpeg";
@@ -19,77 +19,108 @@ export default function StyleByHC() {
 
   const sliderRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const getItemWidth = useCallback(() => {
+    return isMobile ? window.innerWidth * 0.92 : 920;
+  }, [isMobile]);
 
   const handleScroll = () => {
     const slider = sliderRef.current;
-    const itemWidth = window.innerWidth <= 768 ? window.innerWidth : 720;
+    const itemWidth = getItemWidth();
     const index = Math.round(slider.scrollLeft / itemWidth);
     setActiveIndex(index);
   };
 
   const goToSlide = (index) => {
-    const itemWidth = window.innerWidth <= 768 ? window.innerWidth : 720;
+    const itemWidth = getItemWidth();
     sliderRef.current.scrollTo({
       left: index * itemWidth,
       behavior: "smooth",
     });
   };
 
-  const isMobile = window.innerWidth <= 768;
-
-  const itemStyle = {
-    position: "relative",
-    width: isMobile ? "95vw" : "900px",
-    height: isMobile ? "300px" : "500px",
-    marginRight: isMobile ? "7px" : "7px",
-    borderRadius: "0",
-    overflow: "hidden",
-    flexShrink: 0,
-  };
-
-const textStyle = {
-  position: "absolute",
-  bottom: "60px",
-  left: "20px",
-  color: "white",
-  fontSize: isMobile ? "28px" : "60px",   // BIG TEXT
-  fontWeight: "200",
-fontFamily: "Playfair Display, serif",
-  textShadow: "0px 4px 12px rgba(0,0,0,0.8)",
-};
-
-
   return (
     <>
       <style>{`
-        div::-webkit-scrollbar { display:none; }
+        .style-slider::-webkit-scrollbar { display: none; }
+
+        .style-item {
+          position: relative;
+          width: 900px;
+          height: 500px;
+          margin-right: 7px;
+          border-radius: 0;
+          overflow: hidden;
+          flex-shrink: 0;
+        }
+
+        .style-text {
+          position: absolute;
+          bottom: 60px;
+          left: 20px;
+          color: white;
+          font-size: 60px;
+          font-weight: 200;
+          font-family: "Playfair Display", serif;
+          text-shadow: 0px 4px 12px rgba(0,0,0,0.8);
+        }
+
+        .style-button {
+          position: absolute;
+          bottom: 80px;
+          right: 20px;
+          font-family: "MainLux", serif;
+          padding: 6px 14px;
+          font-weight: 530;
+          border-radius: 0px;
+        }
 
         @media (max-width: 768px) {
-          .dot {
+          .style-item {
+            width: 92vw;
+            height: 300px;
+          }
+          .style-text {
+            font-size: 22px;
+            line-height: 26px;
+            left: 10px;
+            bottom: 50px;
+            max-width: 65vw;
+          }
+          .style-button {
+            bottom: 50px;
+            right: 10px;
+            font-size: 10px;
+            padding: 5px 12px;
+          }
+          .style-dot {
             width: 6px !important;
             height: 6px !important;
-            margin: 1px !important;
           }
         }
 
-          /* MOBILE ONLY for Running slide */
-@media (max-width: 768px) {
-  .hc-text {
-    font-size: 22px !important;
-    line-height: 26px !important;
-    left: 10px !important;
-    bottom: 50px !important;
-    max-width: 65vw !important;
-  }
-
-  .hc-button {
-    bottom: 50px !important;
-    right: 10px !important;
-    font-size: 10px !important;
-    padding: 5px 12px !important;
-  }
-}
-
+        @media (max-width: 480px) {
+          .style-item {
+            width: 92vw;
+            height: 250px;
+          }
+          .style-text {
+            font-size: 18px;
+            bottom: 40px;
+          }
+          .style-button {
+            bottom: 40px;
+            font-size: 9px;
+            padding: 4px 10px;
+          }
+        }
       `}</style>
 
       {/* PARENT WRAPPER (NEEDED FOR DOT POSITIONING) */}
@@ -99,6 +130,7 @@ fontFamily: "Playfair Display, serif",
         <div
           ref={sliderRef}
           onScroll={handleScroll}
+          className="style-slider"
           style={{
             whiteSpace: "nowrap",
             overflowX: "auto",
@@ -111,7 +143,7 @@ fontFamily: "Playfair Display, serif",
         >
           <div style={{ display: "inline-flex" }}>
             {items.map((item, i) => (
-              <div key={i} style={itemStyle}>
+              <div key={i} className="style-item">
                 <img
                   src={item.img}
                   alt={item.text}
@@ -122,20 +154,9 @@ fontFamily: "Playfair Display, serif",
                   }}
                 />
 
-              <div style={textStyle} className="hc-text">{item.text}</div>
+              <div className="style-text">{item.text}</div>
 
-<button
-  className="btn btn-light btn-sm hc-button"
-  style={{
-    position: "absolute",
-    bottom: "80px",
-    right: "20px",
-    fontFamily: "MainLux, serif",
-    padding: "6px 14px",
-    fontWeight: "530",
-    borderRadius: "0px",
-  }}
->
+<button className="btn btn-light btn-sm style-button">
  Discover the collection &nbsp; ›
  </button>
 
@@ -161,7 +182,7 @@ fontFamily: "Playfair Display, serif",
             <span
               key={i}
               onClick={() => goToSlide(i)}
-              className="dot"
+              className="style-dot"
               style={{
                 display: "inline-block",
                 width: "8px",

@@ -146,13 +146,20 @@ const HomeFooter = () => {
 
         @media (max-width: 768px) {
           .footer-logo {
-            width: 180px;
+            width: 280px;
+            max-width: 80%;
+          }
+        }
+
+        @media (max-width: 576px) {
+          .footer-logo {
+            width: 200px;
           }
         }
 
         @media (max-width: 480px) {
           .footer-logo {
-            width: 150px;
+            width: 160px;
           }
         }
       `}</style>
