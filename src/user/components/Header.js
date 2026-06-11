@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 import "../styles/Header.css";
 import Hamburger from "./Hamburger";
@@ -55,7 +56,9 @@ const Header = () => {
 
       {/* CENTER */}
       <div className="logo mx-auto text-center">
-        <img src={logo} alt="Logo" style={{ height: "40px" }} />
+        <Link to="/" className="logo-link" aria-label="Go to home">
+          <img src={logo} alt="Logo" style={{ height: "40px" }} />
+        </Link>
       </div>
 
       {/* RIGHT */}
@@ -74,7 +77,7 @@ const Header = () => {
           ></i>
 
           {/* DROPDOWN */}
-          {open && <ProfileDropdown />}
+          {open && <ProfileDropdown onClose={() => setOpen(false)} />}
         </div>
       </div>
     </header>

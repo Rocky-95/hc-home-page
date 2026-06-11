@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
 const CIconModal = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -12,6 +14,7 @@ const CIconModal = () => {
   });
 
   const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -19,11 +22,28 @@ const CIconModal = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setMessage("");
+
     try {
-      const res = await axios.post("http://localhost:5000/api/appointments", formData);
-      setMessage("Appointment booked successfully!");
+      const { data } = await axios.post(`${API_URL}/api/appointments`, formData);
+      setMessage(data?.message || "Appointment booked successfully!");
+      setFormData({
+        name: "",
+        city: "",
+        deliveryDate: "",
+        occasion: "",
+        appointmentDate: "",
+        appointmentTime: ""
+      });
     } catch (err) {
-      setMessage(err.response?.data?.message || "Error booking appointment");
+      setMessage(
+        err.response?.data?.message ||
+          err.message ||
+          "Error booking appointment. Please try again."
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -36,7 +56,7 @@ const CIconModal = () => {
             <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
           </div>
           <div className="modal-body">
-            {message && <p>{message}</p>}
+            {message && <div className="alert alert-secondary">{message}</div>}
             <form id="appointmentForm" onSubmit={handleSubmit}>
               <div className="mb-3">
                 <label htmlFor="name">Name</label>
@@ -62,7 +82,9 @@ const CIconModal = () => {
                 <label htmlFor="appointmentTime">Select Appointment Time</label>
                 <input type="time" className="form-control" id="appointmentTime" value={formData.appointmentTime} onChange={handleChange} required />
               </div>
-              <button type="submit" className="btn btn-dark w-100">Confirm Booking</button>
+              <button type="submit" className="btn btn-dark w-100" disabled={isSubmitting}>
+                {isSubmitting ? "Booking..." : "Confirm Booking"}
+              </button>
             </form>
           </div>
         </div>

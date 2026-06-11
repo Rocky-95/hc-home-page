@@ -108,14 +108,15 @@
   .sidebar {
     top: 60px;
     width: 220px;
-    height: 1000;
+    height: 100vh;
     left: -220px;
     transition: left 0.3s ease;
+    overflow-y: auto;
   }
 
   .sidebar.show {
     left: 0;
-    height: 1000px;
+    height: 100vh;
   }
 
   /* Mobile → 1 column */

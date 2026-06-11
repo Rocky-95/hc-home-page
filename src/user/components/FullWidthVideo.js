@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { FaVolumeMute, FaVolumeUp } from "react-icons/fa";
 import "../styles/FullWidthVideo.css"; // Create this CSS file for styling
-import websiteVideo from "../../shared/assets/video/Luxury wedding 1 pool A .mov";
+import websiteVideo from "../../shared/assets/video/Luxury wedding 1 pool A .mp4";
 
 const FullWidthVideo = () => {
   const videoRef = useRef(null);

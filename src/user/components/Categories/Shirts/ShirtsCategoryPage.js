@@ -84,7 +84,13 @@ useEffect(() => {
         <div className="d-flex justify-content-between align-items-center px-3">
           <div className="d-flex align-items-center gap-3">
             <img src={logo} alt="Logo" className="img-fluid" style={{ height: "40px" }} />
-            <FaHome className="fs-4 text-dark" style={{ cursor: "pointer" }} />
+            <FaHome
+              className="fs-4 text-dark"
+              style={{ cursor: "pointer" }}
+              onClick={() => navigate("/")}
+              role="button"
+              aria-label="Go to Home"
+            />
           </div>
           <h1 className="h5 mb-0 text-dark text-center flex-grow-1">SUITS</h1>
           <FaShoppingCart className="fs-4 text-dark" style={{ cursor: "pointer" }} />
