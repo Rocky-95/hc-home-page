@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/hc-home-page/static/css/main.c09d6583.css",
-    "main.js": "/hc-home-page/static/js/main.88f2cdfb.js",
+    "main.js": "/hc-home-page/static/js/main.b08353c8.js",
     "static/media/Luxury wedding 1 pool A .mp4": "/hc-home-page/static/media/Luxury wedding 1 pool A .9f733bcbad8d9fe56cb4.mp4",
     "static/media/WeddingProductVideo2.mp4": "/hc-home-page/static/media/WeddingProductVideo2.a3ca046e90e467db6926.mp4",
     "static/media/WeddingCenterVideo.mp4": "/hc-home-page/static/media/WeddingCenterVideo.b9ceaa634871f92c8b4e.mp4",
@@ -69,10 +69,10 @@
     "static/media/slick.woff": "/hc-home-page/static/media/slick.295183786cd8a1389865.woff",
     "index.html": "/hc-home-page/index.html",
     "main.c09d6583.css.map": "/hc-home-page/static/css/main.c09d6583.css.map",
-    "main.88f2cdfb.js.map": "/hc-home-page/static/js/main.88f2cdfb.js.map"
+    "main.b08353c8.js.map": "/hc-home-page/static/js/main.b08353c8.js.map"
   },
   "entrypoints": [
     "static/css/main.c09d6583.css",
-    "static/js/main.88f2cdfb.js"
+    "static/js/main.b08353c8.js"
   ]
 }

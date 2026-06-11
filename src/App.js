@@ -1,16 +1,20 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import routes from "./routes";
+
 function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         {routes.map((route) => (
-          <Route key={route.path} path={route.path} element={route.element} />
+          <Route
+            key={route.path}
+            path={route.path}
+            element={route.element}
+          />
         ))}
       </Routes>
-
-    </BrowserRouter>
+    </HashRouter>
   );
-} 
+}
 
 export default App;
