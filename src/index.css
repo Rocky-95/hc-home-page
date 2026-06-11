@@ -72,21 +72,16 @@ select {
   }
 }
 
-/* Touch-friendly tap targets */
+/* Touch-friendly tap targets for primary action buttons */
 @media (max-width: 768px) {
-  a, button, [role="button"] {
+  .btn,
+  .btn-dark,
+  .btn-outline-light,
+  .btn-close,
+  .mute-button,
+  .custom-arrow {
     min-height: 44px;
     min-width: 44px;
-  }
-
-  /* Exception for inline links and small utility buttons */
-  .btn-sm,
-  .accordion-button,
-  p a,
-  li a,
-  .dropdown-item {
-    min-height: unset;
-    min-width: unset;
   }
 }
 

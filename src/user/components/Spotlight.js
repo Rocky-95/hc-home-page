@@ -28,7 +28,12 @@ export default function Spotlight() {
   }, []);
 
   const getItemWidth = useCallback(() => {
-    return isMobile ? window.innerWidth * 0.8 : 720;
+    if (isMobile) {
+      return window.innerWidth <= 480
+        ? window.innerWidth * 0.85 + 7
+        : window.innerWidth * 0.8 + 7;
+    }
+    return 707;
   }, [isMobile]);
 
   const handleScroll = () => {

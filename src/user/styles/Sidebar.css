@@ -104,11 +104,13 @@
 }
 
 /* ██████ MOBILE VIEW: LEFT → RIGHT SLIDE ██████ */
+/* --sidebar-top = header height + running bar height at each breakpoint */
 @media (max-width: 768px) {
   .sidebar {
-    top: 76px;
+    --sidebar-top: 78px; /* 56px header + 22px running bar */
+    top: var(--sidebar-top);
     width: 260px;
-    height: calc(100vh - 76px);
+    height: calc(100vh - var(--sidebar-top));
     left: -260px;
     transition: left 0.3s ease;
     overflow-y: auto;
@@ -116,7 +118,7 @@
 
   .sidebar.show {
     left: 0;
-    height: calc(100vh - 76px);
+    height: calc(100vh - var(--sidebar-top));
   }
 
   /* Mobile → 1 column */
@@ -151,20 +153,20 @@
 
 @media (max-width: 576px) {
   .sidebar {
-    top: 72px;
+    --sidebar-top: 72px; /* 52px header + 20px running bar */
+    top: var(--sidebar-top);
     width: 240px;
     left: -240px;
-    height: calc(100vh - 72px);
+    height: calc(100vh - var(--sidebar-top));
   }
 
   .sidebar.show {
-    height: calc(100vh - 72px);
+    height: calc(100vh - var(--sidebar-top));
   }
 }
 
 @media (max-width: 400px) {
   .sidebar {
-    top: 72px;
     width: 220px;
     left: -220px;
   }
