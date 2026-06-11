@@ -58,13 +58,34 @@
 /* Responsive / Mobile View */
 @media (max-width: 768px) {
   .running-bar {
-    font-size: 12px;
-    padding: 0 20px;
-    height: 25px;
+    font-size: 11px;
+    padding: 0 28px;
+    height: 22px;
+  }
+
+  .sentence-wrapper {
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .arrow {
-    font-size: 14px;
-    padding: 4px 8px;
+    font-size: 12px;
+    padding: 2px 6px;
   }
+}
+
+@media (max-width: 480px) {
+  .running-bar {
+    font-size: 10px;
+    padding: 0 24px;
+    height: 20px;
+  }
+
+  .arrow {
+    font-size: 10px;
+    padding: 2px 5px;
+  }
+
+  .arrow.left { left: 4px; }
+  .arrow.right { right: 4px; }
 }

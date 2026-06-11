@@ -19,7 +19,14 @@
 @media (max-width: 768px) {
   .slider-container,
   .slide img {
-    height: 60vh;
+    height: 55vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .slider-container,
+  .slide img {
+    height: 45vh;
   }
 }
 
@@ -42,6 +49,13 @@
   .white-icon-overlay {
     width: min(65vw, 320px);
     height: min(65vw, 320px);
+  }
+}
+
+@media (max-width: 480px) {
+  .white-icon-overlay {
+    width: min(55vw, 220px);
+    height: min(55vw, 220px);
   }
 }
 
