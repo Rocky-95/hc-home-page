@@ -28,7 +28,10 @@ export default function StyleByHC() {
   }, []);
 
   const getItemWidth = useCallback(() => {
-    return isMobile ? window.innerWidth * 0.92 : 920;
+    if (isMobile) {
+      return window.innerWidth * 0.92 + 7;
+    }
+    return 907;
   }, [isMobile]);
 
   const handleScroll = () => {
