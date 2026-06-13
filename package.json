@@ -1,6 +1,7 @@
 {
   "name": "hc-home-page",
   "version": "0.1.0",
+  "homepage": "www.harryclinton.in",
   "private": true,
   "dependencies": {
     "@testing-library/dom": "^10.4.1",
