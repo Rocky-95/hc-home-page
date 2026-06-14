@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import axios from "axios";
 
 const CIconModal = () => {
   const [formData, setFormData] = useState({
@@ -20,10 +19,22 @@ const CIconModal = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5000/api/appointments", formData);
+      const response = await fetch("http://localhost:5000/api/appointments", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const result = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(result.message || "Error booking appointment");
+      }
+
       setMessage("Appointment booked successfully!");
     } catch (err) {
-      setMessage(err.response?.data?.message || "Error booking appointment");
+      setMessage(err.message || "Error booking appointment");
     }
   };
 

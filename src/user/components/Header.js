@@ -4,8 +4,6 @@ import "../styles/Header.css";
 import Hamburger from "./Hamburger";
 import ProfileDropdown from "./ProfileDropdown";
 import logo from "../../shared/assets/images/HC Black.png";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap-icons/font/bootstrap-icons.css";
 
 const Header = () => {
   const [open, setOpen] = useState(false);

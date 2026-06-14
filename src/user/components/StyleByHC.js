@@ -1,5 +1,4 @@
 import React, { useRef, useState } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
 
 import img1 from "../../shared/assets/images/Designer.jpeg";
 import img2 from "../../shared/assets/images/Wedding.jpeg";
@@ -115,6 +114,8 @@ fontFamily: "Playfair Display, serif",
                 <img
                   src={item.img}
                   alt={item.text}
+                  loading="lazy"
+                  decoding="async"
                   style={{
                     width: "100%",
                     height: "100%",

@@ -143,7 +143,7 @@ const HomeFooter = () => {
       </div>
 
       {/* Inline CSS for responsiveness */}
-      <style jsx>{`
+      <style>{`
         .footer-logo {
           width: 750px;
           max-width: 90%;

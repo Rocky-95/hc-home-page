@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { FaVolumeMute, FaVolumeUp } from "react-icons/fa";
-import "../styles/FullWidthVideo.css"; // Create this CSS file for styling
-import websiteVideo from "../../shared/assets/video/Luxury wedding 1 pool A .mov";
+import "../styles/FullWidthVideo.css";
+import websiteVideo from "../../shared/assets/video/Luxury-wedding-home.mp4";
 
 const FullWidthVideo = () => {
   const videoRef = useRef(null);
@@ -24,9 +24,15 @@ const FullWidthVideo = () => {
         muted
         loop
         playsInline
+        preload="metadata"
         className="responsive-video"
       />
-      <button className="mute-button" onClick={toggleMute}>
+      <button
+        type="button"
+        className="mute-button"
+        onClick={toggleMute}
+        aria-label={isMuted ? "Unmute video" : "Mute video"}
+      >
         {isMuted ? <FaVolumeMute /> : <FaVolumeUp />}
       </button>
     </div>
