@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Header from "../components/Header";
 import VideoImageSlider from "../components/VideoImageSlider";
 import RunningBar from "../components/RunningBar"; // Assuming you have a RunningBar component
@@ -10,10 +10,12 @@ import CIconModal from "../components/CIconModal";
 import Spotlight from "../components/Spotlight";
 import StylyByHC from "../components/StyleByHC";
 const Home = () => {
+  const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
+
   return (
     <>
       <RunningBar/>
-      <Header />
+      <Header onCIconClick={() => setIsAppointmentModalOpen(true)} />
       <VideoImageSlider />
       <OfferBar />
       <FullWidthVideo />
@@ -22,7 +24,10 @@ const Home = () => {
       <StylyByHC/>
       <HomeFaqs /> 
       <HomeFooter />
-       <CIconModal /> 
+      <CIconModal
+        isOpen={isAppointmentModalOpen}
+        onClose={() => setIsAppointmentModalOpen(false)}
+      />
     </>
   );
 };

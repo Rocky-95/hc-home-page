@@ -38,8 +38,11 @@
 
 /* ===== C Icon ===== */
 .c-icon {
+  display: block;
   width: 25px;
   height: 25px;
+  padding: 0;
+  background: transparent;
   border: 3px solid black;
   border-radius: 50%;
   border-right-color: transparent;

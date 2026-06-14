@@ -5,7 +5,7 @@ import Hamburger from "./Hamburger";
 import ProfileDropdown from "./ProfileDropdown";
 import logo from "../../shared/assets/images/HC Black.png";
 
-const Header = () => {
+const Header = ({ onCIconClick }) => {
   const [open, setOpen] = useState(false);
 
   const profileRef = useRef(); // 🔥 wrapper ref
@@ -33,12 +33,12 @@ const Header = () => {
         <Hamburger />
 
         <div className="c-home">
-          <div
+          <button
+            type="button"
             className="c-icon"
-            style={{ width: "24px", height: "24px" }}
-            data-bs-toggle="modal"
-            data-bs-target="#customModal"
-          ></div>
+            aria-label="Book a custom appointment"
+            onClick={onCIconClick}
+          ></button>
         </div>
 
         <div className="search d-flex align-items-center">
