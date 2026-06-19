@@ -12,26 +12,21 @@ import smartCasualImg from "../../../../shared/assets/images/SuitsPage/SmartCasu
 import suitsPageLabelImg from "../../../../shared/assets/images/SuitsPage/LabelNew2.jpeg";
 import "../../../styles/SuitsCategoryPage.css";
 
-const SuitsCategoryPage = () => {
-  const navigate = useNavigate();   
+const categories = [
+  { name: "Wedding", image: weddingImg, link: "/wedding" },
+  { name: "Business", video: businessVideo, link: "/business" },
+  { name: "Designer", image: designerImg, link: "/designer" },
+  { name: "Travel", image: travelImg, link: "/travel" },
+  { name: "Smart Casual", image: smartCasualImg, link: "/smart-casual" },
+];
 
-  // Added a "link" key so we can navigate on click
-  const categories = [
-    { name: "Wedding", image: weddingImg, link: "/wedding" },
-    { name: "Business", video: businessVideo, link: "/business" },
-    { name: "Designer", image: designerImg, link: "/designer" },
-    { name: "Travel", image: travelImg, link: "/travel" },
-    { name: "Smart Casual", image: smartCasualImg, link: "/smart-casual" },
-  ];
-
-  // Single category card
-  const CategoryCard = ({ cat }) => (
+const CategoryCard = ({ cat, onNavigate }) => (
     <div
       className="card border-0 rounded-0 overflow-hidden shadow-sm w-100"
       style={{ cursor: "pointer", transition: "transform 0.4s ease" }}
       onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
       onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-      onClick={() => cat.link && navigate(cat.link)}      // <-- navigate if link
+      onClick={() => cat.link && onNavigate(cat.link)}
     >
       <div className="position-relative">
         {cat.video ? (
@@ -55,7 +50,11 @@ const SuitsCategoryPage = () => {
         <div className="category-overlay">{cat.name}</div>
       </div>
     </div>
-  );
+);
+
+const SuitsCategoryPage = () => {
+  const navigate = useNavigate();
+
   // parallax scroll for hero image
   useEffect(() => {
     const img = document.querySelector(".hero-image");
@@ -129,14 +128,14 @@ const SuitsCategoryPage = () => {
         <div className="row g-2">
           {categories.slice(0, 3).map((cat, i) => (
             <div key={i} className="col-12 col-md-4 d-flex">
-              <CategoryCard cat={cat} />
+              <CategoryCard cat={cat} onNavigate={navigate} />
             </div>
           ))}
         </div>
         <div className="row g-2 mt-2">
           {categories.slice(3).map((cat, i) => (
             <div key={i} className="col-12 col-md-6 d-flex">
-              <CategoryCard cat={cat} />
+              <CategoryCard cat={cat} onNavigate={navigate} />
             </div>
           ))}
         </div>

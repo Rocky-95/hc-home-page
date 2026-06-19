@@ -1,10 +1,16 @@
 import { lazy, Suspense, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import PrivateRoute from "./shared/components/PrivateRoute";
 import Home from "./user/pages/Home";
 import SplashScreen from "./user/components/SplashScreen";
 
 const Login = lazy(() => import("./user/pages/Login"));
 const Register = lazy(() => import("./user/pages/Register"));
+const ContactUs = lazy(() => import("./user/pages/ContactUs"));
+const PrivacyPolicy = lazy(() => import("./user/pages/PrivacyPolicy"));
+const TermsAndConditions = lazy(() => import("./user/pages/TermsAndConditions"));
+const FAQs = lazy(() => import("./user/pages/FAQs"));
+const Policies = lazy(() => import("./user/pages/Policies"));
 const AdminDashboard = lazy(() => import("./admin/pages/AdminDashboard"));
 const ProductPage = lazy(() =>
   import("./user/components/Categories/Suits/ProductPage")
@@ -153,7 +159,14 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/admin" element={<AdminDashboard />} />
+          <Route
+            path="/admin"
+            element={
+              <PrivateRoute requiredRole="admin">
+                <AdminDashboard />
+              </PrivateRoute>
+            }
+          />
           <Route path="/product/:id" element={<ProductPage />} />
 
           <Route path="/suits" element={<SuitsCategoryPage />} />
@@ -222,6 +235,11 @@ function App() {
           <Route path="/services" element={<ServicePage />} />
           <Route path="/aboutUs" element={<AboutUs />} />
           <Route path="/about-designer" element={<AboutUsFull />} />
+          <Route path="/contact-us" element={<ContactUs />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+          <Route path="/FAQs" element={<FAQs />} />
+          <Route path="/Policies" element={<Policies />} />
         </Routes>
       </Suspense>
     </BrowserRouter>

@@ -1,6 +1,7 @@
 import React from "react";
-import FooterLogo from "../../shared/assets/images/Logo White.png"; // Your white logo path
+import FooterLogo from "../../shared/assets/images/Logo White.png";
 import { Link } from "react-router-dom";
+import "../styles/HomeFooter.css";
 
 const HomeFooter = () => {
   return (
@@ -142,26 +143,6 @@ const HomeFooter = () => {
 
       </div>
 
-      {/* Inline CSS for responsiveness */}
-      <style>{`
-        .footer-logo {
-          width: 750px;
-          max-width: 90%;
-          height: auto;
-        }
-
-        @media (max-width: 768px) {
-          .footer-logo {
-            width: 180px;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .footer-logo {
-            width: 150px;
-          }
-        }
-      `}</style>
     </footer>
   );
 };

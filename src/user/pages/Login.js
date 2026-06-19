@@ -1,39 +1,29 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function Login() {
   const navigate = useNavigate();
 
-  // 🔥 STATE
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  // 🔥 LOGIN LOGIC
-  const handleLogin = () => {
-    if (email === "Menaka" && password === "Menaka123@") {
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          name: "Menaka",
-          role: "user",
-        })
+  const handleLogin = async () => {
+    setError("");
+    setIsLoading(true);
+    try {
+      const res = await axios.post(
+        `${process.env.REACT_APP_API_URL}/auth/login`,
+        { email, password }
       );
-
-      alert("User Login Success");
+      localStorage.setItem("user", JSON.stringify(res.data.user));
       navigate("/");
-    } else if (email === "Mounika" && password === "Mounika123@") {
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          name: "Mounika",
-          role: "admin",
-        })
-      );
-
-      alert("Admin Login Success");
-      navigate("/");
-    } else {
-      alert("Invalid credentials");
+    } catch (err) {
+      setError(err.response?.data?.message || "Invalid credentials. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -42,7 +32,13 @@ function Login() {
       <div style={styles.card}>
         <h2 style={styles.title}>Login</h2>
 
-        {/* OTP (ignore for now) */}
+        {error && (
+          <p style={{ color: "red", fontSize: "14px", marginBottom: "12px", textAlign: "center" }}>
+            {error}
+          </p>
+        )}
+
+        {/* OTP */}
         <label style={styles.label}>Email or Mobile</label>
         <input
           type="text"
@@ -62,7 +58,7 @@ function Login() {
         <label style={styles.label}>Email ID</label>
         <input
           type="text"
-          placeholder="Enter your name (Menaka / Mounika)"
+          placeholder="Enter your email"
           style={styles.input}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -79,8 +75,8 @@ function Login() {
         />
 
         {/* LOGIN BUTTON */}
-        <button style={styles.button} onClick={handleLogin}>
-          Login with Password
+        <button style={styles.button} onClick={handleLogin} disabled={isLoading}>
+          {isLoading ? "Logging in..." : "Login with Password"}
         </button>
 
         <p style={styles.register}>
@@ -97,7 +93,6 @@ function Login() {
   );
 }
 
-/* ✅ ADD THIS (YOU MISSED THIS BEFORE) */
 const styles = {
   container: {
     height: "100vh",
@@ -165,5 +160,4 @@ const styles = {
   },
 };
 
-/* ✅ ALSO THIS */
 export default Login;

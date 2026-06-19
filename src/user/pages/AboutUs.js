@@ -92,8 +92,8 @@ export default function About() {
             <h2 className="aboutus-title">About Us</h2>
 
             <p className="aboutus-desc">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit.  
-            Committed to outstanding quality and timeless craft.
+            House of Cavani — where heritage craftsmanship meets contemporary style.
+            Committed to outstanding quality and timeless tailoring since our founding.
             </p>
 
             <Link to="/about-us" className="aboutus-btn">

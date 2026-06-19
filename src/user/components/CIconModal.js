@@ -65,7 +65,7 @@ const CIconModal = ({ isOpen, onClose }) => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("http://localhost:5000/api/appointments", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/appointments`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

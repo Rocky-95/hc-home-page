@@ -12,10 +12,6 @@ import smartCasualImg from "../../../../shared/assets/images/SuitsPage/SmartCasu
 import suitsPageLabelImg from "../../../../shared/assets/images/SuitsPage/LabelNew2.jpeg";
 import "../../../styles/SuitsCategoryPage.css";
 
-const IndoWesternCategoryPage = () => {
-  const navigate = useNavigate();   
-
-  // Added a "link" key so we can navigate on click
 const categories = [
   { name: "Wedding", image: weddingImg, link: "/indowestern/wedding" },
   { name: "Business", video: businessVideo, link: "/indowestern/business" },
@@ -24,14 +20,13 @@ const categories = [
   { name: "Smart Casual", image: smartCasualImg, link: "/indowestern/smart-casual" },
 ];
 
-  // Single category card
-  const CategoryCard = ({ cat }) => (
+const CategoryCard = ({ cat, onNavigate }) => (
     <div
       className="card border-0 rounded-0 overflow-hidden shadow-sm w-100"
       style={{ cursor: "pointer", transition: "transform 0.4s ease" }}
       onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
       onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-      onClick={() => cat.link && navigate(cat.link)}      // <-- navigate if link
+      onClick={() => cat.link && onNavigate(cat.link)}
     >
       <div className="position-relative">
         {cat.video ? (
@@ -55,9 +50,12 @@ const categories = [
         <div className="category-overlay">{cat.name}</div>
       </div>
     </div>
-  );
-  // parallax scroll for hero image
-useEffect(() => {
+);
+
+const IndoWesternCategoryPage = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
   const handleScroll = () => {
     const img = document.querySelector(".hero-image"); // ✅ move inside
 
@@ -86,7 +84,7 @@ useEffect(() => {
             <img src={logo} alt="Logo" className="img-fluid" style={{ height: "40px" }} />
             <FaHome className="fs-4 text-dark" style={{ cursor: "pointer" }} />
           </div>
-          <h1 className="h5 mb-0 text-dark text-center flex-grow-1">SUITS</h1>
+          <h1 className="h5 mb-0 text-dark text-center flex-grow-1">INDO-WESTERN</h1>
           <FaShoppingCart className="fs-4 text-dark" style={{ cursor: "pointer" }} />
         </div>
       </header>
@@ -135,14 +133,14 @@ useEffect(() => {
         <div className="row g-2">
           {categories.slice(0, 3).map((cat, i) => (
             <div key={i} className="col-12 col-md-4 d-flex">
-              <CategoryCard cat={cat} />
+              <CategoryCard cat={cat} onNavigate={navigate} />
             </div>
           ))}
         </div>
         <div className="row g-2 mt-2">
           {categories.slice(3).map((cat, i) => (
             <div key={i} className="col-12 col-md-6 d-flex">
-              <CategoryCard cat={cat} />
+              <CategoryCard cat={cat} onNavigate={navigate} />
             </div>
           ))}
         </div>
