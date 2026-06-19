@@ -3,8 +3,6 @@ import logo from "../../../shared/assets/images/HC-Logo-Golden.PNG";
 /* ─────────────────────────────────────────────
    SHARED CONSTANTS & HELPERS
 ───────────────────────────────────────────── */
-const FONTS = `@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap');`;
-
 const NAV_ITEMS = [
   { id: "embroidery", label: "Embroidery" },
   { id: "alterations", label: "Alterations" },
@@ -986,7 +984,6 @@ export default function ServicesPage() {
   return (
     <>
       <style>{`
-        ${FONTS}
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: #0f0d0b; }
         input, select, button { font-family: inherit; }

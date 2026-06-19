@@ -1,6 +1,7 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Home from "./user/pages/Home";
+import SplashScreen from "./user/components/SplashScreen";
 
 const Login = lazy(() => import("./user/pages/Login"));
 const Register = lazy(() => import("./user/pages/Register"));
@@ -102,6 +103,25 @@ const SmartCasualBabySuit = lazy(() =>
   import("./user/components/Categories/BabySuits/SmartCasualBabySuit")
 );
 
+const TuxedoCollection = lazy(() =>
+  import("./user/components/Collections/TuxedoPage")
+);
+const ExtremePoppinsCollection = lazy(() =>
+  import("./user/components/Collections/ExtremePoppins")
+);
+const GurkhaTrouserCollection = lazy(() =>
+  import("./user/components/Collections/GurkhaTrouserPage")
+);
+const LinenCollection = lazy(() =>
+  import("./user/components/Collections/LinenPage")
+);
+const CigaretteCollection = lazy(() =>
+  import("./user/components/Collections/88CigaretPage")
+);
+const CollectionProductPage = lazy(() =>
+  import("./user/components/Collections/ProductPage")
+);
+
 const ServicePage = lazy(() =>
   import("./user/components/Services/ServicePages.jsx")
 );
@@ -115,6 +135,12 @@ const RouteFallback = () => (
 );
 
 function App() {
+  const [showSplash, setShowSplash] = useState(true);
+
+  if (showSplash) {
+    return <SplashScreen onComplete={() => setShowSplash(false)} />;
+  }
+
   return (
     <BrowserRouter
       future={{
@@ -172,6 +198,25 @@ function App() {
           <Route
             path="/baby-suits/smart-casual"
             element={<SmartCasualBabySuit />}
+          />
+
+          <Route path="/tuxedo" element={<TuxedoCollection />} />
+          <Route
+            path="/extreme-poppins"
+            element={<ExtremePoppinsCollection />}
+          />
+          <Route
+            path="/gurkha-trousers"
+            element={<GurkhaTrouserCollection />}
+          />
+          <Route
+            path="/linen-shirts-trousers"
+            element={<LinenCollection />}
+          />
+          <Route path="/cigarettes" element={<CigaretteCollection />} />
+          <Route
+            path="/collections/product/:id"
+            element={<CollectionProductPage />}
           />
 
           <Route path="/services" element={<ServicePage />} />

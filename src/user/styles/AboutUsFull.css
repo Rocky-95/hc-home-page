@@ -28,7 +28,7 @@
 
 .about-banner-content h1 {
   font-size: 64px;
-  font-family: "Playfair Display", serif;
+  font-family: var(--font-mainlux);
   letter-spacing: 2px;
   margin: 0;
 }
@@ -42,7 +42,7 @@
 }
 
 .about-story h2 {
-  font-family: "Playfair Display", serif;
+  font-family: var(--font-mainlux);
   font-size: 36px;
   margin-bottom: 24px;
 }

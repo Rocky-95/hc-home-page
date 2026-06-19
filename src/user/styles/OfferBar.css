@@ -2,7 +2,7 @@
   margin: 0;
   padding: 0;
   background-color: #fff; /* Your update */
-  font-family: 'Helvetica Neue', sans-serif; /* Your update */
+  font-family: var(--font-mainlux); /* Your update */
   display: flex;
   overflow: hidden;
   white-space: nowrap;

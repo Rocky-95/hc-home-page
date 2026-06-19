@@ -5,7 +5,7 @@
   position: relative;
   height: 20px;
   font-weight: 400;
-  font-family: 'Helvetica Neue', sans-serif;
+  font-family: var(--font-mainlux);
   font-size: 14px;
   letter-spacing: 0.3px;
   padding: 0 40px;

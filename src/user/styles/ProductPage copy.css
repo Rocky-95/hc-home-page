@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=Jost:wght@300;400;500;600&display=swap');
 
 /* ── Reset & Tokens ── */
 *, *::before, *::after {
@@ -31,8 +32,8 @@
   --amber:      #C58B2A;
   --red:        #C0392B;
 
-  --font-display: var(--font-mainlux);
-  --font-body: var(--font-mainlux);
+  --font-display: 'Bodoni Moda', Georgia, serif;
+  --font-body: 'Jost', system-ui, sans-serif;
 
   --gap-xs: 4px;
   --gap-sm: 8px;
@@ -259,7 +260,8 @@
 }
 .pdp-stars { display: flex; gap: 2px; }
 .pdp-star { fill: none; stroke: var(--text-dim); }
-.pdp-star--half { fill: url(#half);  }
+.pdp-star--half {stroke: #111;}
+.pdp-star--full {fill: #111;     /* black filled star */  stroke: #111;}
 .pdp-info__rating-count { font-size: 12px; color: var(--text-dim); letter-spacing: .03em; }
 
 /* Divider */

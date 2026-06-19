@@ -107,7 +107,7 @@ const CIconModal = ({ isOpen, onClose }) => {
               <div className="modal-header">
                 <div>
                   <span className="appointment-modal-eyebrow">
-                    House of Cavani
+                    Harry Clinton
                   </span>
                   <h5 className="modal-title" id="appointment-modal-title">
                     Your Custom Design Appointment

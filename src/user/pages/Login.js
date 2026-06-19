@@ -104,7 +104,7 @@ const styles = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    fontFamily: "Arial",
+    fontFamily: "MAINLUX, Arial, sans-serif",
     backgroundColor: "#fff",
   },
   card: {

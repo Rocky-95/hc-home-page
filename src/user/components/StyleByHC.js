@@ -53,7 +53,7 @@ const textStyle = {
   color: "white",
   fontSize: isMobile ? "28px" : "60px",   // BIG TEXT
   fontWeight: "200",
-fontFamily: "Playfair Display, serif",
+fontFamily: "MAINLUX, Arial, sans-serif",
   textShadow: "0px 4px 12px rgba(0,0,0,0.8)",
 };
 
@@ -131,7 +131,7 @@ fontFamily: "Playfair Display, serif",
     position: "absolute",
     bottom: "80px",
     right: "20px",
-    fontFamily: "MainLux, serif",
+    fontFamily: "MAINLUX, Arial, sans-serif",
     padding: "6px 14px",
     fontWeight: "530",
     borderRadius: "0px",
