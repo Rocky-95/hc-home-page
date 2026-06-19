@@ -1,0 +1,2 @@
+"use strict";(globalThis.webpackChunkhc_home_page=globalThis.webpackChunkhc_home_page||[]).push([[3183],{3183(e,a,s){s.r(a),s.d(a,{default:()=>n});s(5043);var c=s(5475),l=s(579);const n=()=>(0,l.jsxs)("div",{className:"container py-5",children:[(0,l.jsx)("h1",{className:"mb-4",children:"Shipping, Returns & Cancellation"}),(0,l.jsx)("p",{className:"text-muted",children:"Our shipping and returns policies will appear here."}),(0,l.jsx)(c.N_,{to:"/",className:"btn btn-dark mt-3",children:"Back to Home"})]})}}]);
+//# sourceMappingURL=3183.d52ae60a.chunk.js.map

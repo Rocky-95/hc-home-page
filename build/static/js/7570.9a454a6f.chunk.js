@@ -1,0 +1,2 @@
+"use strict";(globalThis.webpackChunkhc_home_page=globalThis.webpackChunkhc_home_page||[]).push([[7570],{7570(h,a,e){e.r(a),e.d(a,{default:()=>c});var s=e(579);const c=()=>(0,s.jsx)("h2",{children:"Admin Dashboard"})}}]);
+//# sourceMappingURL=7570.9a454a6f.chunk.js.map

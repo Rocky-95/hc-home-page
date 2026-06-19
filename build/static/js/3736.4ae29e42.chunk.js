@@ -1,0 +1,2 @@
+"use strict";(globalThis.webpackChunkhc_home_page=globalThis.webpackChunkhc_home_page||[]).push([[3736],{3736(e,s,a){a.r(s),a.d(s,{default:()=>h});a(5043);var c=a(5475),l=a(579);const h=()=>(0,l.jsxs)("div",{className:"container py-5",children:[(0,l.jsx)("h1",{className:"mb-4",children:"FAQs"}),(0,l.jsx)("p",{className:"text-muted",children:"Frequently asked questions will appear here."}),(0,l.jsx)(c.N_,{to:"/",className:"btn btn-dark mt-3",children:"Back to Home"})]})}}]);
+//# sourceMappingURL=3736.4ae29e42.chunk.js.map
