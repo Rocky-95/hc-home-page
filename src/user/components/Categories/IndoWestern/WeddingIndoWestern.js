@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import CategoryPageTemplate from "../../../../shared/components/CategoryPageTemplate";
 import weddingVideo from "../../../../shared/assets/video/WeddingPage/WeddingPageVideo.mp4";
 import leftImg from "../../../../shared/assets/images/WeddingPage/WeddingLeftImage.jpeg";
@@ -43,6 +43,8 @@ const WeddingPage = () => (
     fadeText="The Wedding Indo-Western Collection"
     categories={categories}
     productBasePath="/product"
+    categoryPath="/indo-western"
+    categoryLabel="Indo-Western"
   />
 );
 

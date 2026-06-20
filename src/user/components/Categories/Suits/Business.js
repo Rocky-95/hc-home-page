@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import CategoryPageTemplate from "../../../../shared/components/CategoryPageTemplate";
 import weddingVideo from "../../../../shared/assets/video/WeddingPage/WeddingPageVideo.mp4";
 import leftImg from "../../../../shared/assets/images/WeddingPage/WeddingLeftImage.jpeg";
@@ -15,15 +15,15 @@ import TheDestinationDream from "../../../../shared/assets/images/WeddingSuitPro
 import TheSangeetSoiree from "../../../../shared/assets/images/WeddingSuitProductImages/Sangeet/Sangeet_Main.jpg";
 
 const categories = [
-  { id: 1, name: "The Classic Boardroom", image: TheRoyalWeddingEdit },
-  { id: 2, name: "The Executive Edge", video: TheChurchAffair },
-  { id: 3, name: "The Corporate Prestige", image: TheDestinationDream },
-  { id: 4, name: "The Power Meeting", image: TheRoyalWeddingEdit },
-  { id: 5, name: "The Conference Series", video: TheChurchAffair },
-  { id: 6, name: "The Founder's Cut", image: TheSangeetSoiree },
-  { id: 7, name: "The Diplomat", image: TheRoyalWeddingEdit },
-  { id: 8, name: "The Summit Edit", video: TheChurchAffair },
-  { id: 9, name: "The Minimalist CEO", image: TheDestinationDream },
+  { id: "executive-charcoal-suit",  name: "Executive Charcoal Suit",  image: TheRoyalWeddingEdit },
+  { id: "navy-business-suit",       name: "Navy Business Suit",        video: TheChurchAffair },
+  { id: "black-formal-suit",        name: "Black Formal Suit",         image: TheDestinationDream },
+  { id: "beige-office-suit",        name: "Beige Office Suit",         image: TheRoyalWeddingEdit },
+  { id: "pinstripe-power-suit",     name: "Pinstripe Power Suit",      video: TheChurchAffair },
+  { id: "light-blue-formal-suit",   name: "Light Blue Formal Suit",    image: TheSangeetSoiree },
+  { id: "dark-brown-business-suit", name: "Dark Brown Business Suit",  image: TheRoyalWeddingEdit },
+  { id: "checkered-formal-suit",    name: "Checkered Formal Suit",     video: TheChurchAffair },
+  { id: "slim-fit-grey-suit",       name: "Slim Fit Grey Suit",        image: TheDestinationDream },
 ];
 
 const BusinessPage = () => (
@@ -40,9 +40,11 @@ const BusinessPage = () => (
     sliderDescription="<h3>The Executive Collection</h3><p>Precision-cut business suits crafted for authority. Each piece is tailored with premium fabrics designed to project confidence from the first handshake.</p>"
     labelVideo={LabelVideo}
     labelImage={LabelImage}
-    fadeText="The Business Suit Collection â€“ Tailored for Authority"
+    fadeText="The Business Suit Collection - Tailored for Authority"
     categories={categories}
     productBasePath="/product"
+    categoryPath="/suits"
+    categoryLabel="Suits"
   />
 );
 

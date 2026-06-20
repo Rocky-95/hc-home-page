@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import CategoryPageTemplate from "../../../../shared/components/CategoryPageTemplate";
 import weddingVideo from "../../../../shared/assets/video/WeddingPage/WeddingPageVideo.mp4";
 import leftImg from "../../../../shared/assets/images/WeddingPage/WeddingLeftImage.jpeg";
@@ -9,23 +9,22 @@ import sliderImg2 from "../../../../shared/assets/images/WeddingPage/Slider/Slid
 import sliderImg3 from "../../../../shared/assets/images/WeddingPage/Slider/SliderImage3.jpeg";
 import LabelVideo from "../../../../shared/assets/video/WeddingPage/WeddingLabelVideo.mp4";
 import LabelImage from "../../../../shared/assets/images/WeddingPage/LabelImage.jpeg";
+import vid1 from "../../../../shared/assets/video/WeddingProductVideos/WeddingProductVideo2.mp4";
 import img1 from "../../../../shared/assets/images/WeddingSuitProductImages/The Royal Wedding Edit.jpeg";
 import img2 from "../../../../shared/assets/images/WeddingSuitProductImages/IMG_1016.jpg";
 import img3 from "../../../../shared/assets/images/WeddingSuitProductImages/Sangeet/Sangeet_Main.jpg";
-import vid1 from "../../../../shared/assets/video/WeddingProductVideos/WeddingProductVideo2.mp4";
 
 const categories = [
-  { id: 1, name: "Collection One",   image: img1 },
-  { id: 2, name: "Collection Two",   video: vid1 },
-  { id: 3, name: "Collection Three", image: img2 },
-  { id: 4, name: "Collection Four",  image: img1 },
-  { id: 5, name: "Collection Five",  video: vid1 },
-  { id: 6, name: "Collection Six",   image: img3 },
-  { id: 7, name: "Collection Seven", image: img1 },
-  { id: 8, name: "Collection Eight", video: vid1 },
-  { id: 9, name: "Collection Nine",  image: img2 },
+  { id: "royal-wedding-edit",      name: "The Royal Wedding Edit",  image: img1 },
+  { id: "destination-dream",       name: "The Destination Dream",   video: vid1 },
+  { id: "executive-charcoal-suit", name: "Executive Charcoal Suit", image: img2 },
+  { id: "navy-business-suit",      name: "Navy Business Suit",      image: img1 },
+  { id: "black-formal-suit",       name: "Black Formal Suit",       video: vid1 },
+  { id: "beige-office-suit",       name: "Beige Office Suit",       image: img3 },
+  { id: "pinstripe-power-suit",    name: "Pinstripe Power Suit",    image: img1 },
+  { id: "light-blue-formal-suit",  name: "Light Blue Formal Suit",  video: vid1 },
+  { id: "slim-fit-grey-suit",      name: "Slim Fit Grey Suit",      image: img2 },
 ];
-
 const TravelPage = () => (
   <CategoryPageTemplate
     pageTitle="TRAVEL"
@@ -43,6 +42,8 @@ const TravelPage = () => (
     fadeText="The Travel Suit Collection"
     categories={categories}
     productBasePath="/product"
+    categoryPath="/suits"
+    categoryLabel="Suits"
   />
 );
 

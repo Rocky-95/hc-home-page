@@ -1,7 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { FaShoppingCart } from "react-icons/fa";
-import logo from "../assets/images/HC Black.png";
+import PageHeader from "./PageHeader";
 import "../../user/styles/CategoryPageTemplate.css";
 
 const CategoryCard = ({ cat, onNavigate }) => (
@@ -52,36 +51,21 @@ const CategoryPageTemplate = ({
   fadeText,
   categories,
   productBasePath,
+  categoryPath,
+  categoryLabel,
 }) => {
   const navigate = useNavigate();
 
-  const handleNavigate = (id) => navigate(`${productBasePath}/${id}`);
+  const handleNavigate = (slug) => navigate(`${productBasePath}/${slug}`);
+
+  const breadcrumbs = [
+    ...(categoryPath && categoryLabel ? [{ label: categoryLabel, to: categoryPath }] : []),
+    { label: pageTitle },
+  ];
 
   return (
     <>
-      {/* HEADER */}
-      <header
-        className="container-fluid bg-white border-bottom py-2 sticky-top"
-        style={{ zIndex: 1000 }}
-      >
-        <div className="d-flex justify-content-between align-items-center px-3">
-          <div
-            className="d-flex align-items-center gap-3"
-            style={{ cursor: "pointer" }}
-            onClick={() => navigate("/")}
-          >
-            <img src={logo} alt="Logo" className="img-fluid" style={{ height: "40px" }} />
-          </div>
-          <h1 className="h5 mb-0 text-dark text-center flex-grow-1">
-            {pageTitle}
-          </h1>
-          <FaShoppingCart
-            className="fs-4 text-dark"
-            style={{ cursor: "pointer" }}
-            onClick={() => navigate("/cart")}
-          />
-        </div>
-      </header>
+      <PageHeader breadcrumbs={breadcrumbs} />
 
       {/* HERO VIDEO */}
       <section className="position-relative w-100">

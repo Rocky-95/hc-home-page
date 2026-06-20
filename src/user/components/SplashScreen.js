@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import splashVideo from "../../shared/assets/video/hc_splash1.mp4";
+import splashVideo from "../../shared/assets/video/hc_splash2.mp4";
 import "../styles/SplashScreen.css";
 
 const PLAYBACK_RATE = 2;

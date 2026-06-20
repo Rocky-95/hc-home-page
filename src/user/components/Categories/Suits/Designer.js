@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import CategoryPageTemplate from "../../../../shared/components/CategoryPageTemplate";
 import weddingVideo from "../../../../shared/assets/video/WeddingPage/WeddingPageVideo.mp4";
 import leftImg from "../../../../shared/assets/images/WeddingPage/WeddingLeftImage.jpeg";
@@ -9,23 +9,22 @@ import sliderImg2 from "../../../../shared/assets/images/WeddingPage/Slider/Slid
 import sliderImg3 from "../../../../shared/assets/images/WeddingPage/Slider/SliderImage3.jpeg";
 import LabelVideo from "../../../../shared/assets/video/WeddingPage/WeddingLabelVideo.mp4";
 import LabelImage from "../../../../shared/assets/images/WeddingPage/LabelImage.jpeg";
+import vid1 from "../../../../shared/assets/video/WeddingProductVideos/WeddingProductVideo2.mp4";
 import img1 from "../../../../shared/assets/images/WeddingSuitProductImages/The Royal Wedding Edit.jpeg";
 import img2 from "../../../../shared/assets/images/WeddingSuitProductImages/IMG_1016.jpg";
 import img3 from "../../../../shared/assets/images/WeddingSuitProductImages/Sangeet/Sangeet_Main.jpg";
-import vid1 from "../../../../shared/assets/video/WeddingProductVideos/WeddingProductVideo2.mp4";
 
 const categories = [
-  { id: 1, name: "Collection One",   image: img1 },
-  { id: 2, name: "Collection Two",   video: vid1 },
-  { id: 3, name: "Collection Three", image: img2 },
-  { id: 4, name: "Collection Four",  image: img1 },
-  { id: 5, name: "Collection Five",  video: vid1 },
-  { id: 6, name: "Collection Six",   image: img3 },
-  { id: 7, name: "Collection Seven", image: img1 },
-  { id: 8, name: "Collection Eight", video: vid1 },
-  { id: 9, name: "Collection Nine",  image: img2 },
+  { id: "midnight-designer-suit", name: "Midnight Designer Suit", image: img1 },
+  { id: "royal-wedding-edit",     name: "The Royal Wedding Edit",  video: vid1 },
+  { id: "church-affair",          name: "The Church Affair",       image: img2 },
+  { id: "destination-dream",      name: "The Destination Dream",   image: img1 },
+  { id: "reception-suit",         name: "The Reception Night",     video: vid1 },
+  { id: "engagement-suit",        name: "The Engagement Chapter",  image: img3 },
+  { id: "sangeet-suit",           name: "The Sangeet Suit",        image: img1 },
+  { id: "mehendi-suit",           name: "The Mehendi Suit",        video: vid1 },
+  { id: "minimalist-suit",        name: "The Modern Minimalist",   image: img2 },
 ];
-
 const DesignerPage = () => (
   <CategoryPageTemplate
     pageTitle="DESIGNER"
@@ -43,6 +42,8 @@ const DesignerPage = () => (
     fadeText="The Designer Suit Collection"
     categories={categories}
     productBasePath="/product"
+    categoryPath="/suits"
+    categoryLabel="Suits"
   />
 );
 

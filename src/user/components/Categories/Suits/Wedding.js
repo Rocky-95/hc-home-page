@@ -15,15 +15,15 @@ import TheDestinationDream from "../../../../shared/assets/images/WeddingSuitPro
 import TheSangeetSoiree from "../../../../shared/assets/images/WeddingSuitProductImages/Sangeet/Sangeet_Main.jpg";
 
 const categories = [
-  { id: 1, name: "The Royal Wedding Edit", image: TheRoyalWeddingEdit },
-  { id: 2, name: "The Church Affair", video: TheChurchAffair },
-  { id: 3, name: "The Destination Dream", image: TheDestinationDream },
-  { id: 4, name: "The Reception Night", image: TheRoyalWeddingEdit },
-  { id: 5, name: "The Engagement Chapter", video: TheChurchAffair },
-  { id: 6, name: "The Sangeet Soirée", image: TheSangeetSoiree },
-  { id: 7, name: "The Mehendi & Haldi Mood", image: TheRoyalWeddingEdit },
-  { id: 8, name: "The Intimate Wedding Edit", video: TheChurchAffair },
-  { id: 9, name: "The Modern Minimalist", image: TheDestinationDream },
+  { id: "royal-wedding-edit",  name: "The Royal Wedding Edit",   image: TheRoyalWeddingEdit },
+  { id: "church-affair",       name: "The Church Affair",        video: TheChurchAffair },
+  { id: "destination-dream",   name: "The Destination Dream",    image: TheDestinationDream },
+  { id: "reception-suit",      name: "The Reception Night",      image: TheRoyalWeddingEdit },
+  { id: "engagement-suit",     name: "The Engagement Chapter",   video: TheChurchAffair },
+  { id: "sangeet-suit",        name: "The Sangeet Soirée",       image: TheSangeetSoiree },
+  { id: "mehendi-suit",        name: "The Mehendi & Haldi Mood", image: TheRoyalWeddingEdit },
+  { id: "intimate-suit",       name: "The Intimate Wedding Edit",video: TheChurchAffair },
+  { id: "minimalist-suit",     name: "The Modern Minimalist",    image: TheDestinationDream },
 ];
 
 const WeddingPage = () => (
@@ -43,6 +43,8 @@ const WeddingPage = () => (
     fadeText="The Wedding Suit Collection – Luxury Hand Embroidered"
     categories={categories}
     productBasePath="/product"
+    categoryPath="/suits"
+    categoryLabel="Suits"
   />
 );
 

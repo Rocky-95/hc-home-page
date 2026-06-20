@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import CategoryPageTemplate from "../../../../shared/components/CategoryPageTemplate";
 import weddingVideo from "../../../../shared/assets/video/WeddingPage/WeddingPageVideo.mp4";
 import leftImg from "../../../../shared/assets/images/WeddingPage/WeddingLeftImage.jpeg";
@@ -43,6 +43,8 @@ const TravelBabySuit = () => (
     fadeText="The Travel Baby Suit Collection"
     categories={categories}
     productBasePath="/product"
+    categoryPath="/baby-suits"
+    categoryLabel="Baby Suits"
   />
 );
 
