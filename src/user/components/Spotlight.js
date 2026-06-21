@@ -47,19 +47,28 @@ export default function Spotlight() {
     flexShrink: 0,
   };
 
-  const textStyle = {
+  const spotlightLabelStyle = {
     position: "absolute",
-    bottom: "70px",
-    left: "20px",
+    bottom: "0",
+    left: "0",
+    width: isMobile ? "75vw" : "700px",
+    padding: isMobile ? "6px 16px" : "8px 24px",
     color: "white",
-    fontSize: isMobile ? "28px" : "60px",
-    fontWeight: "200",
+    fontSize: isMobile ? "24px" : "48px",
+    fontWeight: "bold",
     fontFamily: "MAINLUX, Arial, sans-serif",
-    textShadow: "0px 4px 12px rgba(0,0,0,0.8)",
+    textShadow: "0px 2px 8px rgba(0,0,0,0.6)",
+    zIndex: 5,
+    pointerEvents: "none",
   };
 
   return (
-    <div style={{ position: "relative", width: "100%" }}>
+    <div style={{ position: "relative", width: "100%", height: isMobile ? "300px" : "500px" }}>
+      {/* HC Spotlight label — fixed over the section, never scrolls */}
+      <div style={spotlightLabelStyle}>
+        HC Spotlight
+      </div>
+
       <div
         ref={sliderRef}
         onScroll={handleScroll}
@@ -70,12 +79,11 @@ export default function Spotlight() {
             <div key={i} style={itemStyle}>
               <img
                 src={item.img}
-                alt={item.text}
+                alt="HC Spotlight"
                 loading="lazy"
                 decoding="async"
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
-              <div style={textStyle} className="hc-text">{item.text}</div>
               <button className="btn btn-light btn-sm hc-button">
                 Discover the collection &nbsp; &rsaquo;
               </button>

@@ -47,10 +47,10 @@ const Hamburger = () => {
             <strong>CATEGORIES</strong>
             <ul>
               <li><Link to="/suits" onClick={() => setIsActive(false)}>Suits</Link></li>
-              <li><Link to="/indo-western" onClick={() => setIsActive(false)}>Indo-Western</Link></li>
+              <li><Link to="/indowestern" onClick={() => setIsActive(false)}>Indo-Western</Link></li>
               <li><Link to="/shirts" onClick={() => setIsActive(false)}>Shirts</Link></li>
               <li><Link to="/trousers" onClick={() => setIsActive(false)}>Trousers</Link></li>
-              <li><Link to="/baby-suits" onClick={() => setIsActive(false)}>Baby Suits</Link></li>
+              <li><Link to="/babysuits" onClick={() => setIsActive(false)}>Baby Suits</Link></li>
             </ul>
           </div>
 
