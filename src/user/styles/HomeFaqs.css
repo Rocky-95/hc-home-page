@@ -3,6 +3,17 @@
   font-weight: bold;
 }
 
+.home-faqs .accordion {
+  max-width: 100%;
+}
+
+.home-faqs .accordion-body {
+  font-weight: bold;
+  margin-left: 20px;
+  font-size: 18px;
+  font-family: "mainlux-italics", "MAINLUX", Arial, sans-serif;
+}
+
 /* Mobile view improvements */
 @media (max-width: 576px) {
   .home-faqs h2 {

@@ -6,7 +6,7 @@
   display: flex;
   overflow: hidden;
   white-space: nowrap;
-  height: 65px;
+  height: 40px;
 }
 
 .scrolling-label {
