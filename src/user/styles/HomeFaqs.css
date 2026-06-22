@@ -3,8 +3,8 @@
   font-weight: bold;
 }
 
-.home-faqs .accordion {
-  max-width: 100%;
+.container.my-5.home-faqs {
+  max-width: 100% !important;
 }
 
 .home-faqs .accordion-body {

@@ -1,5 +1,6 @@
 import React from "react";
 import FooterLogo from "../../shared/assets/images/Logo White.png";
+import HCWhite from "../../shared/assets/images/HC White.png";
 import { Link } from "react-router-dom";
 import "../styles/HomeFooter.css";
 
@@ -14,7 +15,13 @@ const HomeFooter = () => {
         <div className="row">
           {/* Brand & About */}
           <div className="col-md-4 mb-4">
-            <h4 className="fw-bold">HC</h4>
+            <h4 className="fw-bold">
+              <img
+                src={HCWhite}
+                alt="HC"
+                style={{ height: "40px", width: "auto" }}
+              />
+            </h4>
             <p className="small">
               Empowering innovation with quality and trust. Join us in our
               journey towards excellence.
@@ -22,36 +29,44 @@ const HomeFooter = () => {
             <p className="mb-1 small">Follow us on:</p>
             <div className="d-flex">
               <a
-                href="https://www.facebook.com/yourpage"
+                href="https://www.facebook.com/harry.clinton.829484"
                 className="text-light me-3"
                 target="_blank"
                 rel="noreferrer"
               >
                 <i className="bi bi-facebook fs-5"></i>
               </a>
-              <a
+              {/* <a
                 href="https://twitter.com/yourhandle"
                 className="text-light me-3"
                 target="_blank"
                 rel="noreferrer"
               >
                 <i className="bi bi-twitter fs-5"></i>
-              </a>
-              <a
+              </a> */}
+              {/* <a
                 href="https://www.linkedin.com/in/yourhandle"
                 className="text-light me-3"
                 target="_blank"
                 rel="noreferrer"
               >
                 <i className="bi bi-linkedin fs-5"></i>
-              </a>
+              </a> */}
               <a
-                href="https://www.instagram.com/username/"
-                className="text-light"
+                href="https://www.instagram.com/harryclinton_official/"
+                className="text-light me-3"
                 target="_blank"
                 rel="noreferrer"
               >
                 <i className="bi bi-instagram fs-5"></i>
+              </a>
+              <a
+                href="https://www.youtube.com/@HarryClintonHC"
+                className="text-light"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <i className="bi bi-youtube fs-5"></i>
               </a>
             </div>
           </div>

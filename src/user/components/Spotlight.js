@@ -1,4 +1,4 @@
-﻿import React, { useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import useWindowWidth from "../../shared/hooks/useWindowWidth";
 import img1 from "../../shared/assets/images/Designer.jpeg";
 import img2 from "../../shared/assets/images/Wedding.jpeg";
@@ -20,28 +20,52 @@ export default function Spotlight() {
   const windowWidth = useWindowWidth();
   const isMobile = windowWidth <= 768;
   const sliderRef = useRef(null);
+  const isProgrammaticScroll = useRef(false);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
+  const itemWidthPx = isMobile ? windowWidth * 0.75 : 700;
+  const gapPx = 7;
+  const stepPx = itemWidthPx + gapPx;
 
   const handleScroll = () => {
+    if (isProgrammaticScroll.current) return;
     const slider = sliderRef.current;
-    const itemWidth = isMobile ? windowWidth : 720;
-    const index = Math.round(slider.scrollLeft / itemWidth);
-    setActiveIndex(index);
+    if (!slider) return;
+    const index = Math.round(slider.scrollLeft / stepPx);
+    setActiveIndex(((index % items.length) + items.length) % items.length);
   };
 
-  const goToSlide = (index) => {
-    const itemWidth = isMobile ? windowWidth : 720;
+  const goToSlide = useCallback((index) => {
+    if (!sliderRef.current) return;
+    isProgrammaticScroll.current = true;
     sliderRef.current.scrollTo({
-      left: index * itemWidth,
+      left: index * stepPx,
       behavior: "smooth",
     });
-  };
+    window.setTimeout(() => {
+      isProgrammaticScroll.current = false;
+    }, 650);
+  }, [stepPx]);
+
+  // Left-to-right infinite auto-scroll: move forward through items
+  useEffect(() => {
+    if (isPaused) return;
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % items.length);
+    }, 1800);
+    return () => clearInterval(interval);
+  }, [isPaused, items.length]);
+
+  useEffect(() => {
+    goToSlide(activeIndex);
+  }, [activeIndex, goToSlide]);
 
   const itemStyle = {
     position: "relative",
     width: isMobile ? "75vw" : "700px",
     height: isMobile ? "300px" : "500px",
-    marginRight: "7px",
+    marginRight: `${gapPx}px`,
     borderRadius: "0",
     overflow: "hidden",
     flexShrink: 0,
@@ -72,6 +96,10 @@ export default function Spotlight() {
       <div
         ref={sliderRef}
         onScroll={handleScroll}
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+        onTouchStart={() => setIsPaused(true)}
+        onTouchEnd={() => setIsPaused(false)}
         className="hc-slider"
       >
         <div style={{ display: "inline-flex" }}>
