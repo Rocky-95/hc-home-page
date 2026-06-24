@@ -1,8 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { FaArrowRight, FaHome, FaSearch, FaShoppingBag } from "react-icons/fa";
+import { FaArrowRight, FaSearch } from "react-icons/fa";
 import { products } from "../../../shared/assets/json/tuxedoProducts";
-import logo from "../../../shared/assets/images/HC Black.png";
 import "../../styles/CollectionPage.css";
 
 const CollectionPage = ({
@@ -28,18 +27,6 @@ const CollectionPage = ({
 
   return (
     <main className="collection-page">
-      <header className="collection-header">
-        <Link to="/" className="collection-home-link" aria-label="Go to home">
-          <FaHome />
-        </Link>
-
-        <Link to="/" className="collection-brand" aria-label="House of Cavani">
-          <img src={logo} alt="House of Cavani" />
-        </Link>
-
-        <FaShoppingBag className="collection-bag" aria-label="Shopping bag" />
-      </header>
-
       <section className="collection-hero">
         <img src={bannerImage} alt="" className="collection-hero__image" />
         <div className="collection-hero__overlay" />

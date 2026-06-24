@@ -5,13 +5,14 @@ import "../styles/Slider.css";
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import slide1 from "../../shared/assets/images/HomePageSliderImages/HomeSlide1.jpeg";
-import slide2 from "../../shared/assets/images/HomePageSliderImages/HomeSlide2.jpeg";
-import slide3 from "../../shared/assets/images/HomePageSliderImages/HomeSlide3.jpeg";
-import slide4 from "../../shared/assets/images/HomePageSliderImages/HomeSlide4.jpeg";
-import slide5 from "../../shared/assets/images/HomePageSliderImages/HomeSlide5.jpeg";
-import slide6 from "../../shared/assets/images/HomePageSliderImages/HomeSlide6.jpeg";
-import slide7 from "../../shared/assets/images/HomePageSliderImages/WhatsApp Image 2025-09-26 at 00.49.50.jpeg";
+import slide1 from "../../shared/assets/images/HomePageSliderImages/slider1.png";
+import slide2 from "../../shared/assets/images/HomePageSliderImages/slider2.JPG";
+import slide3 from "../../shared/assets/images/HomePageSliderImages/slider3.png";
+import slide4 from "../../shared/assets/images/HomePageSliderImages/slider4.png";
+import slide5 from "../../shared/assets/images/HomePageSliderImages/slider5.png";
+import slide6 from "../../shared/assets/images/HomePageSliderImages/slider6.png";
+import slide7 from "../../shared/assets/images/HomePageSliderImages/slider7.png";
+import slide8 from "../../shared/assets/images/HomePageSliderImages/slider8.png";
 import whiteIcon from "../../shared/assets/images/Logo White.jpg";
 
 const slides = [
@@ -22,6 +23,7 @@ const slides = [
   { src: slide5, alt: "Harry Clinton collection look 5" },
   { src: slide6, alt: "Harry Clinton collection look 6" },
   { src: slide7, alt: "Harry Clinton collection look 7" },
+  { src: slide8, alt: "Harry Clinton collection look 8" },
 ];
 
 const PrevArrow = ({ onClick }) => (

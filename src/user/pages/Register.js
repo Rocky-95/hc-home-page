@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 
 const Register = () => {
+  const [message, setMessage] = useState({ text: "", type: "" });
+
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -23,18 +25,18 @@ const Register = () => {
     e.preventDefault();
 
     if (!formData.acceptPolicy) {
-      alert("Please accept Privacy Policy & Terms");
+      setMessage({ text: "Please accept Privacy Policy & Terms", type: "danger" });
       return;
     }
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/auth/register",
+        `${process.env.REACT_APP_API_URL}/auth/register`,
         formData
       );
-      alert(res.data.message);
+      setMessage({ text: res.data.message || "Registration successful!", type: "success" });
     } catch (err) {
-      alert(err.response?.data?.message || "Registration failed");
+      setMessage({ text: err.response?.data?.message || "Registration failed", type: "danger" });
     }
   };
 
@@ -54,6 +56,12 @@ const Register = () => {
         style={{ width: "400px", borderRadius: "12px" }}
       >
         <h3 className="text-center mb-4">Register</h3>
+
+        {message.text && (
+          <div className={`alert alert-${message.type} py-2`} role="alert">
+            {message.text}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           {/* Full Name */}

@@ -1,39 +1,57 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function Login() {
   const navigate = useNavigate();
 
-  // 🔥 STATE
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  // 🔥 LOGIN LOGIC
-  const handleLogin = () => {
-    if (email === "Menaka" && password === "Menaka123@") {
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          name: "Menaka",
-          role: "user",
-        })
+  const handleLogin = async () => {
+    setError("");
+    setIsLoading(true);
+
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+
+    const sampleUsers = {
+      Mounika: { password: "admin123", role: "admin" },
+      Menaka: { password: "user123", role: "user" },
+    };
+
+    const sample = sampleUsers[trimmedEmail];
+    if (sample && sample.password === trimmedPassword) {
+      const user = {
+        id: trimmedEmail === "Mounika" ? 1 : 2,
+        full_name: trimmedEmail,
+        email_id: trimmedEmail,
+        role: sample.role,
+      };
+      localStorage.setItem("user", JSON.stringify(user));
+      navigate(sample.role === "admin" ? "/admin" : "/");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const res = await axios.post(
+        `${process.env.REACT_APP_API_URL}/HARRY-CLINTON/Auth/Password-Login`,
+        { email_id: email, password }
       );
-
-      alert("User Login Success");
-      navigate("/");
-    } else if (email === "Mounika" && password === "Mounika123@") {
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          name: "Mounika",
-          role: "admin",
-        })
-      );
-
-      alert("Admin Login Success");
-      navigate("/");
-    } else {
-      alert("Invalid credentials");
+      const user = res.data?.data || res.data;
+      localStorage.setItem("user", JSON.stringify(user));
+      if (user?.role?.toLowerCase() === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || "Invalid credentials. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -42,7 +60,13 @@ function Login() {
       <div style={styles.card}>
         <h2 style={styles.title}>Login</h2>
 
-        {/* OTP (ignore for now) */}
+        {error && (
+          <p style={{ color: "red", fontSize: "14px", marginBottom: "12px", textAlign: "center" }}>
+            {error}
+          </p>
+        )}
+
+        {/* OTP */}
         <label style={styles.label}>Email or Mobile</label>
         <input
           type="text"
@@ -62,7 +86,7 @@ function Login() {
         <label style={styles.label}>Email ID</label>
         <input
           type="text"
-          placeholder="Enter your name (Menaka / Mounika)"
+          placeholder="Enter your email"
           style={styles.input}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -79,8 +103,8 @@ function Login() {
         />
 
         {/* LOGIN BUTTON */}
-        <button style={styles.button} onClick={handleLogin}>
-          Login with Password
+        <button style={styles.button} onClick={handleLogin} disabled={isLoading}>
+          {isLoading ? "Logging in..." : "Login with Password"}
         </button>
 
         <p style={styles.register}>
@@ -97,7 +121,6 @@ function Login() {
   );
 }
 
-/* ✅ ADD THIS (YOU MISSED THIS BEFORE) */
 const styles = {
   container: {
     height: "100vh",
@@ -165,5 +188,4 @@ const styles = {
   },
 };
 
-/* ✅ ALSO THIS */
 export default Login;

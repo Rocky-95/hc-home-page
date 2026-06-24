@@ -1,9 +1,10 @@
-import React, { useRef, useState } from "react";
-
-
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import useWindowWidth from "../../shared/hooks/useWindowWidth";
 import img1 from "../../shared/assets/images/Designer.jpeg";
 import img2 from "../../shared/assets/images/Wedding.jpeg";
 import img3 from "../../shared/assets/images/SmartCasual.jpeg";
+import "../styles/Spotlight.css";
+
 export default function Spotlight() {
   const items = [
     { img: img1 },
@@ -16,171 +17,127 @@ export default function Spotlight() {
     { img: img3 },
   ].map((item) => ({ ...item, text: "HC Spotlight" }));
 
+  const windowWidth = useWindowWidth();
+  const isMobile = windowWidth <= 768;
   const sliderRef = useRef(null);
+  const isProgrammaticScroll = useRef(false);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
+  const itemWidthPx = isMobile ? windowWidth * 0.75 : 700;
+  const gapPx = 7;
+  const stepPx = itemWidthPx + gapPx;
 
   const handleScroll = () => {
+    if (isProgrammaticScroll.current) return;
     const slider = sliderRef.current;
-    const itemWidth = window.innerWidth <= 768 ? window.innerWidth : 720;
-    const index = Math.round(slider.scrollLeft / itemWidth);
-    setActiveIndex(index);
+    if (!slider) return;
+    const index = Math.round(slider.scrollLeft / stepPx);
+    setActiveIndex(((index % items.length) + items.length) % items.length);
   };
 
-  const goToSlide = (index) => {
-    const itemWidth = window.innerWidth <= 768 ? window.innerWidth : 720;
+  const goToSlide = useCallback((index) => {
+    if (!sliderRef.current) return;
+    isProgrammaticScroll.current = true;
     sliderRef.current.scrollTo({
-      left: index * itemWidth,
+      left: index * stepPx,
       behavior: "smooth",
     });
-  };
+    window.setTimeout(() => {
+      isProgrammaticScroll.current = false;
+    }, 650);
+  }, [stepPx]);
 
-  const isMobile = window.innerWidth <= 768;
+  // Left-to-right infinite auto-scroll: move forward through items
+  useEffect(() => {
+    if (isPaused) return;
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % items.length);
+    }, 1800);
+    return () => clearInterval(interval);
+  }, [isPaused, items.length]);
+
+  useEffect(() => {
+    goToSlide(activeIndex);
+  }, [activeIndex, goToSlide]);
 
   const itemStyle = {
     position: "relative",
     width: isMobile ? "75vw" : "700px",
     height: isMobile ? "300px" : "500px",
-    marginRight: isMobile ? "7px" : "7px",
+    marginRight: `${gapPx}px`,
     borderRadius: "0",
     overflow: "hidden",
     flexShrink: 0,
   };
 
-const textStyle = {
-  position: "absolute",
-  bottom: "70px",
-  left: "20px",
-  color: "white",
-  fontSize: isMobile ? "28px" : "60px",   // BIG TEXT
-  fontWeight: "200",
-fontFamily: "MAINLUX, Arial, sans-serif",
-  textShadow: "0px 4px 12px rgba(0,0,0,0.8)",
-};
-
+  const spotlightLabelStyle = {
+    position: "absolute",
+    bottom: "0",
+    left: "0",
+    width: isMobile ? "75vw" : "700px",
+    padding: isMobile ? "6px 16px" : "8px 24px",
+    color: "white",
+    fontSize: isMobile ? "24px" : "48px",
+    fontWeight: "bold",
+    fontFamily: "MAINLUX, Arial, sans-serif",
+    textShadow: "0px 2px 8px rgba(0,0,0,0.6)",
+    zIndex: 5,
+    pointerEvents: "none",
+  };
 
   return (
-    <>
-      <style>{`
-        div::-webkit-scrollbar { display:none; }
+    <div style={{ position: "relative", width: "100%", height: isMobile ? "300px" : "500px" }}>
+      {/* HC Spotlight label — fixed over the section, never scrolls */}
+      <div style={spotlightLabelStyle}>
+        HC Spotlight
+      </div>
 
-        @media (max-width: 768px) {
-          .dot {
-            width: 6px !important;
-            height: 6px !important;
-            margin: 1px !important;
-          }
-        }
-
-          /* MOBILE ONLY for Running slide */
-@media (max-width: 768px) {
-  .hc-text {
-    font-size: 22px !important;
-    line-height: 26px !important;
-    left: 10px !important;
-    bottom: 50px !important;
-    max-width: 65vw !important;
-  }
-
-  .hc-button {
-    bottom: 50px !important;
-    right: 10px !important;
-    font-size: 10px !important;
-    padding: 5px 12px !important;
-  }
-}
-
-      `}</style>
-
-      {/* PARENT WRAPPER (NEEDED FOR DOT POSITIONING) */}
-      <div style={{ position: "relative", width: "100%",}}>
-        
-        {/* SLIDER */}
-        <div
-          ref={sliderRef}
-          onScroll={handleScroll}
-          style={{
-            whiteSpace: "nowrap",
-            overflowX: "auto",
-            overflowY: "hidden",
-            width: "100%",
-            scrollBehavior: "smooth",
-            scrollbarWidth: "none",
-            msOverflowStyle: "none",
-            borderBottom: "10px solid white",
-            borderTop: "10px solid white",
-            borderLeft: "10px solid white",
-          }}
-        >
-          <div style={{ display: "inline-flex" }}>
-            {items.map((item, i) => (
-              <div key={i} style={itemStyle}>
-                <img
-                  src={item.img}
-                  alt={item.text}
-                  loading="lazy"
-                  decoding="async"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                  }}
-                />
-
-              <div style={textStyle} className="hc-text">{item.text}</div>
-
-<button
-  className="btn btn-light btn-sm hc-button"
-  style={{
-    position: "absolute",
-    bottom: "30px",
-    right: "20px",
-    fontFamily: "MAINLUX, Arial, sans-serif",
-    padding: "10px 25px",
-    fontWeight: "530",
-    borderRadius: "0px",
-    fontSize: "20px", 
-  }}
->
- Discover the collection &nbsp; ›
- </button>
-
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* DOTS INSIDE SLIDER */}
-        <div
-          style={{
-            position: "absolute",
-            bottom: "15px",
-            left: "50%",
-            transform: "translateX(-50%)",
-            padding: "6px 12px",
-            borderRadius: "20px",
-            display: "flex",
-            gap: "8px",
-          }}
-        >
-          {items.map((_, i) => (
-            <span
-              key={i}
-              onClick={() => goToSlide(i)}
-              className="dot"
-              style={{
-                display: "inline-block",
-                width: "8px",
-                height: "8px",
-                borderRadius: "50%",
-                backgroundColor: activeIndex === i ? "white" : "#bbb",
-                cursor: "pointer",
-                transition: "0.3s",
-              }}
-            ></span>
+      <div
+        ref={sliderRef}
+        onScroll={handleScroll}
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+        onTouchStart={() => setIsPaused(true)}
+        onTouchEnd={() => setIsPaused(false)}
+        className="hc-slider"
+      >
+        <div style={{ display: "inline-flex" }}>
+          {items.map((item, i) => (
+            <div key={i} style={itemStyle}>
+              <img
+                src={item.img}
+                alt="HC Spotlight"
+                loading="lazy"
+                decoding="async"
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
+              <button className="btn btn-light btn-sm hc-button">
+                Discover the collection &nbsp; &rsaquo;
+              </button>
+            </div>
           ))}
         </div>
       </div>
-    </>
+
+      <div className="hc-slider-dots">
+        {items.map((_, i) => (
+          <span
+            key={i}
+            onClick={() => goToSlide(i)}
+            className="dot"
+            style={{
+              display: "inline-block",
+              width: "8px",
+              height: "8px",
+              borderRadius: "50%",
+              backgroundColor: activeIndex === i ? "white" : "#bbb",
+              cursor: "pointer",
+              transition: "0.3s",
+            }}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
-

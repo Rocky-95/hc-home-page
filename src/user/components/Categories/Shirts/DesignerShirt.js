@@ -1,38 +1,90 @@
 // https://intl.fursac.com/en/c-new-collection.html-------for the reference
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { FaShoppingCart } from "react-icons/fa";
-import logo from "../../../../shared/assets/images/HC Black.png";     
-import weddingVideo from "../../../../shared/assets/video/WeddingPage/WeddingPageVideo.mp4"; 
+// import logo from ""; // "../../../../shared/assets/images/HC Black.png"
+import weddingVideo from "../../../../shared/assets/video/WeddingPage/WeddingPageVideo.mp4"; //"../../../../shared/assets/video/suitsPage/BusinessCategory.mp4"
 
-import leftImg from "../../../../shared/assets/images/WeddingPage/WeddingLeftImage.jpeg";
-import centerVideo from "../../../../shared/assets/video/WeddingPage/WeddingCenterVideo.mp4";
-import rightImg from "../../../../shared/assets/images/WeddingPage/WeddingRightImage.jpeg";
+import leftImg from "../../../../shared/assets/images/ProductDetail/SangeetCreamLeft2.jpg"; //"../../../../shared/assets/images/WeddingPage/WeddingLeftImage.jpeg"
+import centerVideo from "../../../../shared/assets/video/WeddingPage/WeddingPageVideo.mp4"; //"../../../../shared/assets/video/WeddingPage/WeddingCenterVideo.mp4"
+import rightImg from "../../../../shared/assets/images/ProductDetail/SangeetCreamLeft1.jpg"; //"../../../../shared/assets/images/WeddingPage/WeddingRightImage.jpeg"
 
-import sliderImg1 from "../../../../shared/assets/images/WeddingPage/Slider/SliderImage1.jpeg";
-import sliderImg2 from "../../../../shared/assets/images/WeddingPage/Slider/SliderImage2.jpeg";
-import sliderImg3 from "../../../../shared/assets/images/WeddingPage/Slider/SliderImage3.jpeg"; 
+import sliderImg1 from "../../../../shared/assets/images/ProductDetail/SangeetCreamLeft2.jpg"; //"../../../../shared/assets/images/WeddingPage/Slider/SliderImage1.jpeg"
+import sliderImg2 from "../../../../shared/assets/images/ProductDetail/SangeetCreamLeft1.jpg"; //"../../../../shared/assets/images/WeddingPage/Slider/SliderImage2.jpeg"
+import sliderImg3 from "../../../../shared/assets/images/ProductDetail/SangeetCreamLeft2.jpg"; //"../../../../shared/assets/images/WeddingPage/Slider/SliderImage3.jpeg"
 
-import LabelVideo from "../../../../shared/assets/video/WeddingPage/WeddingLabelVideo.mp4";
-import LabelImage from "../../../../shared/assets/images/WeddingPage/LabelImage.jpeg";
-import TheChurchAffair from "../../../../shared/assets/video/WeddingProductVideos/WeddingProductVideo2.mp4";
-import TheRoyalWeddingEdit from "../../../../shared/assets/images/WeddingSuitProductImages/The Royal Wedding Edit.jpeg";
-import TheDestinationDream from "../../../../shared/assets/images/WeddingSuitProductImages/IMG_1016.jpg"
-import TheSangeetSoiree from "../../../../shared/assets/images/WeddingSuitProductImages/Sangeet/Sangeet_Main.jpg"
+import LabelVideo from "../../../../shared/assets/video/WeddingPage/WeddingPageVideo.mp4"; //"../../../../shared/assets/video/WeddingPage/WeddingLabelVideo.mp4"
+import LabelImage from "../../../../shared/assets/images/ProductDetail/SangeetCreamLeft2.jpg"; //"../../../../shared/assets/images/WeddingPage/LabelImage.jpeg"
+import TheChurchAffair from "../../../../shared/assets/video/WeddingPage/WeddingPageVideo.mp4"; //"../../../../shared/assets/video/WeddingPage/TheChurchAffair.mp4"
+import TheRoyalWeddingEdit from "../../../../shared/assets/images/ProductDetail/SangeetCreamLeft1.jpg"; //"../../../../shared/assets/images/WeddingPage/TheRoyalWeddingEdit.jpeg"
+import TheDestinationDream from "../../../../shared/assets/images/ProductDetail/SangeetCreamLeft2.jpg"; //"../../../../shared/assets/images/WeddingPage/TheDestinationDream.jpeg"
+import TheSangeetSoiree from "../../../../shared/assets/images/ProductDetail/SangeetCreamLeft1.jpg"; //"../../../../shared/assets/images/WeddingPage/TheSangeetSoiree.jpeg"
+
 const DesignerShirt = () => {
   const navigate = useNavigate();
 const categories = [
-  { id: 1, name: "The Royal Wedding Edit", image: TheRoyalWeddingEdit, description: "Luxurious black velvet tuxedo with golden embroidery.", link: "/wedding" },
-  { id: 2, name: "The Church Affair", video: TheChurchAffair, description: "Elegant wedding suit perfect for church events." },
-  { id: 3, name: "The Destination Dream", image: TheDestinationDream, description: "Perfect suit for destination weddings." },
+  { 
+    id: "luxury-embroidered-designer-shirt", 
+    name: "Luxury Embroidered Designer Shirt", 
+    image: TheRoyalWeddingEdit, 
+    description: "A premium designer shirt featuring intricate embroidery for a standout luxurious look.", 
+    // link: "/collection/designer-shirts" 
+  },
 
-  { id: 4, name: "The Reception Night", image: TheRoyalWeddingEdit, description: "Perfect for evening receptions." },
-  { id: 5, name: "The Engagement Chapter", video: TheChurchAffair, description: "Stand out at engagement ceremonies." },
-  { id: 6, name: "The Sangeet Soirée", image: TheSangeetSoiree, description: "Bright and festive for sangeet nights." },
+  { 
+    id: "navy-designer-premium-shirt", 
+    name: "Navy Designer Premium Shirt", 
+    video: TheChurchAffair, 
+    description: "A refined navy designer shirt crafted with premium fabric and modern styling." 
+  },
 
-  { id: 7, name: "The Mehendi & Haldi Mood", image: TheRoyalWeddingEdit, description: "Vibrant suits for mehendi & haldi events." },
-  { id: 8, name: "The Intimate Wedding Edit", video: TheChurchAffair, description: "Perfect for small and intimate weddings." },
-  { id: 9, name: "The Modern Minimalist", image: TheDestinationDream, description: "Minimalist style for modern weddings." },
+  { 
+    id: "black-designer-signature-shirt", 
+    name: "Black Designer Signature Shirt", 
+    image: TheDestinationDream, 
+    description: "A bold black designer shirt tailored for a sleek and signature fashion statement." 
+  },
+
+  { 
+    id: "beige-designer-elegance-shirt", 
+    name: "Beige Designer Elegance Shirt", 
+    image: TheRoyalWeddingEdit, 
+    description: "A soft beige designer shirt offering elegance and refined minimal styling." 
+  },
+
+  { 
+    id: "striped-designer-style-shirt", 
+    name: "Striped Designer Style Shirt", 
+    video: TheChurchAffair, 
+    description: "A stylish striped designer shirt that blends trend and sophistication." 
+  },
+
+  { 
+    id: "blue-designer-modern-shirt", 
+    name: "Blue Designer Modern Shirt", 
+    image: TheSangeetSoiree, 
+    description: "A vibrant blue designer shirt crafted for a fresh and modern fashion appeal." 
+  },
+
+  { 
+    id: "brown-designer-premium-shirt", 
+    name: "Brown Designer Premium Shirt", 
+    image: TheRoyalWeddingEdit, 
+    description: "A rich brown designer shirt designed for a warm and premium look." 
+  },
+
+  { 
+    id: "check-designer-fashion-shirt", 
+    name: "Check Designer Fashion Shirt", 
+    video: TheChurchAffair, 
+    description: "A check-pattern designer shirt that adds a fashionable and trendy edge." 
+  },
+
+  { 
+    id: "grey-designer-slim-shirt", 
+    name: "Grey Designer Slim Shirt", 
+    image: TheDestinationDream, 
+    description: "A sleek grey designer shirt with a slim fit for a sharp and modern silhouette." 
+  },
 ];
 
 
@@ -43,7 +95,7 @@ const categories = [
       onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
       onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
 // onClick={() => navigate(`/product/${cat.id}`)}
-onClick={() => navigate(`/wedding/product/${cat.id}`)}
+onClick={() => navigate(`/product/${cat.id}`)}
 
     >
       <div className="position-relative">
@@ -72,32 +124,6 @@ onClick={() => navigate(`/wedding/product/${cat.id}`)}
   );
   return (
     <>
-      {/* ===== HEADER ===== */}
-      <header
-        className="container-fluid bg-white border-bottom py-2 sticky-top"
-        style={{ zIndex: 1000 }}
-      >
-        <div className="d-flex justify-content-between align-items-center px-3">
-          {/* Left: Logo */}
-          <div
-            className="d-flex align-items-center gap-3"
-            style={{ cursor: "pointer" }}
-            onClick={() => navigate("/")}
-          >
-            <img src={logo} alt="Logo" className="img-fluid" style={{ height: "40px" }} />
-          </div>
-
-          {/* Center: Title */}
-          <h1 className="h5 mb-0 text-dark text-center flex-grow-1">WEDDING</h1>
-
-          {/* Right: Cart */}
-          <FaShoppingCart
-            className="fs-4 text-dark"
-            style={{ cursor: "pointer" }}
-            onClick={() => alert("Go to cart page")}
-          />
-        </div>
-      </header>
 
       {/* ===== HERO VIDEO ===== */}
       <section className="position-relative w-100">
@@ -141,7 +167,7 @@ For the Men Who Wear Royalty, Not Just Suits.
             ))}
         </div>
       </div>
-  {/* ===== NEW ROW: image – video – image ===== */}
+  {/* ===== NEW ROW: image â€“ video â€“ image ===== */}
     <section className="container-fluid my-0 px-0">
   <div className="row g-0">
     {/* Left Image */}
@@ -267,7 +293,7 @@ For the Men Who Wear Royalty, Not Just Suits.
     </div>
   </div>
 </div>
-{/* ===== NEW ROW: 75% Video – 25% Image ===== */}
+{/* ===== NEW ROW: 75% Video â€“ 25% Image ===== */}
 <div className="row g-0 mt-1 mx-0">
   {/* Left Side: Video (75%) */}
   <div className="col-md-9 p-0">
@@ -295,7 +321,7 @@ For the Men Who Wear Royalty, Not Just Suits.
 {/* TEXT BAR WITH CONTINUOUS FADE-IN FADE-OUT */}
 <div className="bg-light text-center py-4">
   <span className="fw-bold text-uppercase fs-4 fade-in-out-text">
-    The Wedding Suit Collection – Luxury Hand Embroidered
+    The Wedding Suit Collection â€“ Luxury Hand Embroidered
   </span>
 </div>
 
@@ -320,7 +346,7 @@ For the Men Who Wear Royalty, Not Just Suits.
  {/* CATEGORIES GRID */}
 <div id="category-grid" className="container-fluid px-0 my-0">
 
-  {/* Row 1: Image – Video – Image */}
+  {/* Row 1: Image â€“ Video â€“ Image */}
   <div className="row g-2">
     {categories.slice(0, 3).map((cat, i) => (
       <div key={i} className="col-12 col-md-4 d-flex">
@@ -329,7 +355,7 @@ For the Men Who Wear Royalty, Not Just Suits.
     ))}
   </div>
 
-  {/* Row 2: Image – Video – Image */}
+  {/* Row 2: Image â€“ Video â€“ Image */}
   <div className="row g-2 mt-2">
     {categories.slice(3, 6).map((cat, i) => (
       <div key={i + 3} className="col-12 col-md-4 d-flex">
@@ -338,7 +364,7 @@ For the Men Who Wear Royalty, Not Just Suits.
     ))}
   </div>
 
-  {/* Row 3: Image – Video – Image */}
+  {/* Row 3: Image â€“ Video â€“ Image */}
   <div className="row g-2 mt-2">
     {categories.slice(6, 9).map((cat, i) => (
       <div key={i + 6} className="col-12 col-md-4 d-flex">
