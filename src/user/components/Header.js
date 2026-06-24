@@ -4,8 +4,11 @@ import "../styles/Header.css";
 import Hamburger from "./Hamburger";
 import ProfileDropdown from "./ProfileDropdown";
 import logo from "../../shared/assets/images/HC Black.png";
+import { useCart } from "../../context/CartContext";
+import { Link } from "react-router-dom";
 
 const Header = ({ onCIconClick }) => {
+  const { cartCount, wishlistItems } = useCart();
   const [open, setOpen] = useState(false);
 
   const profileRef = useRef(); // 🔥 wrapper ref
@@ -58,8 +61,22 @@ const Header = ({ onCIconClick }) => {
 
       {/* RIGHT */}
       <div className="right-icons d-flex align-items-center gap-3">
-        <i className="bi bi-heart fs-4"></i>
-        <i className="bi bi-bag fs-4"></i>
+        <Link to="/wishlist" className="text-dark position-relative">
+          <i className="bi bi-heart fs-4"></i>
+          {wishlistItems.length > 0 && (
+            <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+              {wishlistItems.length}
+            </span>
+          )}
+        </Link>
+        <Link to="/cart" className="text-dark position-relative">
+          <i className="bi bi-bag fs-4"></i>
+          {cartCount > 0 && (
+            <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+              {cartCount}
+            </span>
+          )}
+        </Link>
 
         {/* 🔥 WRAPPER (IMPORTANT) */}
         <div ref={profileRef} style={{ position: "relative" }}>

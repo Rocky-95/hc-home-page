@@ -5,8 +5,9 @@ import "../styles/StyleByHC.css";
 import img1 from "../../shared/assets/images/Designer.jpeg";
 import img2 from "../../shared/assets/images/Wedding.jpeg";
 import img3 from "../../shared/assets/images/SmartCasual.jpeg";
+import productService from "../../services/productService";
 
-const items = [
+const defaultItems = [
   { img: img1 },
   { img: img2 },
   { img: img3 },
@@ -18,7 +19,38 @@ const items = [
 ].map((item) => ({ ...item, text: "Style By HC" }));
 
 export default function StyleByHC() {
+  const [items, setItems] = useState(defaultItems);
   const windowWidth = useWindowWidth();
+
+  useEffect(() => {
+    const fetchStyleCollections = async () => {
+      try {
+        const [collectionsRes, mediaRes] = await Promise.all([
+          productService.getStyleCollections(),
+          productService.getStyleCollectionMedia(),
+        ]);
+        const collections = collectionsRes.data?.data || collectionsRes.data || [];
+        const media = mediaRes.data?.data || mediaRes.data || [];
+        if (collections.length > 0 || media.length > 0) {
+          const mapped = media.length > 0
+            ? media.map((m) => ({
+                img: m.media_url || m.image_url || img1,
+                text: m.alt_text || "Style By HC",
+                link: m.redirect_link || null,
+              }))
+            : collections.map((c) => ({
+                img: c.image_url || c.media_url || img1,
+                text: c.collection_name || c.title || "Style By HC",
+                link: c.redirect_link || null,
+              }));
+          setItems(mapped.length > 0 ? mapped : defaultItems);
+        }
+      } catch {
+        // keep defaults
+      }
+    };
+    fetchStyleCollections();
+  }, []);
   const isMobile = windowWidth <= 768;
   const sliderRef = useRef(null);
   const isProgrammaticScroll = useRef(false);

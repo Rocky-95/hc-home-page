@@ -1,8 +1,11 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaArrowRight, FaSearch } from "react-icons/fa";
-import { products } from "../../../shared/assets/json/tuxedoProducts";
+import { products as fallbackProducts } from "../../../shared/assets/json/tuxedoProducts";
 import "../../styles/CollectionPage.css";
+import productService from "../../../services/productService";
+
+const placeholderImage = "https://via.placeholder.com/400x500?text=No+Image";
 
 const CollectionPage = ({
   category,
@@ -12,18 +15,64 @@ const CollectionPage = ({
   bannerImage,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const [productsRes, mediaRes] = await Promise.all([
+          productService.getProducts({ category }),
+          productService.getProductMedia(),
+        ]);
+        const apiProducts = productsRes.data?.data || productsRes.data || [];
+        const apiMedia = mediaRes.data?.data || mediaRes.data || [];
+        const mapped = apiProducts
+          .filter((p) => !category || (p.category || "").toLowerCase() === category.toLowerCase())
+          .map((p) => {
+            const media = apiMedia.find(
+              (m) =>
+                m.product_id === p.product_id &&
+                m.isprimary === true
+            );
+            return {
+              id: p.product_id || p.product_slug,
+              name: p.product_name,
+              category: p.category || category,
+              description: p.short_description || p.description || "",
+              price: p.base_price || 0,
+              originalPrice: null,
+              image: media?.media_url || placeholderImage,
+              subtitle: p.product_slug
+                ?.split("-")
+                .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                .join(" ") || "",
+              colors: [],
+            };
+          });
+        setProducts(mapped.length > 0 ? mapped : fallbackProducts.filter((p) => p.category === category));
+      } catch (err) {
+        setError("Unable to load products from the server.");
+        setProducts(fallbackProducts.filter((p) => p.category === category));
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, [category]);
 
   const collectionProducts = useMemo(() => {
     const normalizedSearch = searchTerm.trim().toLowerCase();
 
     return products.filter(
       (product) =>
-        product.category === category &&
+        (!category || product.category === category) &&
         (!normalizedSearch ||
-          product.name.toLowerCase().includes(normalizedSearch) ||
-          product.description.toLowerCase().includes(normalizedSearch))
+          product.name?.toLowerCase().includes(normalizedSearch) ||
+          product.description?.toLowerCase().includes(normalizedSearch))
     );
-  }, [category, searchTerm]);
+  }, [category, products, searchTerm]);
 
   return (
     <main className="collection-page">
@@ -64,7 +113,19 @@ const CollectionPage = ({
           {collectionProducts.length === 1 ? "piece" : "pieces"}
         </div>
 
-        {collectionProducts.length > 0 ? (
+        {loading && (
+          <div className="text-center py-5">
+            <div className="spinner-border" role="status">
+              <span className="visually-hidden">Loading products...</span>
+            </div>
+          </div>
+        )}
+
+        {error && !loading && (
+          <div className="alert alert-warning text-center">{error}</div>
+        )}
+
+        {!loading && collectionProducts.length > 0 ? (
           <div className="collection-grid">
             {collectionProducts.map((product) => (
               <Link
@@ -92,10 +153,10 @@ const CollectionPage = ({
                     <h3>{product.name}</h3>
                   </div>
                   <div className="collection-card__price">
-                    <span>Rs. {product.price.toLocaleString("en-IN")}</span>
+                    <span>Rs. {(product.price || 0).toLocaleString("en-IN")}</span>
                     {product.originalPrice && (
                       <del>
-                        Rs. {product.originalPrice.toLocaleString("en-IN")}
+                        Rs. {(product.originalPrice || 0).toLocaleString("en-IN")}
                       </del>
                     )}
                   </div>

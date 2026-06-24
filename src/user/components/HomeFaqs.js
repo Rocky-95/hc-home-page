@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "../styles/HomeFaqs.css"; // 👈 We'll add mobile styles here
+import contentService from "../../services/contentService";
 
-const faqs = [
+const defaultFaqs = [
   {
     id: 1,
     question: "1) What's the minimum duration required to stitch a bespoke suit?",
@@ -30,7 +31,29 @@ const faqs = [
 ];
 
 const HomeFaqs = () => {
+  const [faqs, setFaqs] = useState(defaultFaqs);
   const [openId, setOpenId] = useState(1);
+
+  useEffect(() => {
+    const fetchFaqs = async () => {
+      try {
+        const res = await contentService.getFaqs();
+        const data = res.data?.data || res.data || [];
+        if (data.length > 0) {
+          setFaqs(
+            data.slice(0, 5).map((item, index) => ({
+              id: item.faq_id || item.id || index + 1,
+              question: item.question || item.title || "",
+              answer: item.answer || item.description || "",
+            }))
+          );
+        }
+      } catch {
+        // keep defaults
+      }
+    };
+    fetchFaqs();
+  }, []);
 
   const toggle = (id) => setOpenId(openId === id ? null : id);
 

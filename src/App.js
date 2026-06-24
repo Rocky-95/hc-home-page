@@ -5,6 +5,7 @@ import Home from "./user/pages/Home";
 import SplashScreen from "./user/components/SplashScreen";
 import AdminLayout from "./admin/components/AdminLayout";
 import UserLayout from "./user/components/UserLayout";
+import { CartProvider } from "./context/CartContext";
 
 const Login = lazy(() => import("./user/pages/Login"));
 const Register = lazy(() => import("./user/pages/Register"));
@@ -14,6 +15,9 @@ const TermsAndConditions = lazy(() => import("./user/pages/TermsAndConditions"))
 const FAQs = lazy(() => import("./user/pages/FAQs"));
 const Policies = lazy(() => import("./user/pages/Policies"));
 const HelpCenter = lazy(() => import("./user/pages/HelpCenter"));
+const CartPage = lazy(() => import("./user/pages/CartPage"));
+const WishlistPage = lazy(() => import("./user/pages/WishlistPage"));
+const CheckoutPage = lazy(() => import("./user/pages/CheckoutPage"));
 const AdminDashboard = lazy(() => import("./admin/pages/AdminDashboard"));
 const AdminCrudPage = lazy(() => import("./admin/pages/AdminCrudPage"));
 const ProductPage = lazy(() =>
@@ -245,6 +249,9 @@ function AppRoutes({ splashDismissed, onSplashComplete }) {
           <Route path="/FAQs" element={<FAQs />} />
           <Route path="/Policies" element={<Policies />} />
           <Route path="/help-center" element={<HelpCenter />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/wishlist" element={<WishlistPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
         </Route>
       </Routes>
     </Suspense>
@@ -255,12 +262,14 @@ function App() {
   const [splashDismissed, setSplashDismissed] = useState(false);
 
   return (
-    <HashRouter>
-      <AppRoutes
-        splashDismissed={splashDismissed}
-        onSplashComplete={() => setSplashDismissed(true)}
-      />
-    </HashRouter>
+    <CartProvider>
+      <HashRouter>
+        <AppRoutes
+          splashDismissed={splashDismissed}
+          onSplashComplete={() => setSplashDismissed(true)}
+        />
+      </HashRouter>
+    </CartProvider>
   );
 }
 

@@ -3,10 +3,13 @@ import FooterLogo from "../../shared/assets/images/Logo White.png";
 import HCWhite from "../../shared/assets/images/HC White.png";
 import { Link } from "react-router-dom";
 import "../styles/HomeFooter.css";
+import contentService from "../../services/contentService";
 
 const HomeFooter = () => {
   const [showModal, setShowModal] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -14,26 +17,77 @@ const HomeFooter = () => {
     subject: "",
     message: "",
   });
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [newsletterStatus, setNewsletterStatus] = useState({
+    message: "",
+    isError: false,
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
+    setSubmitError("");
+    setIsSubmitting(true);
+
+    try {
+      await contentService.sendMail({
+        to: "connect@harryclinton.com",
+        subject: `Contact Form: ${form.subject}`,
+        html: `
+          <p><strong>Name:</strong> ${form.name}</p>
+          <p><strong>Email:</strong> ${form.email}</p>
+          <p><strong>Phone:</strong> ${form.phone || "Not provided"}</p>
+          <p><strong>Subject:</strong> ${form.subject}</p>
+          <p><strong>Message:</strong></p>
+          <p>${form.message.replace(/\n/g, "<br/>")}</p>
+        `,
+        text: `Name: ${form.name}\nEmail: ${form.email}\nPhone: ${form.phone}\nSubject: ${form.subject}\nMessage: ${form.message}`,
+      });
+      setSubmitted(true);
       setForm({ name: "", email: "", phone: "", subject: "", message: "" });
-      setShowModal(false);
-    }, 3000);
+      setTimeout(() => {
+        setSubmitted(false);
+        setShowModal(false);
+      }, 3000);
+    } catch (err) {
+      setSubmitError(err.response?.data?.message || "Failed to send message. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const closeModal = () => {
     setShowModal(false);
     setSubmitted(false);
     setForm({ name: "", email: "", phone: "", subject: "", message: "" });
+  };
+
+  const handleNewsletterSubscribe = async () => {
+    if (!newsletterEmail || !newsletterEmail.includes("@")) {
+      setNewsletterStatus({ message: "Please enter a valid email.", isError: true });
+      return;
+    }
+    try {
+      await contentService.subscribeNewsletter({
+        emailid: newsletterEmail,
+        subscription_status: "subscribed",
+        rcu: "website",
+      });
+      setNewsletterStatus({
+        message: "Thank you for subscribing!",
+        isError: false,
+      });
+      setNewsletterEmail("");
+    } catch (err) {
+      setNewsletterStatus({
+        message: err.response?.data?.message || "Subscription failed. Please try again.",
+        isError: true,
+      });
+    }
   };
 
   return (
@@ -155,9 +209,21 @@ const HomeFooter = () => {
                   type="email"
                   className="form-control bg-transparent text-light border-light"
                   placeholder="Your email"
+                  value={newsletterEmail}
+                  onChange={(e) => setNewsletterEmail(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleNewsletterSubscribe()}
                 />
-                <button className="btn btn-outline-light">Subscribe</button>
+                <button className="btn btn-outline-light" onClick={handleNewsletterSubscribe}>
+                  Subscribe
+                </button>
               </div>
+              {newsletterStatus.message && (
+                <div
+                  className={`small mt-2 ${newsletterStatus.isError ? "text-danger" : "text-success"}`}
+                >
+                  {newsletterStatus.message}
+                </div>
+              )}
             </div>
           </div>
 
@@ -191,6 +257,9 @@ const HomeFooter = () => {
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit}>
+                    {submitError && (
+                      <div className="alert alert-danger text-center">{submitError}</div>
+                    )}
                     <div className="row g-3">
                       <div className="col-md-6">
                         <label className="form-label small fw-semibold">Name</label>
@@ -257,8 +326,12 @@ const HomeFooter = () => {
                         />
                       </div>
                       <div className="col-12">
-                        <button type="submit" className="btn btn-dark w-100 py-2">
-                          Send Message
+                        <button
+                          type="submit"
+                          className="btn btn-dark w-100 py-2"
+                          disabled={isSubmitting}
+                        >
+                          {isSubmitting ? "Sending..." : "Send Message"}
                         </button>
                       </div>
                     </div>

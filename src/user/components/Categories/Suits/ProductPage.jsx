@@ -1,13 +1,119 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { products } from "../../../../shared/assets/json/products";
+import { products as fallbackProducts } from "../../../../shared/assets/json/products";
 import PageHeader from "../../../../shared/components/PageHeader";
 import "../../../styles/ProductPage.css";
+import productService from "../../../../services/productService";
+import { useCart } from "../../../../context/CartContext";
+
+const placeholderImage = "https://via.placeholder.com/600x800?text=No+Image";
+
+const colorHexMap = {
+  black: "#000000",
+  white: "#FFFFFF",
+  red: "#E63946",
+  blue: "#1D3557",
+  navy: "#14224A",
+  green: "#2A9D8F",
+  yellow: "#E9C46A",
+  gold: "#FFD700",
+  brown: "#8B4513",
+  beige: "#F5F5DC",
+  cream: "#FFFDD0",
+  ivory: "#FFFFF0",
+  burgundy: "#800020",
+  grey: "#808080",
+  gray: "#808080",
+  pink: "#FFC0CB",
+  purple: "#800080",
+  orange: "#FFA500",
+};
+
+const getColorHex = (label) => {
+  const key = label?.toLowerCase().replace(/\s+/g, "");
+  for (const [name, hex] of Object.entries(colorHexMap)) {
+    if (key?.includes(name)) return hex;
+  }
+  return "#CCCCCC";
+};
+
+const mapApiProduct = (p, media, variants, sizes, attributes, attributeValues) => {
+  const productMedia = media.filter((m) => m.product_id === p.product_id);
+  const productVariants = variants.filter((v) => v.product_id === p.product_id);
+  const defaultVariant = productVariants.find((v) => v.isdefault) || productVariants[0] || {};
+
+  const colorAttribute = attributes.find((a) => a.attribute_name?.toLowerCase() === "color");
+  const colors = colorAttribute
+    ? attributeValues
+        .filter((av) => av.product_id === p.product_id && av.attribute_id === colorAttribute.attribute_id)
+        .map((av, idx) => ({
+          id: `${av.attribute_value?.toLowerCase().replace(/\s+/g, "-") || idx}`,
+          label: av.attribute_value || `Color ${idx + 1}`,
+          hex: getColorHex(av.attribute_value),
+          border: "#444",
+        }))
+    : [];
+
+  const imagesByColor = colors.length
+    ? colors.reduce((acc, color) => {
+        acc[color.id] = productMedia
+          .filter((m) => m.alt_text?.toLowerCase().includes(color.label.toLowerCase()))
+          .map((m) => m.media_url);
+        return acc;
+      }, {})
+    : { default: productMedia.map((m) => m.media_url) };
+
+  const productSizes = defaultVariant.size_id
+    ? [
+        {
+          label: sizes.find((s) => s.size_id === defaultVariant.size_id)?.size_name || "M",
+          available: (defaultVariant.stock_qty || 0) > 0,
+        },
+      ]
+    : productVariants.map((v) => ({
+        label: sizes.find((s) => s.size_id === v.size_id)?.size_name || v.variant_name,
+        available: (v.stock_qty || 0) > 0,
+      }));
+
+  return {
+    id: p.product_id || p.product_slug,
+    collection: p.category || "Products",
+    name: p.product_name,
+    subtitle: p.product_slug?.replace(/-/g, " ") || "",
+    price: defaultVariant.price || p.base_price || 0,
+    originalPrice: null,
+    sku: defaultVariant.sku || p.product_slug,
+    rating: 0,
+    reviewCount: 0,
+    stock: (defaultVariant.stock_qty || 0) > 0 ? "in" : "out",
+    description: p.description || p.short_description || "",
+    colors,
+    imagesByColor,
+    sizeOptions: productSizes.map((s) => s.label),
+    sizes: productSizes,
+    sizeChart: [
+      { size: "S", chest: "36", waist: "30", length: "26" },
+      { size: "M", chest: "38", waist: "32", length: "27" },
+      { size: "L", chest: "40", waist: "34", length: "28" },
+      { size: "XL", chest: "42", waist: "36", length: "29" },
+    ],
+    trustBadges: ["Premium Fabric", "Tailored Fit", "Luxury Finish"],
+    details: ["Imported Fabric", "Tailored Fit", "Elegant Finish"],
+    accordion: [
+      { id: "desc", title: "Description", body: p.description || p.short_description || "" },
+      { id: "care", title: "Care Instructions", body: "Dry clean only. Store in a garment bag." },
+      { id: "shipping", title: "Shipping & Returns", body: "Free shipping on orders above ₹5000." },
+    ],
+  };
+};
 
 export default function ProductPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const product = products[id];
+  const { addToCart, addToWishlist } = useCart();
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const [selectedColor, setSelectedColor] = useState(null);
   const [activeImg, setActiveImg] = useState(0);
@@ -21,10 +127,47 @@ export default function ProductPage() {
 
   const ctaRef = useRef(null);
 
+  // Fetch product from API or fallback
+  useEffect(() => {
+    const fetchProduct = async () => {
+      setLoading(true);
+      try {
+        const [productRes, mediaRes, variantsRes, sizesRes, attributesRes, attrValuesRes] = await Promise.all([
+          productService.getProductById(id),
+          productService.getProductMedia(),
+          productService.getProductVariants(),
+          productService.getProductSizes(),
+          productService.getProductAttributes(),
+          productService.getProductAttributesValues(),
+        ]);
+        const p = productRes.data?.data || productRes.data;
+        if (p) {
+          const mapped = mapApiProduct(
+            p,
+            mediaRes.data?.data || mediaRes.data || [],
+            variantsRes.data?.data || variantsRes.data || [],
+            sizesRes.data?.data || sizesRes.data || [],
+            attributesRes.data?.data || attributesRes.data || [],
+            attrValuesRes.data?.data || attrValuesRes.data || []
+          );
+          setProduct(mapped);
+        } else {
+          setProduct(fallbackProducts[id] || null);
+        }
+      } catch (err) {
+        setError("Unable to load product details.");
+        setProduct(fallbackProducts[id] || null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProduct();
+  }, [id]);
+
   // Load defaults
   useEffect(() => {
     if (product) {
-      const defaultColor = product.colors[0];
+      const defaultColor = product.colors?.[0];
       setSelectedColor(defaultColor);
       setActiveImg(0);
     }
@@ -49,8 +192,8 @@ export default function ProductPage() {
 
   const galleryImages =
     selectedColor && product
-      ? product.imagesByColor[selectedColor.id] || []
-      : [];
+      ? product.imagesByColor?.[selectedColor.id]?.filter(Boolean) || [product.image].filter(Boolean)
+      : [product.image].filter(Boolean);
 
   const handleColorChange = (c) => {
     setFadingImg(true);
@@ -68,8 +211,37 @@ export default function ProductPage() {
 
   const handleAddToCart = () => {
     if (!selectedSize) { showToast("Please select a size first"); return; }
+    addToCart({
+      productId: product.id,
+      productVariantId: selectedSize.label,
+      name: product.name,
+      price: product.price,
+      qty: 1,
+      image: galleryImages[activeImg] || product.image,
+    });
     showToast(`Added to cart: ${product.name}`);
   };
+
+  const handleToggleWishlist = () => {
+    addToWishlist({
+      productId: product.id,
+      productVariantId: selectedSize?.label || product.sizeOptions?.[0] || "",
+      name: product.name,
+      image: galleryImages[activeImg] || product.image,
+    });
+    setWished((w) => !w);
+    showToast(wished ? "Removed from wishlist" : "Added to wishlist");
+  };
+
+  if (loading) {
+    return (
+      <div className="text-center py-5">
+        <div className="spinner-border" role="status">
+          <span className="visually-hidden">Loading product...</span>
+        </div>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -78,6 +250,7 @@ export default function ProductPage() {
         <div className="container py-5 text-center">
           <h2>Product not found</h2>
           <p className="text-muted mt-2">The product <code>{id}</code> does not exist.</p>
+          {error && <div className="alert alert-warning mt-3">{error}</div>}
           <button className="btn btn-dark mt-3" onClick={() => navigate(-1)}>Go Back</button>
         </div>
       </>
@@ -229,7 +402,7 @@ export default function ProductPage() {
               </button>
               <button
                 className={`pdp-btn-wish ${wished ? "pdp-btn-wish--active" : ""}`}
-                onClick={() => setWished((w) => !w)}
+                onClick={handleToggleWishlist}
                 aria-label="Wishlist"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill={wished ? "#e63946" : "none"} stroke={wished ? "#e63946" : "#111"} strokeWidth="1.5">

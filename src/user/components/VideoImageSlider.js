@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Slider from "react-slick";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import "../styles/Slider.css";
@@ -14,8 +14,9 @@ import slide6 from "../../shared/assets/images/HomePageSliderImages/slider6.png"
 import slide7 from "../../shared/assets/images/HomePageSliderImages/slider7.png";
 import slide8 from "../../shared/assets/images/HomePageSliderImages/slider8.png";
 import whiteIcon from "../../shared/assets/images/Logo White.jpg";
+import productService from "../../services/productService";
 
-const slides = [
+const defaultSlides = [
   { src: slide1, alt: "Harry Clinton collection look 1" },
   { src: slide2, alt: "Harry Clinton collection look 2" },
   { src: slide3, alt: "Harry Clinton collection look 3" },
@@ -50,6 +51,31 @@ const NextArrow = ({ onClick }) => (
 
 const VideoImageSlider = () => {
   const sliderRef = useRef(null);
+  const [slides, setSlides] = useState(defaultSlides);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSliders = async () => {
+      try {
+        const res = await productService.getImageSliders();
+        const data = res.data?.data || res.data || [];
+        if (data.length > 0) {
+          setSlides(
+            data.map((item) => ({
+              src: item.image_url || item.media_url || item.src,
+              alt: item.title || item.alt_text || "Harry Clinton",
+              redirect: item.redirect_link || null,
+            }))
+          );
+        }
+      } catch {
+        // keep defaults
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSliders();
+  }, []);
 
   const settings = {
     dots: true,
@@ -65,6 +91,16 @@ const VideoImageSlider = () => {
     prevArrow: <PrevArrow />,
     nextArrow: <NextArrow />,
   };
+
+  if (loading) {
+    return (
+      <div className="slider-container d-flex justify-content-center align-items-center">
+        <div className="spinner-border" role="status">
+          <span className="visually-hidden">Loading slider...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="slider-container">

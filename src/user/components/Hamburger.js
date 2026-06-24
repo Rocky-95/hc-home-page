@@ -3,9 +3,20 @@ import "../styles/Hamburger.css";
 import "../styles/Sidebar.css";
 import { Link } from "react-router-dom";
 import travelImg from "../../shared/assets/images/BabySuits/FirstBirthdayCategory.jpeg";
+import productService from "../../services/productService";
+
+const defaultCategories = [
+  { label: "Suits", to: "/suits" },
+  { label: "Indo-Western", to: "/indowestern" },
+  { label: "Shirts", to: "/shirts" },
+  { label: "Trousers", to: "/trousers" },
+  { label: "Baby Suits", to: "/babysuits" },
+];
 
 const Hamburger = () => {
   const [isActive, setIsActive] = useState(false);
+  const [categories, setCategories] = useState(defaultCategories);
+  const [subCategories, setSubCategories] = useState([]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -24,6 +35,37 @@ const Hamburger = () => {
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const fetchMenu = async () => {
+      try {
+        const [catRes, subRes] = await Promise.all([
+          productService.getMenuCategories(),
+          productService.getMenuSubCategories(),
+        ]);
+        const cats = catRes.data?.data || catRes.data || [];
+        const subs = subRes.data?.data || subRes.data || [];
+        if (cats.length > 0) {
+          setCategories(
+            cats.map((c) => ({
+              label: c.menu_category_name,
+              to: `/${c.menu_category_slug || c.menu_category_name.toLowerCase().replace(/\s+/g, "-")}`,
+            }))
+          );
+        }
+        setSubCategories(
+          subs.map((s) => ({
+            label: s.menu_subcategory_name,
+            to: s.redirect_link || `/${s.menu_subcategory_slug || s.menu_subcategory_name.toLowerCase().replace(/\s+/g, "-")}`,
+            categoryId: s.menu_category_id,
+          }))
+        );
+      } catch {
+        // keep defaults
+      }
+    };
+    fetchMenu();
   }, []);
 
   return (
@@ -46,11 +88,13 @@ const Hamburger = () => {
           <div className="Hdropdown-category">
             <strong>CATEGORIES</strong>
             <ul>
-              <li><Link to="/suits" onClick={() => setIsActive(false)}>Suits</Link></li>
-              <li><Link to="/indowestern" onClick={() => setIsActive(false)}>Indo-Western</Link></li>
-              <li><Link to="/shirts" onClick={() => setIsActive(false)}>Shirts</Link></li>
-              <li><Link to="/trousers" onClick={() => setIsActive(false)}>Trousers</Link></li>
-              <li><Link to="/babysuits" onClick={() => setIsActive(false)}>Baby Suits</Link></li>
+              {categories.map((cat) => (
+                <li key={cat.to}>
+                  <Link to={cat.to} onClick={() => setIsActive(false)}>
+                    {cat.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 

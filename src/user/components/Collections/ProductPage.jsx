@@ -1,21 +1,159 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { products } from "../../../shared/assets/json/tuxedoProducts";
+import { products as fallbackProducts } from "../../../shared/assets/json/tuxedoProducts";
 import "../../styles/ProductPage.css";
 import "../../styles/CollectionPage.css";
+import productService from "../../../services/productService";
+import { useCart } from "../../../context/CartContext";
+
+const placeholderImage = "https://via.placeholder.com/600x800?text=No+Image";
+
+const colorHexMap = {
+  black: "#000000",
+  white: "#FFFFFF",
+  red: "#E63946",
+  blue: "#1D3557",
+  navy: "#14224A",
+  green: "#2A9D8F",
+  yellow: "#E9C46A",
+  gold: "#FFD700",
+  brown: "#8B4513",
+  beige: "#F5F5DC",
+  cream: "#FFFDD0",
+  ivory: "#FFFFF0",
+  burgundy: "#800020",
+  grey: "#808080",
+  gray: "#808080",
+  pink: "#FFC0CB",
+  purple: "#800080",
+  orange: "#FFA500",
+};
+
+const getColorHex = (label) => {
+  const key = label?.toLowerCase().replace(/\s+/g, "");
+  for (const [name, hex] of Object.entries(colorHexMap)) {
+    if (key?.includes(name)) return hex;
+  }
+  return "#CCCCCC";
+};
+
+const mapApiProduct = (p, media, variants, sizes, attributes, attributeValues) => {
+  const productMedia = media.filter((m) => m.product_id === p.product_id);
+  const productVariants = variants.filter((v) => v.product_id === p.product_id);
+  const defaultVariant = productVariants.find((v) => v.isdefault) || productVariants[0] || {};
+
+  const colorAttribute = attributes.find((a) => a.attribute_name?.toLowerCase() === "color");
+  const colors = colorAttribute
+    ? attributeValues
+        .filter((av) => av.product_id === p.product_id && av.attribute_id === colorAttribute.attribute_id)
+        .map((av, idx) => ({
+          id: `${av.attribute_value?.toLowerCase().replace(/\s+/g, "-") || idx}`,
+          label: av.attribute_value || `Color ${idx + 1}`,
+          hex: getColorHex(av.attribute_value),
+          border: "#b8b8b8",
+        }))
+    : [];
+
+  const imagesByColor = colors.length
+    ? colors.reduce((acc, color) => {
+        acc[color.id] = productMedia
+          .filter((m) => m.alt_text?.toLowerCase().includes(color.label.toLowerCase()))
+          .map((m) => m.media_url);
+        return acc;
+      }, {})
+    : { default: productMedia.map((m) => m.media_url) };
+
+  const productSizes = defaultVariant.size_id
+    ? [
+        {
+          label: sizes.find((s) => s.size_id === defaultVariant.size_id)?.size_name || "M",
+          available: (defaultVariant.stock_qty || 0) > 0,
+        },
+      ]
+    : productVariants.map((v) => ({
+        label: sizes.find((s) => s.size_id === v.size_id)?.size_name || v.variant_name,
+        available: (v.stock_qty || 0) > 0,
+      }));
+
+  return {
+    id: p.product_id || p.product_slug,
+    name: p.product_name,
+    category: p.category || "collection",
+    subtitle: p.product_slug?.replace(/-/g, " ") || "",
+    price: defaultVariant.price || p.base_price || 0,
+    originalPrice: null,
+    description: p.description || p.short_description || "",
+    colors,
+    imagesByColor,
+    sizes: productSizes,
+    sizeChart: [
+      { size: "S", chest: "36", waist: "30", length: "26" },
+      { size: "M", chest: "38", waist: "32", length: "27" },
+      { size: "L", chest: "40", waist: "34", length: "28" },
+      { size: "XL", chest: "42", waist: "36", length: "29" },
+    ],
+    trustBadges: ["Premium Fabric", "Tailored Fit", "Luxury Finish"],
+    accordion: [
+      { id: "desc", title: "Description", body: p.description || p.short_description || "" },
+      { id: "care", title: "Care Instructions", body: "Dry clean only. Store in a garment bag." },
+      { id: "shipping", title: "Shipping & Returns", body: "Free shipping on orders above ₹5000." },
+    ],
+    stock: (defaultVariant.stock_qty || 0) > 0 ? "in" : "out",
+    sku: defaultVariant.sku || p.product_slug,
+    rating: 0,
+    reviewCount: 0,
+    image: productMedia[0]?.media_url || placeholderImage,
+  };
+};
 
 const CollectionProductPage = () => {
   const { id } = useParams();
-  const product = useMemo(
-    () => products.find((item) => String(item.id) === id),
-    [id]
-  );
+  const { addToCart, addToWishlist } = useCart();
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const [selectedColorId, setSelectedColorId] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
   const [activeImage, setActiveImage] = useState(0);
   const [openAccordion, setOpenAccordion] = useState(null);
   const [toast, setToast] = useState("");
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      setLoading(true);
+      try {
+        const [productRes, mediaRes, variantsRes, sizesRes, attributesRes, attrValuesRes] = await Promise.all([
+          productService.getProductById(id),
+          productService.getProductMedia(),
+          productService.getProductVariants(),
+          productService.getProductSizes(),
+          productService.getProductAttributes(),
+          productService.getProductAttributesValues(),
+        ]);
+        const p = productRes.data?.data || productRes.data;
+        if (p) {
+          const mapped = mapApiProduct(
+            p,
+            mediaRes.data?.data || mediaRes.data || [],
+            variantsRes.data?.data || variantsRes.data || [],
+            sizesRes.data?.data || sizesRes.data || [],
+            attributesRes.data?.data || attributesRes.data || [],
+            attrValuesRes.data?.data || attrValuesRes.data || []
+          );
+          setProduct(mapped);
+        } else {
+          setProduct(fallbackProducts.find((item) => String(item.id) === id) || null);
+        }
+      } catch (err) {
+        setError("Unable to load product details.");
+        setProduct(fallbackProducts.find((item) => String(item.id) === id) || null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProduct();
+  }, [id]);
 
   useEffect(() => {
     setSelectedColorId(product?.colors?.[0]?.id || "");
@@ -33,6 +171,16 @@ const CollectionProductPage = () => {
     return () => window.clearTimeout(timer);
   }, [toast]);
 
+  if (loading) {
+    return (
+      <div className="text-center py-5">
+        <div className="spinner-border" role="status">
+          <span className="visually-hidden">Loading product...</span>
+        </div>
+      </div>
+    );
+  }
+
   if (!product) {
     return (
       <div className="collection-empty">
@@ -46,7 +194,8 @@ const CollectionProductPage = () => {
     product.colors.find((color) => color.id === selectedColorId) ||
     product.colors[0];
   const galleryImages =
-    product.imagesByColor?.[selectedColor?.id] || [product.image];
+    product.imagesByColor?.[selectedColor?.id]?.filter(Boolean) ||
+    [product.image].filter(Boolean);
 
   const handleColorChange = (colorId) => {
     setSelectedColorId(colorId);
@@ -59,7 +208,25 @@ const CollectionProductPage = () => {
       return;
     }
 
+    addToCart({
+      productId: product.id,
+      productVariantId: selectedSize,
+      name: product.name,
+      price: product.price,
+      qty: 1,
+      image: galleryImages[activeImage] || product.image,
+    });
     setToast(`${product.name} has been added to your bag.`);
+  };
+
+  const handleAddToWishlist = () => {
+    addToWishlist({
+      productId: product.id,
+      productVariantId: selectedSize || product.sizes?.[0]?.label || "",
+      name: product.name,
+      image: galleryImages[activeImage] || product.image,
+    });
+    setToast(`${product.name} has been added to your wishlist.`);
   };
 
   return (
@@ -172,6 +339,17 @@ const CollectionProductPage = () => {
                 onClick={handleAddToCart}
               >
                 Add to bag
+              </button>
+              <button
+                type="button"
+                className="pdp-btn-wish"
+                onClick={handleAddToWishlist}
+                aria-label="Add to wishlist"
+                title="Add to wishlist"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="1.5">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                </svg>
               </button>
             </div>
 

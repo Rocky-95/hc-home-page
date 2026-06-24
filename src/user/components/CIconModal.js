@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../styles/CIconModal.css";
+import appointmentService from "../../services/appointmentService";
 
 const initialFormData = {
   name: "",
@@ -8,6 +9,8 @@ const initialFormData = {
   occasion: "",
   appointmentDate: "",
   appointmentTime: "",
+  dateSlotId: "",
+  timeSlotId: "",
 };
 
 const CIconModal = ({ isOpen, onClose }) => {
@@ -65,24 +68,23 @@ const CIconModal = ({ isOpen, onClose }) => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/appointments`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+      await appointmentService.createCustomAppointment({
+        appointment_date_slot_id: formData.dateSlotId || null,
+        appointment_time_slot_id: formData.timeSlotId || null,
+        name: formData.name,
+        city: formData.city,
+        preferred_delivery_date: formData.deliveryDate,
+        occasion: formData.occasion,
+        appointment_status: "Pending",
+        appointment_notes: `Requested appointment on ${formData.appointmentDate} at ${formData.appointmentTime}`,
+        rcu: "customer",
       });
-      const result = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        throw new Error(result.message || "Error booking appointment");
-      }
 
       setFormData(initialFormData);
       handleClose();
       setShowSuccess(true);
     } catch (err) {
-      setError(err.message || "Unable to send your details. Please try again.");
+      setError(err.response?.data?.message || err.message || "Unable to send your details. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

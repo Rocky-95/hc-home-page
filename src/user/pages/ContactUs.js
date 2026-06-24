@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link } from "react-router-dom";
 import hcBlack from "../../shared/assets/images/HC Black.png";
+import contentService from "../../services/contentService";
 
 const contactInfo = [
   {
@@ -39,19 +40,41 @@ const ContactUs = () => {
     message: "",
   });
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
+    setSubmitError("");
+    setIsSubmitting(true);
+
+    try {
+      await contentService.sendMail({
+        to: "connect@harryclinton.com",
+        subject: `Contact Form: ${form.subject}`,
+        html: `
+          <p><strong>Name:</strong> ${form.name}</p>
+          <p><strong>Email:</strong> ${form.email}</p>
+          <p><strong>Phone:</strong> ${form.phone || "Not provided"}</p>
+          <p><strong>Subject:</strong> ${form.subject}</p>
+          <p><strong>Message:</strong></p>
+          <p>${form.message.replace(/\n/g, "<br/>")}</p>
+        `,
+        text: `Name: ${form.name}\nEmail: ${form.email}\nPhone: ${form.phone}\nSubject: ${form.subject}\nMessage: ${form.message}`,
+      });
+      setSubmitted(true);
       setForm({ name: "", email: "", phone: "", subject: "", message: "" });
-    }, 4000);
+      setTimeout(() => setSubmitted(false), 4000);
+    } catch (err) {
+      setSubmitError(err.response?.data?.message || "Failed to send message. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -97,6 +120,9 @@ const ContactUs = () => {
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit}>
+                    {submitError && (
+                      <div className="alert alert-danger text-center">{submitError}</div>
+                    )}
                     <div className="row g-3">
                       <div className="col-md-6 mb-3">
                         <label className="form-label">Full Name</label>
@@ -163,8 +189,12 @@ const ContactUs = () => {
                         />
                       </div>
                       <div className="col-12">
-                        <button type="submit" className="btn btn-dark w-100 py-2">
-                          Send Message
+                        <button
+                          type="submit"
+                          className="btn btn-dark w-100 py-2"
+                          disabled={isSubmitting}
+                        >
+                          {isSubmitting ? "Sending..." : "Send Message"}
                         </button>
                       </div>
                     </div>

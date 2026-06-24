@@ -4,20 +4,55 @@ import img1 from "../../shared/assets/images/Designer.jpeg";
 import img2 from "../../shared/assets/images/Wedding.jpeg";
 import img3 from "../../shared/assets/images/SmartCasual.jpeg";
 import "../styles/Spotlight.css";
+import productService from "../../services/productService";
+
+const defaultItems = [
+  { img: img1 },
+  { img: img2 },
+  { img: img3 },
+  { img: img3 },
+  { img: img3 },
+  { img: img3 },
+  { img: img3 },
+  { img: img3 },
+].map((item) => ({ ...item, text: "HC Spotlight" }));
 
 export default function Spotlight() {
-  const items = [
-    { img: img1 },
-    { img: img2 },
-    { img: img3 },
-    { img: img3 },
-    { img: img3 },
-    { img: img3 },
-    { img: img3 },
-    { img: img3 },
-  ].map((item) => ({ ...item, text: "HC Spotlight" }));
-
+  const [items, setItems] = useState(defaultItems);
+  const [loading, setLoading] = useState(true);
   const windowWidth = useWindowWidth();
+
+  useEffect(() => {
+    const fetchSpotlight = async () => {
+      try {
+        const [entriesRes, mediaRes] = await Promise.all([
+          productService.getSpotlightEntries(),
+          productService.getSpotlightMedia(),
+        ]);
+        const entries = entriesRes.data?.data || entriesRes.data || [];
+        const media = mediaRes.data?.data || mediaRes.data || [];
+        if (entries.length > 0 || media.length > 0) {
+          const mapped = media.length > 0
+            ? media.map((m) => ({
+                img: m.media_url || m.image_url || img1,
+                text: m.alt_text || "HC Spotlight",
+                link: m.redirect_link || null,
+              }))
+            : entries.map((e) => ({
+                img: e.image_url || e.media_url || img1,
+                text: e.title || "HC Spotlight",
+                link: e.redirect_link || null,
+              }));
+          setItems(mapped.length > 0 ? mapped : defaultItems);
+        }
+      } catch {
+        // keep defaults
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSpotlight();
+  }, []);
   const isMobile = windowWidth <= 768;
   const sliderRef = useRef(null);
   const isProgrammaticScroll = useRef(false);
