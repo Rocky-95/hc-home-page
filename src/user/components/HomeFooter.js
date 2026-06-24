@@ -92,9 +92,9 @@ const HomeFooter = () => {
               <h6 className="fw-bold text-uppercase">Quick Links</h6>
               <ul className="list-unstyled">
                 <li>
-                  <a href="/aboutUs" className="text-white text-decoration-none">
+                  <Link to="/aboutUs" className="text-white text-decoration-none">
                     About Us
-                  </a>
+                  </Link>
                 </li>
                 <li>
                   <button

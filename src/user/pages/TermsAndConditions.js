@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 function TermsAndConditions() {
@@ -46,7 +47,7 @@ function TermsAndConditions() {
         </ul>
 
         <h5 className="mt-4">7. Returns & Refunds</h5>
-        <p>Please refer to our <a href="/Policies">Returns & Refunds Policy</a> for more details.</p>
+        <p>Please refer to our <Link to="/Policies">Returns & Refunds Policy</Link> for more details.</p>
 
         <h5 className="mt-4">8. Intellectual Property</h5>
         <p>All content on this site, including logos, images, designs, and text, are the intellectual property of Harry Clinton and protected by copyright and trademark laws.</p>

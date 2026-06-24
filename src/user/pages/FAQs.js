@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/PageAccordions.css";
 
@@ -54,9 +55,9 @@ const FAQs = () => {
         <div className="container">
           <p className="mb-1">© 2025 Harry Clinton. All rights reserved.</p>
           <p className="mb-0">
-            <a href="/" style={{ color: "#ffc107" }}>Home</a> |{" "}
-            <a href="/FAQs" style={{ color: "#ffc107" }}>FAQs</a> |{" "}
-            <a href="/contact" style={{ color: "#ffc107" }}>Contact</a>
+            <Link to="/" style={{ color: "#ffc107" }}>Home</Link> |{" "}
+            <Link to="/FAQs" style={{ color: "#ffc107" }}>FAQs</Link> |{" "}
+            <Link to="/contact-us" style={{ color: "#ffc107" }}>Contact</Link>
           </p>
         </div>
       </footer>
