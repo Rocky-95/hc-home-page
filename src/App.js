@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState } from "react";
-import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { HashRouter, Route, Routes, useLocation } from "react-router-dom";
 import PrivateRoute from "./shared/components/PrivateRoute";
 import Home from "./user/pages/Home";
 import SplashScreen from "./user/components/SplashScreen";
@@ -255,17 +255,12 @@ function App() {
   const [splashDismissed, setSplashDismissed] = useState(false);
 
   return (
-    <BrowserRouter
-      future={{
-        v7_relativeSplatPath: true,
-        v7_startTransition: true,
-      }}
-    >
+    <HashRouter>
       <AppRoutes
         splashDismissed={splashDismissed}
         onSplashComplete={() => setSplashDismissed(true)}
       />
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
