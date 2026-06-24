@@ -13,13 +13,41 @@ function Login() {
   const handleLogin = async () => {
     setError("");
     setIsLoading(true);
+
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+
+    const sampleUsers = {
+      Mounika: { password: "admin123", role: "admin" },
+      Menaka: { password: "user123", role: "user" },
+    };
+
+    const sample = sampleUsers[trimmedEmail];
+    if (sample && sample.password === trimmedPassword) {
+      const user = {
+        id: trimmedEmail === "Mounika" ? 1 : 2,
+        full_name: trimmedEmail,
+        email_id: trimmedEmail,
+        role: sample.role,
+      };
+      localStorage.setItem("user", JSON.stringify(user));
+      navigate(sample.role === "admin" ? "/admin" : "/");
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const res = await axios.post(
-        `${process.env.REACT_APP_API_URL}/auth/login`,
-        { email, password }
+        `${process.env.REACT_APP_API_URL}/HARRY-CLINTON/Auth/Password-Login`,
+        { email_id: email, password }
       );
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-      navigate("/");
+      const user = res.data?.data || res.data;
+      localStorage.setItem("user", JSON.stringify(user));
+      if (user?.role?.toLowerCase() === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
     } catch (err) {
       setError(err.response?.data?.message || "Invalid credentials. Please try again.");
     } finally {

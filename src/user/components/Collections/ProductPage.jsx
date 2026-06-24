@@ -1,17 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { FaArrowLeft } from "react-icons/fa";
 import { Link, useParams } from "react-router-dom";
 import { products } from "../../../shared/assets/json/tuxedoProducts";
 import "../../styles/ProductPage.css";
 import "../../styles/CollectionPage.css";
-
-const collectionRoutes = {
-  tuxedo: "/tuxedo",
-  "extreme-poppins": "/extreme-poppins",
-  "gurkha-trousers": "/gurkha-trousers",
-  linen: "/linen-shirts-trousers",
-  cigarette: "/cigarettes",
-};
 
 const CollectionProductPage = () => {
   const { id } = useParams();
@@ -56,7 +47,6 @@ const CollectionProductPage = () => {
     product.colors[0];
   const galleryImages =
     product.imagesByColor?.[selectedColor?.id] || [product.image];
-  const collectionRoute = collectionRoutes[product.category] || "/";
 
   const handleColorChange = (colorId) => {
     setSelectedColorId(colorId);
@@ -75,10 +65,6 @@ const CollectionProductPage = () => {
   return (
     <>
       <div className="pdp">
-        <Link to={collectionRoute} className="collection-product-back">
-          <FaArrowLeft /> Back to collection
-        </Link>
-
         <div className="pdp-grid">
           <div className="pdp-gallery">
             <div className="pdp-gallery__thumbs">

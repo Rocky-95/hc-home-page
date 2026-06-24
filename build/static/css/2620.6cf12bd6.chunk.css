@@ -1,0 +1,2 @@
+.hero-scroll{height:95vh;overflow:hidden;position:relative}.hero-image{height:1000px;margin:0;width:100%}.hero-overlay{bottom:5%;left:5%;text-shadow:0 2px 6px #0009}.marquee-track{animation:scroll-left 30s linear infinite;white-space:nowrap}@keyframes scroll-left{0%{transform:translateX(0)}to{transform:translateX(-50%)}}.category-overlay{background:#00000073;bottom:0;color:#fff;font-size:1.1rem;font-weight:600;left:0;letter-spacing:.5px;padding:.6rem 0;position:absolute;text-align:center;text-transform:uppercase;width:100%}
+/*# sourceMappingURL=2620.6cf12bd6.chunk.css.map*/

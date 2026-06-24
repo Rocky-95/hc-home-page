@@ -1,8 +1,6 @@
-﻿// https://intl.fursac.com/en/c-new-collection.html-------for the reference
+// https://intl.fursac.com/en/c-new-collection.html-------for the reference
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { FaShoppingCart } from "react-icons/fa";
-import logo from "../../../../shared/assets/images/HC Black.png";
 // import logo from ""; // "../../../../shared/assets/images/HC Black.png"
 import weddingVideo from "../../../../shared/assets/video/WeddingPage/WeddingPageVideo.mp4"; //"../../../../shared/assets/video/suitsPage/BusinessCategory.mp4"
 
@@ -127,32 +125,6 @@ onClick={() => navigate(`/product/${cat.id}`)}
   );
   return (
     <>
-      {/* ===== HEADER ===== */}
-      <header
-        className="container-fluid bg-white border-bottom py-2 sticky-top"
-        style={{ zIndex: 1000 }}
-      >
-        <div className="d-flex justify-content-between align-items-center px-3">
-          {/* Left: Logo */}
-          <div
-            className="d-flex align-items-center gap-3"
-            style={{ cursor: "pointer" }}
-            onClick={() => navigate("/")}
-          >
-            <img src={logo} alt="Logo" className="img-fluid" style={{ height: "40px" }} />
-          </div>
-
-          {/* Center: Title */}
-          <h1 className="h5 mb-0 text-dark text-center flex-grow-1">Travel Trousers</h1>
-
-          {/* Right: Cart */}
-          <FaShoppingCart
-            className="fs-4 text-dark"
-            style={{ cursor: "pointer" }}
-            onClick={() => alert("Go to cart page")}
-          />
-        </div>
-      </header>
 
       {/* ===== HERO VIDEO ===== */}
       <section className="position-relative w-100">
@@ -196,7 +168,7 @@ For the Men Who Wear Royalty, Not Just Suits.
             ))}
         </div>
       </div>
-  {/* ===== NEW ROW: image – video – image ===== */}
+  {/* ===== NEW ROW: image â€“ video â€“ image ===== */}
     <section className="container-fluid my-0 px-0">
   <div className="row g-0">
     {/* Left Image */}
@@ -322,7 +294,7 @@ For the Men Who Wear Royalty, Not Just Suits.
     </div>
   </div>
 </div>
-{/* ===== NEW ROW: 75% Video – 25% Image ===== */}
+{/* ===== NEW ROW: 75% Video â€“ 25% Image ===== */}
 <div className="row g-0 mt-1 mx-0">
   {/* Left Side: Video (75%) */}
   <div className="col-md-9 p-0">
@@ -350,7 +322,7 @@ For the Men Who Wear Royalty, Not Just Suits.
 {/* TEXT BAR WITH CONTINUOUS FADE-IN FADE-OUT */}
 <div className="bg-light text-center py-4">
   <span className="fw-bold text-uppercase fs-4 fade-in-out-text">
-    The Wedding Suit Collection – Luxury Hand Embroidered
+    The Wedding Suit Collection â€“ Luxury Hand Embroidered
   </span>
 </div>
 
@@ -375,7 +347,7 @@ For the Men Who Wear Royalty, Not Just Suits.
  {/* CATEGORIES GRID */}
 <div id="category-grid" className="container-fluid px-0 my-0">
 
-  {/* Row 1: Image – Video – Image */}
+  {/* Row 1: Image â€“ Video â€“ Image */}
   <div className="row g-2">
     {categories.slice(0, 3).map((cat, i) => (
       <div key={i} className="col-12 col-md-4 d-flex">
@@ -384,7 +356,7 @@ For the Men Who Wear Royalty, Not Just Suits.
     ))}
   </div>
 
-  {/* Row 2: Image – Video – Image */}
+  {/* Row 2: Image â€“ Video â€“ Image */}
   <div className="row g-2 mt-2">
     {categories.slice(3, 6).map((cat, i) => (
       <div key={i + 3} className="col-12 col-md-4 d-flex">
@@ -393,7 +365,7 @@ For the Men Who Wear Royalty, Not Just Suits.
     ))}
   </div>
 
-  {/* Row 3: Image – Video – Image */}
+  {/* Row 3: Image â€“ Video â€“ Image */}
   <div className="row g-2 mt-2">
     {categories.slice(6, 9).map((cat, i) => (
       <div key={i + 6} className="col-12 col-md-4 d-flex">

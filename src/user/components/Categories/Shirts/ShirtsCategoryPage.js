@@ -1,7 +1,5 @@
-﻿import React, { useEffect } from "react";
-import { FaHome, FaShoppingCart } from "react-icons/fa";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";       
-import logo from "../../../../shared/assets/images/HC Black.png";
 // import logo from ""; // "../../../../shared/assets/images/HC Black.png"
 
 // category images / video
@@ -61,9 +59,9 @@ const categories = [
   // parallax scroll for hero image
 useEffect(() => {
   const handleScroll = () => {
-    const img = document.querySelector(".hero-image"); // ✅ move inside
+    const img = document.querySelector(".hero-image"); // âœ… move inside
 
-    if (!img) return; // ✅ safety
+    if (!img) return; // âœ… safety
 
     const y = window.scrollY;
     const vh = window.innerHeight;
@@ -78,20 +76,6 @@ useEffect(() => {
 }, []);
   return (
     <>
-      {/* HEADER */}
-      <header
-        className="container-fluid bg-white border-bottom py-2 sticky-top"
-        style={{ zIndex: 1000 }}
-      >
-        <div className="d-flex justify-content-between align-items-center px-3">
-          <div className="d-flex align-items-center gap-3">
-            <img src={logo} alt="Logo" className="img-fluid" style={{ height: "40px" }} />
-            <FaHome className="fs-4 text-dark" style={{ cursor: "pointer" }} />
-          </div>
-          <h1 className="h5 mb-0 text-dark text-center flex-grow-1">Shirts</h1>
-          <FaShoppingCart className="fs-4 text-dark" style={{ cursor: "pointer" }} />
-        </div>
-      </header>
 
       {/* HERO IMAGE WITH PARALLAX */}
       <section className="hero-scroll position-relative container-fluid px-0">

@@ -1,8 +1,10 @@
 import { lazy, Suspense, useState } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import PrivateRoute from "./shared/components/PrivateRoute";
 import Home from "./user/pages/Home";
 import SplashScreen from "./user/components/SplashScreen";
+import AdminLayout from "./admin/components/AdminLayout";
+import UserLayout from "./user/components/UserLayout";
 
 const Login = lazy(() => import("./user/pages/Login"));
 const Register = lazy(() => import("./user/pages/Register"));
@@ -11,7 +13,9 @@ const PrivacyPolicy = lazy(() => import("./user/pages/PrivacyPolicy"));
 const TermsAndConditions = lazy(() => import("./user/pages/TermsAndConditions"));
 const FAQs = lazy(() => import("./user/pages/FAQs"));
 const Policies = lazy(() => import("./user/pages/Policies"));
+const HelpCenter = lazy(() => import("./user/pages/HelpCenter"));
 const AdminDashboard = lazy(() => import("./admin/pages/AdminDashboard"));
+const AdminCrudPage = lazy(() => import("./admin/pages/AdminCrudPage"));
 const ProductPage = lazy(() =>
   import("./user/components/Categories/Suits/ProductPage")
 );
@@ -140,33 +144,35 @@ const RouteFallback = () => (
   </div>
 );
 
-function App() {
-  const [showSplash, setShowSplash] = useState(true);
+function AppRoutes({ splashDismissed, onSplashComplete }) {
+  const location = useLocation();
+  const isRoot = location.pathname === "/";
 
-  if (showSplash) {
-    return <SplashScreen onComplete={() => setShowSplash(false)} />;
+  if (isRoot && !splashDismissed) {
+    return <SplashScreen onComplete={onSplashComplete} />;
   }
 
   return (
-    <BrowserRouter
-      future={{
-        v7_relativeSplatPath: true,
-        v7_startTransition: true,
-      }}
-    >
-      <Suspense fallback={<RouteFallback />}>
-        <Routes>
+    <Suspense fallback={<RouteFallback />}>
+      <Routes>
+        {/* ADMIN */}
+        <Route
+          path="/admin"
+          element={
+            <PrivateRoute requiredRole="admin">
+              <AdminLayout />
+            </PrivateRoute>
+          }
+        >
+          <Route index element={<AdminDashboard />} />
+          <Route path=":moduleKey" element={<AdminCrudPage />} />
+        </Route>
+
+        {/* USER PAGES */}
+        <Route element={<UserLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route
-            path="/admin"
-            element={
-              <PrivateRoute requiredRole="admin">
-                <AdminDashboard />
-              </PrivateRoute>
-            }
-          />
           <Route path="/product/:id" element={<ProductPage />} />
 
           {/* CATEGORY PAGES */}
@@ -238,8 +244,27 @@ function App() {
           <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
           <Route path="/FAQs" element={<FAQs />} />
           <Route path="/Policies" element={<Policies />} />
-        </Routes>
-      </Suspense>
+          <Route path="/help-center" element={<HelpCenter />} />
+        </Route>
+      </Routes>
+    </Suspense>
+  );
+}
+
+function App() {
+  const [splashDismissed, setSplashDismissed] = useState(false);
+
+  return (
+    <BrowserRouter
+      future={{
+        v7_relativeSplatPath: true,
+        v7_startTransition: true,
+      }}
+    >
+      <AppRoutes
+        splashDismissed={splashDismissed}
+        onSplashComplete={() => setSplashDismissed(true)}
+      />
     </BrowserRouter>
   );
 }

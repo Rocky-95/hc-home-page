@@ -1,4 +1,4 @@
-﻿/**
+/**
  * products.js — Central Product Data Store
  *
  * Architecture note:
