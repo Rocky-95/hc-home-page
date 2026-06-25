@@ -5,6 +5,7 @@ import PageHeader from "../../../../shared/components/PageHeader";
 import "../../../styles/ProductPage.css";
 import productService from "../../../../services/productService";
 import { useCart } from "../../../../context/CartContext";
+import ReviewsSection from "../../../components/ReviewsSection";
 
 const placeholderImage = "https://via.placeholder.com/600x800?text=No+Image";
 
@@ -63,17 +64,23 @@ const mapApiProduct = (p, media, variants, sizes, attributes, attributeValues) =
       }, {})
     : { default: productMedia.map((m) => m.media_url) };
 
-  const productSizes = defaultVariant.size_id
-    ? [
+  const productSizes = productVariants.length
+    ? productVariants.map((v) => ({
+        variant_id: v.product_variant_id,
+        label: sizes.find((s) => s.size_id === v.size_id)?.size_name || v.variant_name || "M",
+        size_id: v.size_id,
+        price: v.price || p.base_price || 0,
+        available: (v.stock_qty || 0) > 0,
+      }))
+    : [
         {
+          variant_id: defaultVariant.product_variant_id || null,
           label: sizes.find((s) => s.size_id === defaultVariant.size_id)?.size_name || "M",
+          size_id: defaultVariant.size_id,
+          price: defaultVariant.price || p.base_price || 0,
           available: (defaultVariant.stock_qty || 0) > 0,
         },
-      ]
-    : productVariants.map((v) => ({
-        label: sizes.find((s) => s.size_id === v.size_id)?.size_name || v.variant_name,
-        available: (v.stock_qty || 0) > 0,
-      }));
+      ];
 
   return {
     id: p.product_id || p.product_slug,
@@ -170,6 +177,8 @@ export default function ProductPage() {
       const defaultColor = product.colors?.[0];
       setSelectedColor(defaultColor);
       setActiveImg(0);
+      const sizes = product.sizes || [];
+      setSelectedSize(sizes.length === 1 ? sizes[0] : null);
     }
     window.scrollTo(0, 0);
   }, [product, id]);
@@ -213,9 +222,10 @@ export default function ProductPage() {
     if (!selectedSize) { showToast("Please select a size first"); return; }
     addToCart({
       productId: product.id,
-      productVariantId: selectedSize.label,
+      productVariantId: selectedSize.variant_id,
+      sizeLabel: selectedSize.label,
       name: product.name,
-      price: product.price,
+      price: selectedSize.price || product.price,
       qty: 1,
       image: galleryImages[activeImg] || product.image,
     });
@@ -223,10 +233,13 @@ export default function ProductPage() {
   };
 
   const handleToggleWishlist = () => {
+    const wishlistVariant = selectedSize || product.sizes?.[0] || {};
     addToWishlist({
       productId: product.id,
-      productVariantId: selectedSize?.label || product.sizeOptions?.[0] || "",
+      productVariantId: wishlistVariant.variant_id || null,
+      sizeLabel: wishlistVariant.label,
       name: product.name,
+      price: wishlistVariant.price || product.price,
       image: galleryImages[activeImg] || product.image,
     });
     setWished((w) => !w);
@@ -331,7 +344,7 @@ export default function ProductPage() {
 
             {/* Price */}
             <div className="pdp-price-row">
-              <span className="pdp-price">&#8377;{product.price?.toLocaleString("en-IN")}</span>
+              <span className="pdp-price">&#8377;{(selectedSize?.price || product.price)?.toLocaleString("en-IN")}</span>
               {product.originalPrice && (
                 <span className="pdp-price-orig">&#8377;{product.originalPrice?.toLocaleString("en-IN")}</span>
               )}
@@ -448,6 +461,11 @@ export default function ProductPage() {
         </div>
       </div>
 
+      {/* ── Reviews ── */}
+      <div className="container">
+        <ReviewsSection productId={product.id} />
+      </div>
+
       {/* ── Size Guide Modal ── */}
       {product.sizeChart && (
         <div
@@ -486,7 +504,7 @@ export default function ProductPage() {
       <div className={`pdp-sticky ${stickyVisible ? "pdp-sticky--visible" : ""}`}>
         <div className="pdp-sticky__info">
           <span className="pdp-sticky__name">{product.name}</span>
-          <span className="pdp-sticky__price">&#8377;{product.price?.toLocaleString("en-IN")}</span>
+          <span className="pdp-sticky__price">&#8377;{(selectedSize?.price || product.price)?.toLocaleString("en-IN")}</span>
         </div>
         <button className="pdp-sticky__btn" onClick={handleAddToCart}>Add to Cart</button>
       </div>

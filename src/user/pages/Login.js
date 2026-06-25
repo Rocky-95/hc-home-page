@@ -19,19 +19,32 @@ function Login() {
         email_id: email.trim(),
         password: password.trim(),
       });
-      const user = res.data?.data || res.data;
-      const token = res.data?.token || user?.token;
+      const payload = res.data || {};
+      const isSuccess = payload.Status === "1" || payload.Status === "true" || payload.Status === true;
+
+      if (!isSuccess) {
+        setError(payload.Message || "Invalid credentials. Please try again.");
+        return;
+      }
+
+      const response = payload.Response || {};
+      const token = response.token || response.access_token || response.auth_token;
+      const user = response.user || response;
+
+      const roleName = user?.roles?.[0]?.role_name || user?.role || user?.role_name || "Customer";
+      const normalizedUser = { ...user, role: roleName };
+
       if (token) {
         localStorage.setItem("hc_token", token);
       }
-      localStorage.setItem("hc_user", JSON.stringify(user));
-      if (user?.role?.toLowerCase() === "admin") {
+      localStorage.setItem("hc_user", JSON.stringify(normalizedUser));
+      if (roleName?.toLowerCase() === "admin") {
         navigate("/admin");
       } else {
         navigate("/");
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Invalid credentials. Please try again.");
+      setError(err.response?.data?.Message || err.response?.data?.message || "Login failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -83,6 +96,15 @@ function Login() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+
+        <p style={{ textAlign: "right", marginBottom: "15px", fontSize: "13px" }}>
+          <span
+            style={{ ...styles.registerLink, fontWeight: "normal" }}
+            onClick={() => navigate("/forgot-password")}
+          >
+            Forgot password?
+          </span>
+        </p>
 
         {/* LOGIN BUTTON */}
         <button style={styles.button} onClick={handleLogin} disabled={isLoading}>

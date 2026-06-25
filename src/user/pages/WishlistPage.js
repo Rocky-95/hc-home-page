@@ -40,8 +40,9 @@ const WishlistPage = () => {
                       addToCart({
                         productId: item.product_id,
                         productVariantId: item.product_variant_id,
+                        sizeLabel: item.size_label || item.sizeLabel,
                         name: item.name,
-                        price: 0,
+                        price: item.unit_price || 0,
                         qty: 1,
                         image: item.image,
                       })

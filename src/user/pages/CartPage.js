@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -9,8 +9,15 @@ const CartPage = () => {
     removeFromCart,
     updateCartQty,
     cartTotal,
+    discountedTotal,
+    discountAmount,
+    appliedCoupon,
+    couponError,
+    applyCoupon,
+    removeCoupon,
     loading,
   } = useCart();
+  const [couponInput, setCouponInput] = useState(appliedCoupon?.code || "");
 
   if (loading) {
     return (
@@ -55,7 +62,7 @@ const CartPage = () => {
                     <div>
                       <h5 className="card-title mb-1">{item.name}</h5>
                       <p className="card-text text-muted mb-1">
-                        Size: {item.product_variant_id}
+                        {item.size_label || item.sizeLabel ? `Size: ${item.size_label || item.sizeLabel}` : null}
                       </p>
                       <p className="card-text fw-bold">
                         &#8377;{(item.unit_price || 0).toLocaleString("en-IN")}
@@ -97,6 +104,23 @@ const CartPage = () => {
               <span>Subtotal</span>
               <span>&#8377;{cartTotal.toLocaleString("en-IN")}</span>
             </div>
+            {appliedCoupon && (
+              <div className="d-flex justify-content-between mb-2 text-success">
+                <span>
+                  Discount ({appliedCoupon.code})
+                  <button
+                    className="btn btn-link btn-sm text-danger p-0 ms-2"
+                    onClick={() => {
+                      removeCoupon();
+                      setCouponInput("");
+                    }}
+                  >
+                    Remove
+                  </button>
+                </span>
+                <span>-&#8377;{discountAmount.toLocaleString("en-IN")}</span>
+              </div>
+            )}
             <div className="d-flex justify-content-between mb-2">
               <span>Shipping</span>
               <span>Calculated at checkout</span>
@@ -104,8 +128,30 @@ const CartPage = () => {
             <hr />
             <div className="d-flex justify-content-between fw-bold mb-3">
               <span>Total</span>
-              <span>&#8377;{cartTotal.toLocaleString("en-IN")}</span>
+              <span>&#8377;{discountedTotal.toLocaleString("en-IN")}</span>
             </div>
+
+            <div className="mb-3">
+              <div className="input-group">
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Coupon code"
+                  value={couponInput}
+                  onChange={(e) => setCouponInput(e.target.value)}
+                  disabled={!!appliedCoupon}
+                />
+                <button
+                  className="btn btn-outline-dark"
+                  onClick={() => applyCoupon(couponInput)}
+                  disabled={!couponInput.trim() || !!appliedCoupon}
+                >
+                  Apply
+                </button>
+              </div>
+              {couponError && <div className="text-danger small mt-1">{couponError}</div>}
+            </div>
+
             <Link to="/checkout" className="btn btn-dark w-100">
               Proceed to Checkout
             </Link>

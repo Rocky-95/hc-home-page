@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link } from "react-router-dom";
 import hcBlack from "../../shared/assets/images/HC Black.png";
 import contentService from "../../services/contentService";
 
-const contactInfo = [
+const fallbackContactInfo = [
   {
     icon: "bi-telephone",
     title: "Phone",
@@ -32,6 +32,7 @@ const contactInfo = [
 ];
 
 const ContactUs = () => {
+  const [contactInfo, setContactInfo] = useState(fallbackContactInfo);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -42,6 +43,28 @@ const ContactUs = () => {
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const fetchSupportContacts = async () => {
+      try {
+        const res = await contentService.getSupportContacts();
+        const data = res.data?.data || res.data || [];
+        const phone = data.find((c) => c.contact_type?.toLowerCase() === "phone")?.contact_value;
+        const email = data.find((c) => c.contact_type?.toLowerCase() === "email")?.contact_value;
+        const address = data.find((c) => c.contact_type?.toLowerCase() === "address")?.contact_value;
+        const hours = data.find((c) => c.contact_type?.toLowerCase() === "working_hours")?.contact_value;
+        const updated = [...fallbackContactInfo];
+        if (phone) updated[0] = { ...updated[0], detail: phone, link: `tel:${phone}` };
+        if (email) updated[1] = { ...updated[1], detail: email, link: `mailto:${email}` };
+        if (address) updated[2] = { ...updated[2], detail: address };
+        if (hours) updated[3] = { ...updated[3], detail: hours };
+        setContactInfo(updated);
+      } catch {
+        // keep fallback
+      }
+    };
+    fetchSupportContacts();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -71,7 +94,13 @@ const ContactUs = () => {
       setForm({ name: "", email: "", phone: "", subject: "", message: "" });
       setTimeout(() => setSubmitted(false), 4000);
     } catch (err) {
-      setSubmitError(err.response?.data?.message || "Failed to send message. Please try again.");
+      if (err.response?.status === 404) {
+        setSubmitError(
+          "Our email service is currently unavailable. Please contact us directly at connect@harryclinton.com or +91 7094 094 194."
+        );
+      } else {
+        setSubmitError(err.response?.data?.message || "Failed to send message. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }

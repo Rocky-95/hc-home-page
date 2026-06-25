@@ -17,11 +17,17 @@ const RunningBar = () => {
   useEffect(() => {
     const fetchRunningBar = async () => {
       try {
-        const res = await productService.getRunningBars();
+        const res = await productService.getRunningBarItems();
         const data = res.data?.data || res.data || [];
-        if (data.length > 0) {
+        const activeItems = data.filter(
+          (item) => item.isactive === 1 || item.isactive === true || item.is_active === 1 || item.is_active === true
+        );
+        const items = activeItems.length > 0 ? activeItems : data;
+        if (items.length > 0) {
           setSentences(
-            data.map((item) => item.text || item.title || item.content || "")
+            items
+              .sort((a, b) => (a.display_order || 0) - (b.display_order || 0))
+              .map((item) => item.itemsdata || item.text || item.title || item.content || "")
           );
         }
       } catch {

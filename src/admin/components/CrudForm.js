@@ -18,7 +18,13 @@ const CrudForm = ({ fields, initialValues, onSubmit, onCancel }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(values);
+    const normalized = { ...values };
+    fields.forEach((field) => {
+      if (field.type === "checkbox") {
+        normalized[field.name] = normalized[field.name] ? 1 : 0;
+      }
+    });
+    onSubmit(normalized);
   };
 
   return (

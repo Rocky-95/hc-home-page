@@ -19,6 +19,7 @@ import TheChurchAffair from "../../../../shared/assets/video/WeddingPage/Wedding
 import TheRoyalWeddingEdit from "../../../../shared/assets/images/ProductDetail/SangeetBlack.jpg"; // "../../../../shared/assets/images/WeddingSuitProductImages/The Royal Wedding Edit.jpeg"
 import TheDestinationDream from "../../../../shared/assets/images/ProductDetail/SangeetBlack.jpg"; // "../../../../shared/assets/images/WeddingSuitProductImages/IMG_1016.jpg"
 import TheSangeetSoiree from "../../../../shared/assets/images/ProductDetail/SangeetBlack.jpg"; // "../../../../shared/assets/images/WeddingSuitProductImages/Sangeet/Sangeet_Main.jpg"
+import ProductGrid from "../../ProductGrid";
 
 const DesignerPage = () => {
   const navigate = useNavigate();
@@ -374,8 +375,7 @@ For the Men Who Wear Royalty, Not Just Suits.
   </div>
 
 </div>
-
-
+      <ProductGrid keyword="" />
     </>
   );
 };

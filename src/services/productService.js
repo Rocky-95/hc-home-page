@@ -18,6 +18,7 @@ const productService = {
   getProductClothTypes: () => apiClient.get("/Products-Cloth-Types"),
   getProductSizes: () => apiClient.get("/Products-Sizes"),
   getProductAttributes: () => apiClient.get("/Products-Attributes"),
+  getProductAttributeValues: () => apiClient.get("/Products-Attributes-Values"),
   getProductVariants: () => apiClient.get("/Products-Variants"),
 
   // Style collections

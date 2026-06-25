@@ -7,8 +7,6 @@ const initialFormData = {
   city: "",
   deliveryDate: "",
   occasion: "",
-  appointmentDate: "",
-  appointmentTime: "",
   dateSlotId: "",
   timeSlotId: "",
 };
@@ -18,6 +16,8 @@ const CIconModal = ({ isOpen, onClose }) => {
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [dateSlots, setDateSlots] = useState([]);
+  const [timeSlots, setTimeSlots] = useState([]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -40,6 +40,25 @@ const CIconModal = ({ isOpen, onClose }) => {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [isOpen, isSubmitting, onClose]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const fetchSlots = async () => {
+      try {
+        const [dateRes, timeRes] = await Promise.all([
+          appointmentService.getDateSlots(),
+          appointmentService.getTimeSlots(),
+        ]);
+        const dates = dateRes.data?.data || dateRes.data || [];
+        const times = timeRes.data?.data || timeRes.data || [];
+        setDateSlots(dates.filter((d) => d.isavailable !== false && d.isactive !== false));
+        setTimeSlots(times.filter((t) => t.isavailable !== false && t.isactive !== false));
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to load appointment slots.");
+      }
+    };
+    fetchSlots();
+  }, [isOpen]);
 
   useEffect(() => {
     if (!showSuccess) {
@@ -68,7 +87,10 @@ const CIconModal = ({ isOpen, onClose }) => {
     setIsSubmitting(true);
 
     try {
+      const storedUser = localStorage.getItem("hc_user");
+      const user = storedUser ? JSON.parse(storedUser) : null;
       await appointmentService.createCustomAppointment({
+        user_id: user?.user_id || user?.id || null,
         appointment_date_slot_id: formData.dateSlotId || null,
         appointment_time_slot_id: formData.timeSlotId || null,
         name: formData.name,
@@ -76,7 +98,7 @@ const CIconModal = ({ isOpen, onClose }) => {
         preferred_delivery_date: formData.deliveryDate,
         occasion: formData.occasion,
         appointment_status: "Pending",
-        appointment_notes: `Requested appointment on ${formData.appointmentDate} at ${formData.appointmentTime}`,
+        appointment_notes: `Requested date slot ${formData.dateSlotId}, time slot ${formData.timeSlotId}`,
         rcu: "customer",
       });
 
@@ -194,32 +216,49 @@ const CIconModal = ({ isOpen, onClose }) => {
                     />
                   </div>
                   <div className="mb-3">
-                    <label htmlFor="appointmentDate" className="form-label">
+                    <label htmlFor="dateSlotId" className="form-label">
                       Appointment Date
                     </label>
-                    <input
-                      type="date"
+                    <select
                       className="form-control"
-                      id="appointmentDate"
-                      name="appointmentDate"
-                      value={formData.appointmentDate}
+                      id="dateSlotId"
+                      name="dateSlotId"
+                      value={formData.dateSlotId}
                       onChange={handleChange}
                       required
-                    />
+                    >
+                      <option value="">Select a date</option>
+                      {dateSlots.map((slot) => (
+                        <option key={slot.appointment_date_slot_id} value={slot.appointment_date_slot_id}>
+                          {slot.slot_date ? new Date(slot.slot_date).toLocaleDateString("en-IN", {
+                            weekday: "short",
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          }) : slot.appointment_date_slot_id}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div className="mb-3">
-                    <label htmlFor="appointmentTime" className="form-label">
+                    <label htmlFor="timeSlotId" className="form-label">
                       Appointment Time
                     </label>
-                    <input
-                      type="time"
+                    <select
                       className="form-control"
-                      id="appointmentTime"
-                      name="appointmentTime"
-                      value={formData.appointmentTime}
+                      id="timeSlotId"
+                      name="timeSlotId"
+                      value={formData.timeSlotId}
                       onChange={handleChange}
                       required
-                    />
+                    >
+                      <option value="">Select a time</option>
+                      {timeSlots.map((slot) => (
+                        <option key={slot.appointment_time_slot_id} value={slot.appointment_time_slot_id}>
+                          {slot.slot_start_time || ""} - {slot.slot_end_time || ""}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <button
                     type="submit"

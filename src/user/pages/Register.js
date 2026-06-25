@@ -1,14 +1,15 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
+import authService from "../../services/authService";
 
 const Register = () => {
+  const navigate = useNavigate();
   const [message, setMessage] = useState({ text: "", type: "" });
 
   const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    mobile: "",
+    full_name: "",
+    email_id: "",
+    mobile_number: "",
     password: "",
     acceptPolicy: false,
   });
@@ -30,13 +31,32 @@ const Register = () => {
     }
 
     try {
-      const res = await axios.post(
-        `${process.env.REACT_APP_API_URL}/auth/register`,
-        formData
-      );
-      setMessage({ text: res.data.message || "Registration successful!", type: "success" });
+      const res = await authService.register({
+        full_name: formData.full_name.trim(),
+        email_id: formData.email_id.trim(),
+        password: formData.password,
+        mobile_number: formData.mobile_number.trim() || undefined,
+        isactive: 1,
+        rcu: "website",
+      });
+      const payload = res.data || {};
+      const isSuccess =
+        payload.Status === "1" ||
+        payload.Status === "true" ||
+        payload.Status === true ||
+        payload.success === true;
+
+      if (isSuccess) {
+        setMessage({ text: payload.Message || "Registration successful!", type: "success" });
+        setTimeout(() => navigate("/login"), 1500);
+      } else {
+        setMessage({ text: payload.Message || "Registration failed", type: "danger" });
+      }
     } catch (err) {
-      setMessage({ text: err.response?.data?.message || "Registration failed", type: "danger" });
+      setMessage({
+        text: err.response?.data?.Message || err.response?.data?.message || "Registration failed",
+        type: "danger",
+      });
     }
   };
 
@@ -69,10 +89,10 @@ const Register = () => {
             <label className="form-label">Full Name</label>
             <input
               type="text"
-              name="username"
+              name="full_name"
               className="form-control border-dark"
               placeholder="Enter your full name"
-              value={formData.username}
+              value={formData.full_name}
               onChange={handleChange}
               required
             />
@@ -83,10 +103,10 @@ const Register = () => {
             <label className="form-label">Email</label>
             <input
               type="email"
-              name="email"
+              name="email_id"
               className="form-control border-dark"
               placeholder="Enter your email address"
-              value={formData.email}
+              value={formData.email_id}
               onChange={handleChange}
               required
             />
@@ -97,10 +117,10 @@ const Register = () => {
             <label className="form-label">Mobile</label>
             <input
               type="tel"
-              name="mobile"
+              name="mobile_number"
               className="form-control border-dark"
               placeholder="Enter your mobile number"
-              value={formData.mobile}
+              value={formData.mobile_number}
               onChange={handleChange}
               required
             />

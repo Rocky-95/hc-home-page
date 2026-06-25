@@ -5,6 +5,7 @@ import "../../styles/ProductPage.css";
 import "../../styles/CollectionPage.css";
 import productService from "../../../services/productService";
 import { useCart } from "../../../context/CartContext";
+import ReviewsSection from "../ReviewsSection";
 
 const placeholderImage = "https://via.placeholder.com/600x800?text=No+Image";
 
@@ -63,17 +64,23 @@ const mapApiProduct = (p, media, variants, sizes, attributes, attributeValues) =
       }, {})
     : { default: productMedia.map((m) => m.media_url) };
 
-  const productSizes = defaultVariant.size_id
-    ? [
+  const productSizes = productVariants.length
+    ? productVariants.map((v) => ({
+        variant_id: v.product_variant_id,
+        label: sizes.find((s) => s.size_id === v.size_id)?.size_name || v.variant_name || "M",
+        size_id: v.size_id,
+        price: v.price || p.base_price || 0,
+        available: (v.stock_qty || 0) > 0,
+      }))
+    : [
         {
+          variant_id: defaultVariant.product_variant_id || null,
           label: sizes.find((s) => s.size_id === defaultVariant.size_id)?.size_name || "M",
+          size_id: defaultVariant.size_id,
+          price: defaultVariant.price || p.base_price || 0,
           available: (defaultVariant.stock_qty || 0) > 0,
         },
-      ]
-    : productVariants.map((v) => ({
-        label: sizes.find((s) => s.size_id === v.size_id)?.size_name || v.variant_name,
-        available: (v.stock_qty || 0) > 0,
-      }));
+      ];
 
   return {
     id: p.product_id || p.product_slug,
@@ -157,7 +164,8 @@ const CollectionProductPage = () => {
 
   useEffect(() => {
     setSelectedColorId(product?.colors?.[0]?.id || "");
-    setSelectedSize("");
+    const sizes = product?.sizes || [];
+    setSelectedSize(sizes.length === 1 ? sizes[0].label : "");
     setActiveImage(0);
     setOpenAccordion(null);
   }, [product]);
@@ -202,17 +210,20 @@ const CollectionProductPage = () => {
     setActiveImage(0);
   };
 
+  const selectedVariant = product.sizes.find((s) => s.label === selectedSize);
+
   const handleAddToCart = () => {
-    if (!selectedSize) {
+    if (!selectedSize || !selectedVariant) {
       setToast("Please select a size first.");
       return;
     }
 
     addToCart({
       productId: product.id,
-      productVariantId: selectedSize,
+      productVariantId: selectedVariant.variant_id,
+      sizeLabel: selectedVariant.label,
       name: product.name,
-      price: product.price,
+      price: selectedVariant.price || product.price,
       qty: 1,
       image: galleryImages[activeImage] || product.image,
     });
@@ -220,10 +231,13 @@ const CollectionProductPage = () => {
   };
 
   const handleAddToWishlist = () => {
+    const wishlistVariant = selectedVariant || product.sizes?.[0] || {};
     addToWishlist({
       productId: product.id,
-      productVariantId: selectedSize || product.sizes?.[0]?.label || "",
+      productVariantId: wishlistVariant.variant_id || null,
+      sizeLabel: wishlistVariant.label,
       name: product.name,
+      price: wishlistVariant.price || product.price,
       image: galleryImages[activeImage] || product.image,
     });
     setToast(`${product.name} has been added to your wishlist.`);
@@ -394,6 +408,10 @@ const CollectionProductPage = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="container">
+        <ReviewsSection productId={product.id} />
       </div>
 
       {toast && <div className="pdp-toast pdp-toast--visible">{toast}</div>}

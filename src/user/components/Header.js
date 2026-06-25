@@ -5,11 +5,13 @@ import Hamburger from "./Hamburger";
 import ProfileDropdown from "./ProfileDropdown";
 import logo from "../../shared/assets/images/HC Black.png";
 import { useCart } from "../../context/CartContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Header = ({ onCIconClick }) => {
   const { cartCount, wishlistItems } = useCart();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const profileRef = useRef(); // 🔥 wrapper ref
 
@@ -45,11 +47,22 @@ const Header = ({ onCIconClick }) => {
         </div>
 
         <div className="search d-flex align-items-center">
-          <i className="bi bi-search fs-4"></i>
+          <i
+            className="bi bi-search fs-4"
+            style={{ cursor: "pointer" }}
+            onClick={() => searchQuery.trim() && navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`)}
+          ></i>
           <input
             type="text"
             placeholder="Search..."
             className="search-input ms-2"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && searchQuery.trim()) {
+                navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+              }
+            }}
           />
         </div>
       </div>

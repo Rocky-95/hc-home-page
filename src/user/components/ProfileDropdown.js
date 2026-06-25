@@ -4,7 +4,7 @@ import "../styles/ProfileDropdown.css";
 
 const ProfileDropdown = ({ onClose }) => {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = JSON.parse(localStorage.getItem("hc_user"));
 
   const dropdownRef = useRef(); // 🔥 reference
 
@@ -29,8 +29,11 @@ const ProfileDropdown = ({ onClose }) => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
+    localStorage.removeItem("hc_user");
+    localStorage.removeItem("hc_token");
+    localStorage.removeItem("hc_cart");
+    localStorage.removeItem("hc_wishlist");
+    localStorage.removeItem("hc_coupon");
     navigate("/login");
     onClose && onClose();
   };
@@ -56,8 +59,8 @@ const ProfileDropdown = ({ onClose }) => {
       {user && (
         <>
           <div className="dropdown-header">
-            <strong>{user.name}</strong>
-            <p className="dropdown-role">{user.role}</p>
+            <strong>{user.full_name || user.fullname || user.name || user.email_id || user.email || "User"}</strong>
+            {user.role && <p className="dropdown-role">{user.role}</p>}
           </div>
 
           <div className="dropdown-divider"></div>
@@ -65,6 +68,11 @@ const ProfileDropdown = ({ onClose }) => {
           <div className="dropdown-item" onClick={() => handleNavigate("/profile")}>
             <i className="bi bi-person me-2"></i>
             My Profile
+          </div>
+
+          <div className="dropdown-item" onClick={() => handleNavigate("/addresses")}>
+            <i className="bi bi-geo-alt me-2"></i>
+            My Addresses
           </div>
 
           <div className="dropdown-item" onClick={() => handleNavigate("/appointments")}>
@@ -77,10 +85,10 @@ const ProfileDropdown = ({ onClose }) => {
             My Orders
           </div>
 
-          {user.role === "admin" && (
+          {user.role?.toLowerCase() === "admin" && (
             <div
               className="dropdown-item"
-              onClick={() => handleNavigate("/admin/dashboard")}
+              onClick={() => handleNavigate("/admin")}
             >
               <i className="bi bi-speedometer2 me-2"></i>
               Admin Dashboard

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import FooterLogo from "../../shared/assets/images/Logo White.png";
 import HCWhite from "../../shared/assets/images/HC White.png";
 import { Link } from "react-router-dom";
@@ -22,6 +22,27 @@ const HomeFooter = () => {
     message: "",
     isError: false,
   });
+  const [supportContacts, setSupportContacts] = useState([]);
+
+  useEffect(() => {
+    const fetchSupportContacts = async () => {
+      try {
+        const res = await contentService.getSupportContacts();
+        const data = res.data?.data || res.data || [];
+        setSupportContacts(data);
+      } catch {
+        // keep empty
+      }
+    };
+    fetchSupportContacts();
+  }, []);
+
+  const primaryEmail =
+    supportContacts.find((c) => c.contact_type === "email" || c.contact_type === "Email")?.contact_value ||
+    "connect@harryclinton.com";
+  const primaryPhone =
+    supportContacts.find((c) => c.contact_type === "phone" || c.contact_type === "Phone")?.contact_value ||
+    "";
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -35,7 +56,7 @@ const HomeFooter = () => {
 
     try {
       await contentService.sendMail({
-        to: "connect@harryclinton.com",
+        to: primaryEmail,
         subject: `Contact Form: ${form.subject}`,
         html: `
           <p><strong>Name:</strong> ${form.name}</p>
@@ -54,7 +75,13 @@ const HomeFooter = () => {
         setShowModal(false);
       }, 3000);
     } catch (err) {
-      setSubmitError(err.response?.data?.message || "Failed to send message. Please try again.");
+      if (err.response?.status === 404) {
+        setSubmitError(
+          `Our email service is currently unavailable. Please contact us directly at ${primaryEmail}.`
+        );
+      } else {
+        setSubmitError(err.response?.data?.message || "Failed to send message. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -112,6 +139,22 @@ const HomeFooter = () => {
                 Empowering innovation with quality and trust. Join us in our
                 journey towards excellence.
               </p>
+              {primaryEmail && (
+                <p className="small mb-1">
+                  <strong>Email:</strong>{" "}
+                  <a href={`mailto:${primaryEmail}`} className="text-light text-decoration-none">
+                    {primaryEmail}
+                  </a>
+                </p>
+              )}
+              {primaryPhone && (
+                <p className="small mb-1">
+                  <strong>Phone:</strong>{" "}
+                  <a href={`tel:${primaryPhone}`} className="text-light text-decoration-none">
+                    {primaryPhone}
+                  </a>
+                </p>
+              )}
               <p className="mb-1 small">Follow us on:</p>
               <div className="d-flex">
                 <a

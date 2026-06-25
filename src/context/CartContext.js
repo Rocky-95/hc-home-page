@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import cartService from "../services/cartService";
 import userService from "../services/userService";
+import orderService from "../services/orderService";
 
 const CartContext = createContext();
 
@@ -8,6 +9,7 @@ export const useCart = () => useContext(CartContext);
 
 const CART_STORAGE_KEY = "hc_cart";
 const WISHLIST_STORAGE_KEY = "hc_wishlist";
+const COUPON_STORAGE_KEY = "hc_coupon";
 
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
@@ -17,17 +19,22 @@ export const CartProvider = ({ children }) => {
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [couponError, setCouponError] = useState("");
 
   // Load localStorage fallback
   useEffect(() => {
     try {
       const savedCart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || "[]");
       const savedWishlist = JSON.parse(localStorage.getItem(WISHLIST_STORAGE_KEY) || "[]");
+      const savedCoupon = JSON.parse(localStorage.getItem(COUPON_STORAGE_KEY) || "null");
       setCartItems(savedCart);
       setWishlistItems(savedWishlist);
+      setAppliedCoupon(savedCoupon);
     } catch {
       setCartItems([]);
       setWishlistItems([]);
+      setAppliedCoupon(null);
     }
   }, []);
 
@@ -139,7 +146,7 @@ export const CartProvider = ({ children }) => {
   }, [wishlistId, isLoggedIn, userId]);
 
   const addToCart = useCallback(
-    async ({ productId, productVariantId, name, price, qty = 1, image }) => {
+    async ({ productId, productVariantId, sizeLabel, name, price, qty = 1, image }) => {
       if (isLoggedIn && userId) {
         const cid = await ensureCart();
         if (cid) {
@@ -179,6 +186,7 @@ export const CartProvider = ({ children }) => {
             cart_item_id: `local-${Date.now()}`,
             product_id: productId,
             product_variant_id: productVariantId,
+            size_label: sizeLabel,
             name,
             unit_price: price,
             qty,
@@ -233,7 +241,7 @@ export const CartProvider = ({ children }) => {
   );
 
   const addToWishlist = useCallback(
-    async ({ productId, productVariantId, name, image }) => {
+    async ({ productId, productVariantId, sizeLabel, name, price, image }) => {
       if (isLoggedIn && userId) {
         const wid = await ensureWishlist();
         if (wid) {
@@ -262,7 +270,9 @@ export const CartProvider = ({ children }) => {
             wishlist_item_id: `local-${Date.now()}`,
             product_id: productId,
             product_variant_id: productVariantId,
+            size_label: sizeLabel,
             name,
+            unit_price: price,
             image,
           },
         ];
@@ -291,6 +301,70 @@ export const CartProvider = ({ children }) => {
   const cartCount = cartItems.reduce((sum, item) => sum + (item.qty || 1), 0);
   const cartTotal = cartItems.reduce((sum, item) => sum + (item.unit_price || 0) * (item.qty || 1), 0);
 
+  const discountAmount = appliedCoupon
+    ? appliedCoupon.discount_type === "percent"
+      ? Math.round(cartTotal * (appliedCoupon.discount_value / 100) * 100) / 100
+      : Math.min(appliedCoupon.discount_value, cartTotal)
+    : 0;
+  const discountedTotal = Math.max(0, cartTotal - discountAmount);
+
+  const applyCoupon = useCallback(async (code) => {
+    setCouponError("");
+    if (!code.trim()) return;
+    try {
+      const [couponsRes, discountsRes] = await Promise.all([
+        orderService.getCoupons(),
+        orderService.getDiscounts(),
+      ]);
+      const coupons = couponsRes.data?.data || couponsRes.data || [];
+      const discounts = discountsRes.data?.data || discountsRes.data || [];
+
+      const coupon = coupons.find(
+        (c) => c.coupon_code?.toLowerCase() === code.trim().toLowerCase() && c.isactive !== false
+      );
+      if (!coupon) {
+        setCouponError("Invalid coupon code.");
+        return;
+      }
+      const now = new Date();
+      const validFrom = coupon.valid_from ? new Date(coupon.valid_from) : null;
+      const validTill = coupon.valid_till ? new Date(coupon.valid_till) : null;
+      if (validFrom && now < validFrom) {
+        setCouponError("Coupon is not yet valid.");
+        return;
+      }
+      if (validTill && now > validTill) {
+        setCouponError("Coupon has expired.");
+        return;
+      }
+
+      // Match discount by name if available, otherwise use first active discount as fallback
+      let discount = discounts.find(
+        (d) => d.discount_name?.toLowerCase() === coupon.description?.toLowerCase() && d.isactive !== false
+      );
+      if (!discount) {
+        discount = discounts.find((d) => d.isactive !== false);
+      }
+      const couponData = {
+        coupon_id: coupon.coupon_id,
+        code: coupon.coupon_code,
+        discount_name: discount?.discount_name || coupon.coupon_code,
+        discount_type: discount?.discount_type || "percent",
+        discount_value: discount?.discount_value || 10,
+      };
+      setAppliedCoupon(couponData);
+      localStorage.setItem(COUPON_STORAGE_KEY, JSON.stringify(couponData));
+    } catch {
+      setCouponError("Could not validate coupon. Please try again.");
+    }
+  }, []);
+
+  const removeCoupon = useCallback(() => {
+    setAppliedCoupon(null);
+    setCouponError("");
+    localStorage.removeItem(COUPON_STORAGE_KEY);
+  }, []);
+
   const clearCart = useCallback(async () => {
     if (isLoggedIn && cartId) {
       try {
@@ -311,7 +385,9 @@ export const CartProvider = ({ children }) => {
       }
     }
     setCartItems([]);
+    setAppliedCoupon(null);
     localStorage.removeItem(CART_STORAGE_KEY);
+    localStorage.removeItem(COUPON_STORAGE_KEY);
   }, [cartId, isLoggedIn]);
 
   return (
@@ -327,6 +403,12 @@ export const CartProvider = ({ children }) => {
         clearCart,
         cartCount,
         cartTotal,
+        discountedTotal,
+        discountAmount,
+        appliedCoupon,
+        couponError,
+        applyCoupon,
+        removeCoupon,
         loading,
         isLoggedIn,
       }}

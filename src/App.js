@@ -9,6 +9,8 @@ import { CartProvider } from "./context/CartContext";
 
 const Login = lazy(() => import("./user/pages/Login"));
 const Register = lazy(() => import("./user/pages/Register"));
+const ForgotPassword = lazy(() => import("./user/pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./user/pages/ResetPassword"));
 const ContactUs = lazy(() => import("./user/pages/ContactUs"));
 const PrivacyPolicy = lazy(() => import("./user/pages/PrivacyPolicy"));
 const TermsAndConditions = lazy(() => import("./user/pages/TermsAndConditions"));
@@ -18,8 +20,15 @@ const HelpCenter = lazy(() => import("./user/pages/HelpCenter"));
 const CartPage = lazy(() => import("./user/pages/CartPage"));
 const WishlistPage = lazy(() => import("./user/pages/WishlistPage"));
 const CheckoutPage = lazy(() => import("./user/pages/CheckoutPage"));
+const ProfilePage = lazy(() => import("./user/pages/ProfilePage"));
+const AddressesPage = lazy(() => import("./user/pages/AddressesPage"));
+const OrdersPage = lazy(() => import("./user/pages/OrdersPage"));
+const AppointmentsPage = lazy(() => import("./user/pages/AppointmentsPage"));
+const SearchPage = lazy(() => import("./user/pages/SearchPage"));
 const AdminDashboard = lazy(() => import("./admin/pages/AdminDashboard"));
 const AdminCrudPage = lazy(() => import("./admin/pages/AdminCrudPage"));
+const AdminOrdersPage = lazy(() => import("./admin/pages/AdminOrdersPage"));
+const AdminAppointmentsPage = lazy(() => import("./admin/pages/AdminAppointmentsPage"));
 const ProductPage = lazy(() =>
   import("./user/components/Categories/Suits/ProductPage")
 );
@@ -169,6 +178,8 @@ function AppRoutes({ splashDismissed, onSplashComplete }) {
           }
         >
           <Route index element={<AdminDashboard />} />
+          <Route path="orders" element={<AdminOrdersPage />} />
+          <Route path="appointments" element={<AdminAppointmentsPage />} />
           <Route path=":moduleKey" element={<AdminCrudPage />} />
         </Route>
 
@@ -177,6 +188,8 @@ function AppRoutes({ splashDismissed, onSplashComplete }) {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/product/:id" element={<ProductPage />} />
 
           {/* CATEGORY PAGES */}
@@ -252,6 +265,11 @@ function AppRoutes({ splashDismissed, onSplashComplete }) {
           <Route path="/cart" element={<CartPage />} />
           <Route path="/wishlist" element={<WishlistPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/addresses" element={<AddressesPage />} />
+          <Route path="/orders" element={<OrdersPage />} />
+          <Route path="/appointments" element={<AppointmentsPage />} />
+          <Route path="/search" element={<SearchPage />} />
         </Route>
       </Routes>
     </Suspense>

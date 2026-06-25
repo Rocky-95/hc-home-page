@@ -41,12 +41,25 @@ const AdminCrudPage = () => {
     loadData();
   }, [loadData]);
 
+  const idField = config.idField || "id";
+
+  const normalizeValues = (values) => {
+    const normalized = { ...values };
+    config.fields.forEach((field) => {
+      if (field.type === "checkbox") {
+        normalized[field.name] = values[field.name] === true || values[field.name] === 1 ? 1 : 0;
+      }
+    });
+    return normalized;
+  };
+
   const handleSubmit = async (values) => {
     try {
-      if (editingItem?.id) {
-        await service.update({ ...values, id: editingItem.id });
+      const payload = normalizeValues(values);
+      if (editingItem?.[idField]) {
+        await service.update({ ...payload, [idField]: editingItem[idField] });
       } else {
-        await service.create(values);
+        await service.create(payload);
       }
       setShowForm(false);
       setEditingItem(null);
@@ -64,7 +77,7 @@ const AdminCrudPage = () => {
   const handleDelete = async () => {
     if (!deleteItem) return;
     try {
-      await service.remove(deleteItem.id);
+      await service.remove(deleteItem[idField]);
       setDeleteItem(null);
       loadData();
     } catch (err) {
@@ -112,6 +125,7 @@ const AdminCrudPage = () => {
         onEdit={handleEdit}
         onDelete={setDeleteItem}
         loading={loading}
+        idField={idField}
       />
 
       <ConfirmModal

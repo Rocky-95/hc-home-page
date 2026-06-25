@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import orderService from "../../services/orderService";
 import userService from "../../services/userService";
+import paymentService, { loadRazorpayScript } from "../../services/paymentService";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const initialAddress = {
@@ -17,27 +18,64 @@ const initialAddress = {
 };
 
 const CheckoutPage = () => {
-  const { cartItems, cartTotal, clearCart } = useCart();
+  const { cartItems, cartTotal, discountedTotal, discountAmount, appliedCoupon, clearCart } = useCart();
   const navigate = useNavigate();
 
   const [userId, setUserId] = useState(null);
+  const [user, setUser] = useState(null);
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [selectedAddressId, setSelectedAddressId] = useState("");
   const [address, setAddress] = useState(initialAddress);
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [placing, setPlacing] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [saveAddress, setSaveAddress] = useState(true);
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const storedUser = localStorage.getItem("hc_user");
+    let uid = null;
+    let parsedUser = null;
+    if (storedUser) {
       try {
-        const profileRes = await userService.getProfile();
-        const profile = profileRes.data?.data || profileRes.data;
-        if (profile?.user_id) setUserId(profile.user_id);
+        parsedUser = JSON.parse(storedUser);
+        uid = parsedUser.user_id || parsedUser.id;
       } catch {
-        // guest checkout stays null
+        // ignore
+      }
+    }
+    if (parsedUser) setUser(parsedUser);
+
+    const fetchUserAndAddresses = async () => {
+      if (uid) {
+        setUserId(uid);
+        try {
+          const addressesRes = await userService.getAddresses();
+          const all = addressesRes.data?.data || addressesRes.data || [];
+          const userAddresses = all.filter((a) => a.user_id === uid);
+          setSavedAddresses(userAddresses);
+          const defaultAddress = userAddresses.find(
+            (a) => a.isdefault === 1 || a.isdefault === true
+          ) || userAddresses[0];
+          if (defaultAddress) {
+            setSelectedAddressId(defaultAddress.address_id);
+            setAddress({
+              recipient_name: defaultAddress.full_name || "",
+              phone_number: defaultAddress.mobile_number || "",
+              address_line1: defaultAddress.house_street || "",
+              address_line2: defaultAddress.landmark || "",
+              city: defaultAddress.city || "",
+              state: defaultAddress.state || "",
+              postal_code: defaultAddress.pincode || "",
+              country: "India",
+            });
+          }
+        } catch {
+          // ignore
+        }
       }
     };
-    fetchUser();
+    fetchUserAndAddresses();
   }, []);
 
   useEffect(() => {
@@ -57,16 +95,42 @@ const CheckoutPage = () => {
     setPlacing(true);
 
     try {
-      const shippingPrice = cartTotal >= 5000 ? 0 : 150;
-      const taxAmount = Math.round(cartTotal * 0.05 * 100) / 100;
-      const totalPrice = cartTotal + taxAmount + shippingPrice;
+      const shippingPrice = discountedTotal >= 5000 ? 0 : 150;
+      const taxAmount = Math.round(discountedTotal * 0.05 * 100) / 100;
+      const totalPrice = discountedTotal + taxAmount + shippingPrice;
+
+      // Ensure a default pending order status exists
+      let statusRes = await orderService.getOrderStatusMaster();
+      let statuses = statusRes.data?.data || statusRes.data || [];
+      let pendingStatus = statuses.find(
+        (s) => s.status_code?.toLowerCase() === "pending" || s.status_name?.toLowerCase() === "pending"
+      );
+
+      if (!pendingStatus) {
+        const createStatusRes = await orderService.createOrderStatusMaster({
+          status_name: "Pending",
+          status_code: "PENDING",
+          status_description: "Order placed, pending processing",
+          isactive: 1,
+          rcu: "website",
+        });
+        pendingStatus = createStatusRes.data?.data || createStatusRes.data;
+      }
+
+      const orderStatusId = pendingStatus?.order_status_id;
+      if (!orderStatusId) {
+        throw new Error("Could not resolve order status. Please try again.");
+      }
+
+      const orderNumber = `ORD-${Date.now()}`;
 
       const orderPayload = {
         user_id: userId,
-        cart_id: null,
-        order_status_id: null,
+        order_number: orderNumber,
+        order_status_id: orderStatusId,
         order_date: new Date().toISOString(),
-        subtotal_price: cartTotal,
+        subtotal_price: discountedTotal,
+        discount_amount: discountAmount || 0,
         tax_amount: taxAmount,
         shipping_price: shippingPrice,
         total_price: totalPrice,
@@ -87,9 +151,9 @@ const CheckoutPage = () => {
           orderService.createOrderItem({
             order_id: orderId,
             product_id: item.product_id,
-            product_variant_id: item.product_variant_id,
+            product_variant_id: item.product_variant_id || null,
             product_name: item.name,
-            sku: item.sku || item.product_variant_id,
+            sku: item.sku || item.product_variant_id || "SKU",
             qty: item.qty || 1,
             unit_price: item.unit_price || 0,
             rcu: "website",
@@ -100,22 +164,157 @@ const CheckoutPage = () => {
       await orderService.createOrderAddress({
         order_id: orderId,
         address_type: "shipping",
-        ...address,
+        full_name: address.recipient_name,
+        mobile_number: address.phone_number,
+        house_street: address.address_line1,
+        city: address.city,
+        state: address.state,
+        pincode: address.postal_code,
+        landmark: address.address_line2,
+        country: address.country,
         rcu: "website",
       });
 
-      await orderService.createPayment({
+      await orderService.createOrderStatusHistory({
         order_id: orderId,
-        razorpay_order_id: null,
-        payment_amount: totalPrice,
-        payment_status: "pending",
-        payment_method_type: paymentMethod,
+        order_status_id: orderStatusId,
+        orderstatus: "Pending",
+        notes: "Order placed via website",
         rcu: "website",
       });
 
-      await clearCart();
-      setSuccess(true);
-      setTimeout(() => navigate("/"), 3000);
+      const saveAddressToUser = async () => {
+        if (userId && saveAddress && !selectedAddressId) {
+          try {
+            await userService.createAddress({
+              user_id: userId,
+              full_name: address.recipient_name,
+              mobile_number: address.phone_number,
+              emailid: "",
+              house_street: address.address_line1,
+              city: address.city,
+              state: address.state,
+              pincode: address.postal_code,
+              landmark: address.address_line2,
+              country: address.country,
+              isdefault: savedAddresses.length === 0 ? 1 : 0,
+              isactive: 1,
+              rcu: "website",
+            });
+          } catch (addressErr) {
+            console.error("Failed to save address to user account", addressErr);
+          }
+        }
+      };
+
+      const finalizeOrder = async (paymentStatus) => {
+        if (paymentStatus === "success") {
+          await orderService.updateOrder({
+            order_id: orderId,
+            payment_status: "success",
+            rcu: "website",
+          });
+        }
+        await saveAddressToUser();
+        clearCart();
+        setSuccess(true);
+      };
+
+      if (paymentMethod === "cod") {
+        await paymentService.createPayment({
+          order_id: orderId,
+          user_id: userId,
+          amount: totalPrice,
+          payment_method: paymentMethod,
+          payment_status: "pending",
+          payment_date: new Date().toISOString(),
+          rcu: "website",
+        });
+        await finalizeOrder("pending");
+        return;
+      }
+
+      // Online payment via Razorpay
+      let razorpayOrder;
+      try {
+        const razorpayRes = await paymentService.createRazorpayOrder({
+          order_id: orderId,
+          amount: Math.round(totalPrice * 100),
+          currency: "INR",
+          rcu: "website",
+        });
+        razorpayOrder = razorpayRes.data?.data || razorpayRes.data;
+      } catch (err) {
+        console.error("Razorpay order creation failed", err);
+        setError("Payment provider is not ready. Please try Cash on Delivery or contact support.");
+        setPlacing(false);
+        return;
+      }
+
+      if (!razorpayOrder?.key_id || !razorpayOrder?.order_id) {
+        setError("Invalid payment configuration. Please try Cash on Delivery or contact support.");
+        setPlacing(false);
+        return;
+      }
+
+      const Razorpay = await loadRazorpayScript();
+
+      const options = {
+        key: razorpayOrder.key_id,
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency || "INR",
+        name: "Harry Clinton",
+        description: `Order ${orderNumber}`,
+        order_id: razorpayOrder.order_id,
+        handler: async (response) => {
+          try {
+            await paymentService.verifyRazorpayPayment({
+              order_id: orderId,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+              rcu: "website",
+            });
+
+            await paymentService.createPayment({
+              order_id: orderId,
+              user_id: userId,
+              amount: totalPrice,
+              payment_method: paymentMethod,
+              payment_status: "success",
+              payment_date: new Date().toISOString(),
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              rcu: "website",
+            });
+
+            await finalizeOrder("success");
+          } catch (err) {
+            setError(err.response?.data?.message || err.message || "Payment verification failed.");
+            setPlacing(false);
+          }
+        },
+        prefill: {
+          name: address.recipient_name,
+          email: user?.email_id || "",
+          contact: address.phone_number,
+        },
+        theme: { color: "#000000" },
+        modal: {
+          ondismiss: () => {
+            setError("Payment was cancelled. You can retry from My Orders.");
+            setPlacing(false);
+          },
+        },
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.on("payment.failed", (response) => {
+        setError(response.error?.description || "Payment failed.");
+        setPlacing(false);
+      });
+      rzp.open();
     } catch (err) {
       setError(err.response?.data?.message || err.message || "Checkout failed. Please try again.");
     } finally {
@@ -143,6 +342,39 @@ const CheckoutPage = () => {
             <div className="card-body">
               <h5 className="card-title mb-3">Shipping Address</h5>
               {error && <div className="alert alert-danger">{error}</div>}
+              {savedAddresses.length > 0 && (
+                <div className="mb-3">
+                  <label className="form-label">Select a saved address</label>
+                  <select
+                    className="form-select mb-2"
+                    value={selectedAddressId}
+                    onChange={(e) => {
+                      const id = e.target.value;
+                      setSelectedAddressId(id);
+                      const addr = savedAddresses.find((a) => a.address_id === id);
+                      if (addr) {
+                        setAddress({
+                          recipient_name: addr.full_name || "",
+                          phone_number: addr.mobile_number || "",
+                          address_line1: addr.house_street || "",
+                          address_line2: addr.landmark || "",
+                          city: addr.city || "",
+                          state: addr.state || "",
+                          postal_code: addr.pincode || "",
+                          country: "India",
+                        });
+                      }
+                    }}
+                  >
+                    <option value="">Use a saved address</option>
+                    {savedAddresses.map((addr) => (
+                      <option value={addr.address_id} key={addr.address_id}>
+                        {addr.full_name} — {addr.house_street}, {addr.city}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                   <label className="form-label">Full Name</label>
@@ -235,6 +467,20 @@ const CheckoutPage = () => {
                     />
                   </div>
                 </div>
+                {userId && (
+                  <div className="form-check mb-3">
+                    <input
+                      type="checkbox"
+                      className="form-check-input"
+                      id="saveAddress"
+                      checked={saveAddress}
+                      onChange={(e) => setSaveAddress(e.target.checked)}
+                    />
+                    <label className="form-check-label" htmlFor="saveAddress">
+                      Save this address to my account
+                    </label>
+                  </div>
+                )}
                 <div className="mb-3">
                   <label className="form-label">Payment Method</label>
                   <select
@@ -273,13 +519,19 @@ const CheckoutPage = () => {
               <span>Subtotal</span>
               <span>&#8377;{cartTotal.toLocaleString("en-IN")}</span>
             </div>
+            {appliedCoupon && (
+              <div className="d-flex justify-content-between mb-2 text-success">
+                <span>Discount ({appliedCoupon.code})</span>
+                <span>-&#8377;{discountAmount.toLocaleString("en-IN")}</span>
+              </div>
+            )}
             <div className="d-flex justify-content-between mb-2">
               <span>Tax (5%)</span>
-              <span>&#8377;{(Math.round(cartTotal * 0.05 * 100) / 100).toLocaleString("en-IN")}</span>
+              <span>&#8377;{(Math.round(discountedTotal * 0.05 * 100) / 100).toLocaleString("en-IN")}</span>
             </div>
             <div className="d-flex justify-content-between mb-2">
               <span>Shipping</span>
-              <span>{cartTotal >= 5000 ? "Free" : "₹150"}</span>
+              <span>{discountedTotal >= 5000 ? "Free" : "₹150"}</span>
             </div>
             <hr />
             <div className="d-flex justify-content-between fw-bold">
@@ -287,9 +539,9 @@ const CheckoutPage = () => {
               <span>
                 &#8377;
                 {(
-                  cartTotal +
-                  Math.round(cartTotal * 0.05 * 100) / 100 +
-                  (cartTotal >= 5000 ? 0 : 150)
+                  discountedTotal +
+                  Math.round(discountedTotal * 0.05 * 100) / 100 +
+                  (discountedTotal >= 5000 ? 0 : 150)
                 ).toLocaleString("en-IN")}
               </span>
             </div>
