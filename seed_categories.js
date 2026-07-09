@@ -128,27 +128,40 @@ async function registerOrLogin() {
   }
   console.log("Logged in.");
 
-  // Try to assign admin role using user from login response
+  // Try to assign admin role using POST /User-Roles
   try {
     const user = loginRes.data?.Response?.user;
     const currentRoles = loginRes.data?.Response?.roles || [];
     console.log("Logged in user:", user?.email_id, "current roles:", currentRoles.map((r) => r.role_name));
     const rolesRes = await api.get("/Roles");
     const roles = rolesRes.data?.data || rolesRes.data || [];
-    const adminRole = roles.find((r) => r.role_name?.toLowerCase() === "administrator" || r.role_name?.toLowerCase() === "admin");
-    console.log("Admin role found:", adminRole?.role_name);
-    if (user && adminRole && !currentRoles.some((r) => ["admin", "administrator"].includes(r.role_name?.toLowerCase()))) {
-      await api.put("/Users", {
+    let adminRole = roles.find((r) => r.role_name?.toLowerCase() === "admin");
+    // Create Admin role if it doesn't exist
+    if (!adminRole) {
+      const created = await api.post("/Roles", {
+        role_name: "Admin",
+        role_code: "ADMIN",
+        description: "Full admin access to the platform",
+        isactive: true,
+        rcu: "website",
+      });
+      adminRole = created.data?.data;
+      console.log("Created Admin role:", adminRole?.role_id);
+    }
+    console.log("Admin role:", adminRole?.role_name);
+    const alreadyAdmin = currentRoles.some((r) => r.role_name?.toLowerCase() === "admin");
+    if (user && adminRole && !alreadyAdmin) {
+      await api.post("/User-Roles", {
         user_id: user.user_id,
         role_id: adminRole.role_id,
-        luu: "website",
+        rcu: "website",
       });
-      console.log("Admin role assigned.");
+      console.log("Admin role assigned via User-Roles.");
     } else {
       console.log("User already has admin role or admin role not found.");
     }
   } catch (err) {
-    console.log("Role assignment failed:", err.response?.data?.Message || err.response?.data?.message || err.message);
+    console.log("Role assignment failed:", err.response?.data?.message || err.message);
   }
 }
 

@@ -1,6 +1,7 @@
-import { lazy, Suspense, useState } from "react";
-import { HashRouter, Route, Routes, useLocation } from "react-router-dom";
+import { lazy, Suspense, useState, useEffect } from "react";
+import { HashRouter, Route, Routes, useLocation, Navigate } from "react-router-dom";
 import PrivateRoute from "./shared/components/PrivateRoute";
+import LoginPopup from "./shared/components/LoginPopup";
 import Home from "./user/pages/Home";
 import SplashScreen from "./user/components/SplashScreen";
 import AdminLayout from "./admin/components/AdminLayout";
@@ -25,10 +26,18 @@ const AddressesPage = lazy(() => import("./user/pages/AddressesPage"));
 const OrdersPage = lazy(() => import("./user/pages/OrdersPage"));
 const AppointmentsPage = lazy(() => import("./user/pages/AppointmentsPage"));
 const SearchPage = lazy(() => import("./user/pages/SearchPage"));
+const BookAppointmentPage = lazy(() => import("./user/pages/BookAppointmentPage"));
+const NewArrivalsPage = lazy(() => import("./user/pages/NewArrivalsPage"));
+const HCSpotlightPage = lazy(() => import("./user/pages/HCSpotlightPage"));
+const TheVisionPage = lazy(() => import("./user/pages/TheVisionPage"));
+const StyleByHCPage = lazy(() => import("./user/pages/StyleByHCPage"));
+const EmbroideryPage = lazy(() => import("./user/pages/EmbroideryPage"));
 const AdminDashboard = lazy(() => import("./admin/pages/AdminDashboard"));
 const AdminCrudPage = lazy(() => import("./admin/pages/AdminCrudPage"));
 const AdminOrdersPage = lazy(() => import("./admin/pages/AdminOrdersPage"));
 const AdminAppointmentsPage = lazy(() => import("./admin/pages/AdminAppointmentsPage"));
+const AdminProductsPage = lazy(() => import("./admin/pages/AdminProductsPage"));
+const AdminUsersPage = lazy(() => import("./admin/pages/AdminUsersPage"));
 const ProductPage = lazy(() =>
   import("./user/components/Categories/Suits/ProductPage")
 );
@@ -160,12 +169,65 @@ const RouteFallback = () => (
 function AppRoutes({ splashDismissed, onSplashComplete }) {
   const location = useLocation();
   const isRoot = location.pathname === "/";
+  const roleCode = localStorage.getItem("hc_role") || "";
+  const isLoggedIn = !!(localStorage.getItem("hc_token") || localStorage.getItem("hc_session"));
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
+
+  useEffect(() => {
+    if (!splashDismissed || isLoggedIn) return;
+
+    let scrolled = false;
+    let timerDone = false;
+    let timer;
+
+    const tryShow = () => {
+      if (scrolled && timerDone) setShowLoginPopup(true);
+    };
+
+    const onScroll = () => {
+      if (!scrolled) {
+        scrolled = true;
+        tryShow();
+      }
+    };
+
+    timer = setTimeout(() => {
+      timerDone = true;
+      tryShow();
+    }, 30000);
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [splashDismissed, isLoggedIn]);
+
+  // Hide popup when user navigates to /login
+  useEffect(() => {
+    if (location.pathname === "/login") {
+      setShowLoginPopup(false);
+    }
+  }, [location.pathname]);
 
   if (isRoot && !splashDismissed) {
     return <SplashScreen onComplete={onSplashComplete} />;
   }
 
+  // Redirect admin to /admin when landing on /
+  if (isRoot && roleCode === "ADMIN") {
+    return <Navigate to="/admin" replace />;
+  }
+
   return (
+    <>
+      {showLoginPopup && (
+        <LoginPopup
+          onSkip={() => setShowLoginPopup(false)}
+          onLogin={() => setShowLoginPopup(false)}
+        />
+      )}
     <Suspense fallback={<RouteFallback />}>
       <Routes>
         {/* ADMIN */}
@@ -180,6 +242,8 @@ function AppRoutes({ splashDismissed, onSplashComplete }) {
           <Route index element={<AdminDashboard />} />
           <Route path="orders" element={<AdminOrdersPage />} />
           <Route path="appointments" element={<AdminAppointmentsPage />} />
+          <Route path="products" element={<AdminProductsPage />} />
+          <Route path="users" element={<AdminUsersPage />} />
           <Route path=":moduleKey" element={<AdminCrudPage />} />
         </Route>
 
@@ -254,6 +318,7 @@ function AppRoutes({ splashDismissed, onSplashComplete }) {
           />
 
           <Route path="/services" element={<ServicePage />} />
+          <Route path="/embroidery" element={<EmbroideryPage />} />
           <Route path="/aboutUs" element={<AboutUs />} />
           <Route path="/about-designer" element={<AboutUsFull />} />
           <Route path="/contact-us" element={<ContactUs />} />
@@ -269,10 +334,16 @@ function AppRoutes({ splashDismissed, onSplashComplete }) {
           <Route path="/addresses" element={<AddressesPage />} />
           <Route path="/orders" element={<OrdersPage />} />
           <Route path="/appointments" element={<AppointmentsPage />} />
+          <Route path="/book-appointment" element={<BookAppointmentPage />} />
+          <Route path="/new-arrivals" element={<NewArrivalsPage />} />
+          <Route path="/hc-spotlight" element={<HCSpotlightPage />} />
+          <Route path="/the-vision" element={<TheVisionPage />} />
+          <Route path="/style-by-hc" element={<StyleByHCPage />} />
           <Route path="/search" element={<SearchPage />} />
         </Route>
       </Routes>
     </Suspense>
+    </>
   );
 }
 

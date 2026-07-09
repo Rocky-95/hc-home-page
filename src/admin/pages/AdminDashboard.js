@@ -1,14 +1,21 @@
 import React, { useEffect, useState } from "react";
 import SimpleBarChart from "../components/SimpleBarChart";
-import orderService from "../../services/orderService";
-import userService from "../../services/userService";
+import { buildService } from "../services/crudService";
+
+const usersService = buildService("Users", "user_id");
+const ordersService = buildService("Orders", "order_id");
+const categoriesService = buildService("Menu-Category", "menu_category_id");
+const productsService = buildService("Products", "product_id");
+const appointmentsService = buildService("Custom-Appointments", "appointment_id");
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
-    orders: 0,
-    revenue: 0,
     users: 0,
-    pendingShipments: 0,
+    orders: 0,
+    categories: 0,
+    products: 0,
+    appointments: 0,
+    revenue: 0,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -16,28 +23,39 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [ordersRes, usersRes, shipmentsRes] = await Promise.all([
-          orderService.getOrders(),
-          userService.getUsers(),
-          orderService.getShipments(),
+        const results = await Promise.allSettled([
+          usersService.list(),
+          ordersService.list(),
+          categoriesService.list(),
+          productsService.list(),
+          appointmentsService.list(),
         ]);
-        const orders = ordersRes.data?.data || ordersRes.data || [];
-        const users = usersRes.data?.data || usersRes.data || [];
-        const shipments = shipmentsRes.data?.data || shipmentsRes.data || [];
 
-        const revenue = orders.reduce((sum, o) => sum + (o.total_price || 0), 0);
-        const pendingShipments = shipments.filter(
-          (s) => s.shipment_status?.toLowerCase() !== "delivered" && s.shipment_status?.toLowerCase() !== "returned"
-        ).length;
+        const extract = (res) => {
+          if (res.status === "fulfilled") {
+            const d = res.value;
+            return Array.isArray(d) ? d : d?.data || [];
+          }
+          return [];
+        };
+
+        const users = extract(results[0]);
+        const orders = extract(results[1]);
+        const categories = extract(results[2]);
+        const products = extract(results[3]);
+        const appointments = extract(results[4]);
+        const revenue = orders.reduce((sum, o) => sum + (parseFloat(o.total_price) || 0), 0);
 
         setStats({
-          orders: orders.length,
-          revenue,
           users: users.length,
-          pendingShipments,
+          orders: orders.length,
+          categories: categories.length,
+          products: products.length,
+          appointments: appointments.length,
+          revenue,
         });
       } catch (err) {
-        setError(err.response?.data?.message || "Failed to load dashboard stats");
+        setError("Failed to load dashboard stats");
       } finally {
         setLoading(false);
       }
@@ -46,10 +64,12 @@ const AdminDashboard = () => {
   }, []);
 
   const statCards = [
-    { label: "Total Orders", value: stats.orders.toString(), color: "#0d6efd" },
-    { label: "Total Revenue", value: `₹${stats.revenue.toLocaleString("en-IN")}`, color: "#198754" },
-    { label: "Total Users", value: stats.users.toString(), color: "#6c757d" },
-    { label: "Pending Shipments", value: stats.pendingShipments.toString(), color: "#dc3545" },
+    { label: "Total Users", value: stats.users.toString(), color: "#0d6efd", link: "/admin/users" },
+    { label: "Total Orders", value: stats.orders.toString(), color: "#6f42c1", link: "/admin/orders" },
+    { label: "Total Revenue", value: `₹${stats.revenue.toLocaleString("en-IN")}`, color: "#198754", link: "/admin/orders" },
+    { label: "Products", value: stats.products.toString(), color: "#fd7e14", link: "/admin/products" },
+    { label: "Categories", value: stats.categories.toString(), color: "#20c997", link: "/admin/categories" },
+    { label: "Appointments", value: stats.appointments.toString(), color: "#dc3545", link: "/admin/appointments" },
   ];
 
   if (loading) {
@@ -69,13 +89,15 @@ const AdminDashboard = () => {
 
       <div className="row g-4 mb-4">
         {statCards.map((stat, idx) => (
-          <div className="col-md-3 col-sm-6" key={idx}>
-            <div className="card text-white" style={{ backgroundColor: stat.color }}>
-              <div className="card-body">
-                <h5 className="card-title">{stat.label}</h5>
-                <p className="card-text fs-3 fw-bold">{stat.value}</p>
+          <div className="col-md-4 col-sm-6" key={idx}>
+            <a href={`#${stat.link}`} style={{ textDecoration: "none" }}>
+              <div className="card text-white h-100" style={{ backgroundColor: stat.color, cursor: "pointer" }}>
+                <div className="card-body">
+                  <h6 className="card-title text-white-50">{stat.label}</h6>
+                  <p className="card-text fs-2 fw-bold mb-0">{stat.value}</p>
+                </div>
               </div>
-            </div>
+            </a>
           </div>
         ))}
       </div>

@@ -56,12 +56,26 @@ const CrudForm = ({ fields, initialValues, onSubmit, onCancel }) => {
               required={field.required}
               rows={field.rows || 3}
             />
+          ) : field.type === "checkbox" ? (
+            <div className="form-check mt-1">
+              <input
+                className="form-check-input"
+                type="checkbox"
+                name={field.name}
+                id={`field_${field.name}`}
+                checked={!!values[field.name]}
+                onChange={handleChange}
+              />
+              <label className="form-check-label" htmlFor={`field_${field.name}`}>
+                {field.label}
+              </label>
+            </div>
           ) : (
             <input
               className="form-control"
               type={field.type || "text"}
               name={field.name}
-              value={values[field.name] || ""}
+              value={values[field.name] ?? ""}
               onChange={handleChange}
               required={field.required}
             />

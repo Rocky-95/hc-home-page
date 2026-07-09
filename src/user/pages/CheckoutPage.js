@@ -33,6 +33,13 @@ const CheckoutPage = () => {
   const [saveAddress, setSaveAddress] = useState(true);
 
   useEffect(() => {
+    const token = localStorage.getItem("hc_token");
+    const session = localStorage.getItem("hc_session");
+    if (!token && !session) {
+      navigate("/login", { state: { from: "/checkout" } });
+      return;
+    }
+
     const storedUser = localStorage.getItem("hc_user");
     let uid = null;
     let parsedUser = null;

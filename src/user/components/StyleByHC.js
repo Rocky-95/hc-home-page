@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import useWindowWidth from "../../shared/hooks/useWindowWidth";
 import "../styles/StyleByHC.css";
 
@@ -19,6 +20,7 @@ const defaultItems = [
 ].map((item) => ({ ...item, text: "Style By HC" }));
 
 export default function StyleByHC() {
+  const navigate = useNavigate();
   const [items, setItems] = useState(defaultItems);
   const windowWidth = useWindowWidth();
 
@@ -137,7 +139,11 @@ export default function StyleByHC() {
       >
         <div style={{ display: "inline-flex" }}>
           {items.map((item, i) => (
-            <div key={i} style={itemStyle}>
+            <div
+              key={i}
+              style={{ ...itemStyle, cursor: "pointer" }}
+              onClick={() => navigate(item.link || "/style-by-hc")}
+            >
               <img
                 src={item.img}
                 alt={item.text}
@@ -145,9 +151,6 @@ export default function StyleByHC() {
                 decoding="async"
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
-              <button className="btn btn-light btn-sm hc-button">
-                Discover the collection &nbsp; &rsaquo;
-              </button>
             </div>
           ))}
         </div>

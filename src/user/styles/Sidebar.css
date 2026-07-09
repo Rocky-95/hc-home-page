@@ -106,34 +106,54 @@
 /* ██████ MOBILE VIEW: LEFT → RIGHT SLIDE ██████ */
 @media (max-width: 768px) {
   .sidebar {
-    top: 60px;
-    width: 220px;
-    height: 1000;
-    left: -220px;
+    top: 0;
+    width: 50%;
+    height: 100vh;
+    left: -50%;
+    overflow: hidden;
+    overflow-y: auto;
     transition: left 0.3s ease;
   }
 
   .sidebar.show {
     left: 0;
-    height: 1000px;
+    height: 100vh;
   }
 
   /* Mobile → 1 column */
   .grid-3col {
     grid-template-columns: 1fr;
-    padding: 20px;
+    padding: 15px 12px;
   }
 
-  /* Hide column 3 image */
+  /* Show vision image at bottom */
   .Hdropdown-image-box {
-    display: none;
+    display: block;
+    position: relative;
+    width: 100%;
+    left: 0;
+    bottom: 0;
+  }
+
+  .Hdropdown-image {
+    height: 130px;
+    width: 100%;
+    object-fit: cover;
+  }
+
+  .Hdropdown-overlay {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    right: 8px;
   }
 }
 
 @media (max-width: 480px) {
   .sidebar {
     top: 80px;
-    width: 180px;
-    left: -180px;
+    width: 50%;
+    height: 100vh;
+    left: -50%;
   }
 }

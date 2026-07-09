@@ -22,7 +22,7 @@ const ShirtsCategoryPage = () => {
     <CategoryPage
       categorySlug="shirts"
       heroImage={labelImg}
-      heroTitle="Own the Room"
+      heroTitle="New Arrivals"
       heroSubtitle="Power dressing starts with a perfectly tailored shirt."
       marqueeWords={["WEDDING", "BUSINESS", "DESIGNER", "TRAVEL", "SMARTCASUAL"]}
       fallbackSubcategories={fallbackSubcategories}

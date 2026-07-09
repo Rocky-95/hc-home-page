@@ -1,14 +1,71 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import authService from "../../services/authService";
 
 function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const redirectTo = location.state?.from || null;
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const [otpEmail, setOtpEmail] = useState("");
+  const [otpCode, setOtpCode] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [otpVerifyLoading, setOtpVerifyLoading] = useState(false);
+  const [otpMessage, setOtpMessage] = useState("");
+
+  const handleSendOtp = async () => {
+    if (!otpEmail.trim()) { setOtpMessage("Enter email or mobile."); return; }
+    setOtpLoading(true);
+    setOtpMessage("");
+    try {
+      const res = await authService.otpLogin({ email_id: otpEmail.trim() });
+      const payload = res.data || {};
+      if (payload.Status === "1" || payload.Status === true || payload.Status === "true") {
+        setOtpSent(true);
+        setOtpMessage("OTP sent! Check your email.");
+      } else {
+        setOtpMessage(payload.Message || "Failed to send OTP.");
+      }
+    } catch (err) {
+      setOtpMessage(err.response?.data?.Message || "Failed to send OTP.");
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (!otpCode.trim()) { setOtpMessage("Enter the OTP."); return; }
+    setOtpVerifyLoading(true);
+    setOtpMessage("");
+    try {
+      const res = await authService.verifyLoginOtp({ email_id: otpEmail.trim(), otp: otpCode.trim() });
+      const payload = res.data || {};
+      const isSuccess = payload.Status === "1" || payload.Status === true || payload.Status === "true";
+      if (!isSuccess) { setOtpMessage(payload.Message || "Invalid OTP."); return; }
+      const response = payload.Response || {};
+      const token = response.token || response.access_token;
+      const user = response.user || response;
+      const roles = response.roles || user?.roles || [];
+      const primaryRole = roles[0] || {};
+      const roleCode = primaryRole.role_code || "CUSTOMER";
+      if (token) localStorage.setItem("hc_token", token);
+      localStorage.setItem("hc_session", "1");
+      localStorage.setItem("hc_user", JSON.stringify({ ...user, role_code: roleCode }));
+      localStorage.setItem("hc_role", roleCode);
+      if (roleCode === "ADMIN") navigate("/admin");
+      else navigate(redirectTo || "/");
+    } catch (err) {
+      setOtpMessage(err.response?.data?.Message || "OTP verification failed.");
+    } finally {
+      setOtpVerifyLoading(false);
+    }
+  };
 
   const handleLogin = async () => {
     setError("");
@@ -30,18 +87,25 @@ function Login() {
       const response = payload.Response || {};
       const token = response.token || response.access_token || response.auth_token;
       const user = response.user || response;
+      const roles = response.roles || user?.roles || [];
 
-      const roleName = user?.roles?.[0]?.role_name || user?.role || user?.role_name || "Customer";
-      const normalizedUser = { ...user, role: roleName };
+      const primaryRole = roles[0] || {};
+      const roleCode = primaryRole.role_code || "CUSTOMER";
+      const roleName = primaryRole.role_name || "Customer";
+      const normalizedUser = { ...user, role: roleName, role_code: roleCode };
 
       if (token) {
         localStorage.setItem("hc_token", token);
       }
+      // Backend uses cookie/session auth (no JWT). Store a session marker.
+      localStorage.setItem("hc_session", "1");
       localStorage.setItem("hc_user", JSON.stringify(normalizedUser));
-      if (roleName?.toLowerCase() === "admin") {
+      localStorage.setItem("hc_role", roleCode);
+
+      if (roleCode === "ADMIN") {
         navigate("/admin");
       } else {
-        navigate("/");
+        navigate(redirectTo || "/");
       }
     } catch (err) {
       setError(err.response?.data?.Message || err.response?.data?.message || "Login failed. Please try again.");
@@ -67,9 +131,32 @@ function Login() {
           type="text"
           placeholder="Enter email or mobile number"
           style={styles.input}
+          value={otpEmail}
+          onChange={(e) => setOtpEmail(e.target.value)}
         />
-
-        <button style={styles.button}>Send OTP</button>
+        {otpSent && (
+          <>
+            <label style={styles.label}>Enter OTP</label>
+            <input
+              type="text"
+              placeholder="Enter OTP from email"
+              style={styles.input}
+              value={otpCode}
+              onChange={(e) => setOtpCode(e.target.value)}
+            />
+            <button style={styles.button} onClick={handleVerifyOtp} disabled={otpVerifyLoading}>
+              {otpVerifyLoading ? "Verifying..." : "Verify OTP & Login"}
+            </button>
+          </>
+        )}
+        {!otpSent && (
+          <button style={styles.button} onClick={handleSendOtp} disabled={otpLoading}>
+            {otpLoading ? "Sending..." : "Send OTP"}
+          </button>
+        )}
+        {otpMessage && (
+          <p style={{ color: otpMessage.includes("sent") ? "green" : "red", fontSize: "13px", marginTop: "6px" }}>{otpMessage}</p>
+        )}
 
         <div style={styles.orBox}>
           <div style={styles.line}></div>

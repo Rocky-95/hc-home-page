@@ -12,7 +12,7 @@ const AdminCrudPage = () => {
 
   const service = useMemo(() => {
     if (!config) return null;
-    return buildService(config.module);
+    return buildService(config.module, config.idField);
   }, [config]);
 
   const [data, setData] = useState([]);
@@ -21,6 +21,7 @@ const AdminCrudPage = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [deleteItem, setDeleteItem] = useState(null);
+  const [search, setSearch] = useState("");
 
   const loadData = useCallback(async () => {
     if (!service) return;
@@ -94,13 +95,31 @@ const AdminCrudPage = () => {
     config.fields.find((f) => f.name === name) || { name, label: name }
   );
 
+  const searchFields = config.listFields.slice(0, 2);
+  const filteredData = search.trim()
+    ? data.filter((row) =>
+        searchFields.some((key) =>
+          String(row[key] ?? "").toLowerCase().includes(search.toLowerCase())
+        )
+      )
+    : data;
+
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h3>{config.label}</h3>
-        <button className="btn btn-dark" onClick={() => { setEditingItem(null); setShowForm(true); }}>
-          + Add {config.label}
-        </button>
+        <div className="d-flex gap-2">
+          <input
+            className="form-control"
+            placeholder={`Search ${config.label}...`}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{ minWidth: 200 }}
+          />
+          <button className="btn btn-dark" onClick={() => { setEditingItem(null); setShowForm(true); }}>
+            + Add {config.label}
+          </button>
+        </div>
       </div>
 
       {error && <div className="alert alert-danger">{error}</div>}
@@ -121,7 +140,7 @@ const AdminCrudPage = () => {
 
       <DataTable
         fields={listFields}
-        data={data}
+        data={filteredData}
         onEdit={handleEdit}
         onDelete={setDeleteItem}
         loading={loading}

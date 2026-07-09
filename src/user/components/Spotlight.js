@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import useWindowWidth from "../../shared/hooks/useWindowWidth";
 import img1 from "../../shared/assets/images/Designer.jpeg";
 import img2 from "../../shared/assets/images/Wedding.jpeg";
@@ -18,6 +19,7 @@ const defaultItems = [
 ].map((item) => ({ ...item, text: "HC Spotlight" }));
 
 export default function Spotlight() {
+  const navigate = useNavigate();
   const [items, setItems] = useState(defaultItems);
   const [loading, setLoading] = useState(true);
   const windowWidth = useWindowWidth();
@@ -139,7 +141,11 @@ export default function Spotlight() {
       >
         <div style={{ display: "inline-flex" }}>
           {items.map((item, i) => (
-            <div key={i} style={itemStyle}>
+            <div
+              key={i}
+              style={{ ...itemStyle, cursor: "pointer" }}
+              onClick={() => navigate(item.link || "/hc-spotlight")}
+            >
               <img
                 src={item.img}
                 alt="HC Spotlight"
@@ -147,9 +153,6 @@ export default function Spotlight() {
                 decoding="async"
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
-              <button className="btn btn-light btn-sm hc-button">
-                Discover the collection &nbsp; &rsaquo;
-              </button>
             </div>
           ))}
         </div>

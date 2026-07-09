@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "../styles/Hamburger.css";
 import "../styles/Sidebar.css";
-import { Link } from "react-router-dom";
-import travelImg from "../../shared/assets/images/BabySuits/FirstBirthdayCategory.jpeg";
+import { Link, useNavigate } from "react-router-dom";
+import travelImg from "../../shared/assets/images/vision_title.jpeg";
 import productService from "../../services/productService";
 
 const defaultCategories = [
@@ -14,6 +14,7 @@ const defaultCategories = [
 ];
 
 const Hamburger = () => {
+  const navigate = useNavigate();
   const [isActive, setIsActive] = useState(false);
   const [categories, setCategories] = useState(defaultCategories);
   const [subCategories, setSubCategories] = useState([]);
@@ -113,7 +114,7 @@ const Hamburger = () => {
           <div className="Hdropdown-category">
             <strong>SERVICES</strong>
             <ul>
-              <li><Link to="/services" onClick={() => setIsActive(false)}>Embroidery</Link></li>
+              <li><Link to="/embroidery" onClick={() => setIsActive(false)}>Embroidery</Link></li>
               <li><Link to="/services" onClick={() => setIsActive(false)}>Alterations</Link></li>
               <li><Link to="/services" onClick={() => setIsActive(false)}>Personal Styling</Link></li>
               <li><Link to="/services" onClick={() => setIsActive(false)}>Custom Tailoring</Link></li>
@@ -125,7 +126,7 @@ const Hamburger = () => {
 
   <div className="Hdropdown-overlay">
     <h4>The Vision</h4>
-    <button onClick={() => setIsActive(false)}>Shop Now</button>
+    <button onClick={() => { setIsActive(false); navigate("/the-vision"); }}>Explore</button>
   </div>
 </div>
         </div>

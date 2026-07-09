@@ -29,11 +29,10 @@ const ProfileDropdown = ({ onClose }) => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("hc_user");
-    localStorage.removeItem("hc_token");
-    localStorage.removeItem("hc_cart");
-    localStorage.removeItem("hc_wishlist");
-    localStorage.removeItem("hc_coupon");
+    if (!window.confirm("Are you sure you want to logout?")) return;
+    ["hc_user", "hc_token", "hc_session", "hc_role", "hc_cart", "hc_wishlist", "hc_coupon"].forEach(
+      (k) => localStorage.removeItem(k)
+    );
     navigate("/login");
     onClose && onClose();
   };
@@ -75,8 +74,13 @@ const ProfileDropdown = ({ onClose }) => {
             My Addresses
           </div>
 
+          <div className="dropdown-item" onClick={() => handleNavigate("/book-appointment")}>
+            <i className="bi bi-calendar-plus me-2"></i>
+            Book Appointment
+          </div>
+
           <div className="dropdown-item" onClick={() => handleNavigate("/appointments")}>
-            <i className="bi bi-calendar me-2"></i>
+            <i className="bi bi-calendar-check me-2"></i>
             My Appointments
           </div>
 
@@ -85,7 +89,7 @@ const ProfileDropdown = ({ onClose }) => {
             My Orders
           </div>
 
-          {user.role?.toLowerCase() === "admin" && (
+          {(user.role?.toLowerCase() === "admin" || user.role_code === "ADMIN") && (
             <div
               className="dropdown-item"
               onClick={() => handleNavigate("/admin")}
