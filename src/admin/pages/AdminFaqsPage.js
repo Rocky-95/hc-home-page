@@ -1,0 +1,174 @@
+import React, { useEffect, useState, useCallback } from "react";
+import api from "../services/api";
+
+const RCU = "ADMIN_PORTAL";
+
+const emptyFaq = {
+  question: "",
+  answer: "",
+  display_order: 1,
+  isactive: true,
+};
+
+const AdminFaqsPage = () => {
+  const [faqs, setFaqs] = useState([]);
+  const [form, setForm] = useState(emptyFaq);
+  const [editing, setEditing] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [message, setMessage] = useState({ text: "", isError: false });
+
+  const flash = (text, isError = false) => {
+    setMessage({ text, isError });
+    setTimeout(() => setMessage({ text: "", isError: false }), 4000);
+  };
+
+  const fetchFaqs = useCallback(async () => {
+    setLoading(true);
+    try {
+      const r = await api.get("/FAQs");
+      setFaqs(r.data?.data || r.data || []);
+    } catch {
+      setFaqs([]);
+      flash("Failed to load FAQs.", true);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchFaqs();
+  }, [fetchFaqs]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const payload = {
+        ...form,
+        display_order: parseInt(form.display_order) || 1,
+        isactive: form.isactive ? 1 : 0,
+      };
+      if (editing) {
+        await api.put("/FAQs", { ...payload, faq_id: editing.faq_id, luu: RCU });
+        flash("FAQ updated.");
+      } else {
+        await api.post("/FAQs", { ...payload, rcu: RCU });
+        flash("FAQ created.");
+      }
+      setShowForm(false);
+      setEditing(null);
+      setForm(emptyFaq);
+      fetchFaqs();
+    } catch (err) {
+      flash(err.response?.data?.message || "Failed to save FAQ.", true);
+    }
+  };
+
+  const handleDelete = async (f) => {
+    if (!window.confirm(`Delete "${f.question}"?`)) return;
+    try {
+      await api.delete("/FAQs", { data: { faq_id: f.faq_id, luu: RCU } });
+      flash("FAQ deleted.");
+      fetchFaqs();
+    } catch (err) {
+      flash(err.response?.data?.message || "Delete failed.", true);
+    }
+  };
+
+  const startEdit = (f) => {
+    setEditing(f);
+    setForm({
+      question: f.question || "",
+      answer: f.answer || "",
+      display_order: f.display_order || 1,
+      isactive: f.isactive !== false && f.isactive !== 0,
+    });
+    setShowForm(true);
+  };
+
+  const filtered = faqs.filter((f) =>
+    f.question?.toLowerCase().includes(search.toLowerCase()) ||
+    f.answer?.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div>
+      <h3 className="mb-4">FAQ Management</h3>
+      {message.text && <div className={`alert ${message.isError ? "alert-danger" : "alert-success"} py-2`}>{message.text}</div>}
+
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <input className="form-control w-auto" placeholder="Search FAQs..." value={search} onChange={(e) => setSearch(e.target.value)} style={{ minWidth: 220 }} />
+        <button className="btn btn-dark" onClick={() => { setShowForm(true); setEditing(null); setForm(emptyFaq); }}>
+          + Add FAQ
+        </button>
+      </div>
+
+      {showForm && (
+        <div className="card mb-4">
+          <div className="card-body">
+            <h5>{editing ? "Edit FAQ" : "New FAQ"}</h5>
+            <form onSubmit={handleSubmit}>
+              <div className="row g-3">
+                <div className="col-md-12">
+                  <label className="form-label">Question *</label>
+                  <input className="form-control" value={form.question} onChange={(e) => setForm((p) => ({ ...p, question: e.target.value }))} required />
+                </div>
+                <div className="col-md-12">
+                  <label className="form-label">Answer *</label>
+                  <textarea className="form-control" rows={4} value={form.answer} onChange={(e) => setForm((p) => ({ ...p, answer: e.target.value }))} required />
+                </div>
+                <div className="col-md-3">
+                  <label className="form-label">Display Order</label>
+                  <input type="number" className="form-control" value={form.display_order} onChange={(e) => setForm((p) => ({ ...p, display_order: e.target.value }))} />
+                </div>
+                <div className="col-md-3 d-flex align-items-end">
+                  <div className="form-check mb-2">
+                    <input type="checkbox" className="form-check-input" checked={form.isactive} onChange={(e) => setForm((p) => ({ ...p, isactive: e.target.checked }))} id="faqActive" />
+                    <label className="form-check-label" htmlFor="faqActive">Active</label>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-3 d-flex gap-2">
+                <button type="submit" className="btn btn-dark">{editing ? "Update" : "Create"} FAQ</button>
+                <button type="button" className="btn btn-outline-secondary" onClick={() => { setShowForm(false); setEditing(null); setForm(emptyFaq); }}>Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {loading ? (
+        <div className="text-center py-4"><div className="spinner-border" /></div>
+      ) : (
+        <div className="table-responsive">
+          <table className="table table-hover align-middle">
+            <thead className="table-dark">
+              <tr><th>Question</th><th>Answer</th><th>Order</th><th>Active</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+              {filtered.length === 0 ? (
+                <tr><td colSpan={5} className="text-center text-muted">No FAQs found.</td></tr>
+              ) : (
+                filtered.map((f) => (
+                  <tr key={f.faq_id}>
+                    <td><strong>{f.question}</strong></td>
+                    <td style={{ maxWidth: 400, whiteSpace: "pre-wrap" }}>{f.answer}</td>
+                    <td>{f.display_order}</td>
+                    <td><span className={`badge bg-${f.isactive ? "success" : "secondary"}`}>{f.isactive ? "Yes" : "No"}</span></td>
+                    <td>
+                      <button className="btn btn-sm btn-outline-dark me-1" onClick={() => startEdit(f)}>Edit</button>
+                      <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(f)}>Delete</button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default AdminFaqsPage;

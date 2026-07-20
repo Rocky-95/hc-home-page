@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import productService from "../../../../services/productService";
 import ProductFilters from "../../ProductFilters";
 import ProductGrid from "../../ProductGrid";
+import { safeParse, useSubcategorySettings } from "../../../../utils/contentHelpers";
 // import logo from ""; // "../../../../shared/assets/images/HC Black.png"
 import weddingVideo from "../../../../shared/assets/video/WeddingPage/WeddingPageVideo.mp4"; // "../../../../shared/assets/video/WeddingPage/WeddingPageVideo.mp4"
 
@@ -84,6 +85,31 @@ const fallbackCategories = [
 
 const WeddingPage = () => {
   const navigate = useNavigate();
+  const { s } = useSubcategorySettings("wedding");
+
+  const dynamicHeroVideo = s("hero_video") || weddingVideo;
+  const dynamicHeroTitle = s("hero_title") || "Velvet Royal Series";
+  const dynamicHeroSubtitle =
+    s("hero_subtitle") || "For the Men Who Wear Royalty, Not Just Suits.";
+  const dynamicMarquee =
+    safeParse(s("marquee_words")) || [
+      "Pick your Handcrafted elegance for unforgettable moments.",
+    ];
+  const dynamicLeftImage = s("left_image") || leftImg;
+  const dynamicCenterVideo = s("center_video") || centerVideo;
+  const dynamicRightImage = s("right_image") || rightImg;
+  const dynamicSliderImages =
+    safeParse(s("slider_images")) || [sliderImg1, sliderImg2, sliderImg3];
+  const dynamicLabelVideo = s("label_video") || LabelVideo;
+  const dynamicLabelImage = s("label_image") || LabelImage;
+  const dynamicDescriptionTitle =
+    s("description_title") || "Regal Black & Gold Hand-Embroidered Tuxedo";
+  const dynamicDescriptionText =
+    s("description_text") ||
+    "Command attention with this masterpiece of craftsmanship: a luxurious black velvet tuxedo intricately hand-embroidered with golden threadwork and shimmering sequins. The blazer features an ornate front design, extending seamlessly to an equally detailed back, showcasing royal patterns inspired by heritage artistry. Paired with a sleek black shirt, bow tie, and trousers, the look is finished with a golden pocket square for the perfect touch of elegance.\n\nThis outfit blends modern tailoring with timeless hand embroidery, making it the ideal choice for weddings, receptions, red carpet events, and any occasion where sophistication meets grandeur.";
+  const dynamicFooterText =
+    s("footer_text") || "The Wedding Suit Collection – Luxury Hand Embroidered";
+
   const [categories, setCategories] = useState(fallbackCategories);
   const [variants, setVariants] = useState([]);
   const [attributeValues, setAttributeValues] = useState([]);
@@ -236,7 +262,7 @@ onClick={() => navigate(`/product/${cat.id}`)}
       {/* ===== HERO VIDEO ===== */}
       <section className="position-relative w-100">
         <video
-          src={weddingVideo}
+          src={dynamicHeroVideo}
           className="w-100"
           style={{ objectFit: "cover", height: "600px" }}
           autoPlay
@@ -246,10 +272,8 @@ onClick={() => navigate(`/product/${cat.id}`)}
         />
      
          <div className="position-absolute text-white hero-overlay">
-          <h1 className="fw-bold display-4 mb-1">Velvet Royal Series</h1>
-          <h5 className="fw-normal mb-0">
-For the Men Who Wear Royalty, Not Just Suits.
-      </h5>
+          <h1 className="fw-bold display-4 mb-1">{dynamicHeroTitle}</h1>
+          <h5 className="fw-normal mb-0">{dynamicHeroSubtitle}</h5>
           <button
             className="btn btn-light btn-lg fw-semibold mt-3"
             style={{ borderRadius: "20px", padding: "0.5rem 1.5rem" }}
@@ -266,7 +290,7 @@ For the Men Who Wear Royalty, Not Just Suits.
       <div className="bg-light overflow-hidden">
         <div className="d-flex marquee-track py-4">
           {Array(4)
-            .fill(["Pick your Handcrafted elegance for unforgettable moments."])
+            .fill(dynamicMarquee)
             .flat()
             .map((word, idx) => (
               <span key={idx} className="mx-4 fw-bold text-uppercase">
@@ -281,7 +305,7 @@ For the Men Who Wear Royalty, Not Just Suits.
     {/* Left Image */}
     <div className="col-md-4">
       <img
-        src={leftImg}
+        src={dynamicLeftImage}
         alt="Left"
         className="img-fluid shadow-sm"
         style={{
@@ -295,7 +319,7 @@ For the Men Who Wear Royalty, Not Just Suits.
     {/* Center Video */}
     <div className="col-md-4">
       <video
-        src={centerVideo}
+        src={dynamicCenterVideo}
         className="w-100 shadow-sm"
         style={{
           height: "520.39px",
@@ -313,7 +337,7 @@ For the Men Who Wear Royalty, Not Just Suits.
     {/* Right Image */}
     <div className="col-md-4">
       <img
-        src={rightImg}
+        src={dynamicRightImage}
         alt="Right"
         className="img-fluid shadow-sm"
         style={{
@@ -334,7 +358,7 @@ For the Men Who Wear Royalty, Not Just Suits.
       <div className="carousel-inner">
         <div className="carousel-item active">
           <img
-            src={sliderImg1}
+            src={dynamicSliderImages[0]}
             className="d-block w-100"
             alt="Slide 1"
             style={{ height: "500px", objectFit: "cover" }}
@@ -342,7 +366,7 @@ For the Men Who Wear Royalty, Not Just Suits.
         </div>
         <div className="carousel-item">
           <img
-            src={sliderImg2}
+            src={dynamicSliderImages[1]}
             className="d-block w-100"
             alt="Slide 2"
             style={{ height: "500px", objectFit: "cover" }}
@@ -350,7 +374,7 @@ For the Men Who Wear Royalty, Not Just Suits.
         </div>
         <div className="carousel-item">
           <img
-            src={sliderImg3}
+            src={dynamicSliderImages[2]}
             className="d-block w-100"
             alt="Slide 3"
             style={{ height: "500px", objectFit: "cover" }}
@@ -383,21 +407,10 @@ For the Men Who Wear Royalty, Not Just Suits.
   {/* Right Side: Description */}
   <div className="col-md-6 d-flex align-items-center p-4">
     <div>
-      <h3>Regal Black & Gold Hand-Embroidered Tuxedo</h3>
-      <p>
-        Command attention with this masterpiece of craftsmanship: a luxurious
-        black velvet tuxedo intricately hand-embroidered with golden threadwork
-        and shimmering sequins. The blazer features an ornate front design,
-        extending seamlessly to an equally detailed back, showcasing royal
-        patterns inspired by heritage artistry. Paired with a sleek black shirt,
-        bow tie, and trousers, the look is finished with a golden pocket square
-        for the perfect touch of elegance.
-      </p>
-      <p>
-        This outfit blends modern tailoring with timeless hand embroidery,
-        making it the ideal choice for weddings, receptions, red carpet events,
-        and any occasion where sophistication meets grandeur.
-      </p>
+      <h3>{dynamicDescriptionTitle}</h3>
+      {dynamicDescriptionText.split("\n").map((para, idx) => (
+        <p key={idx}>{para}</p>
+      ))}
     </div>
   </div>
 </div>
@@ -406,7 +419,7 @@ For the Men Who Wear Royalty, Not Just Suits.
   {/* Left Side: Video (75%) */}
   <div className="col-md-9 p-0">
     <video
-      src={LabelVideo} 
+      src={dynamicLabelVideo}
       className="w-100"
       style={{ height: "500px", objectFit: "cover" }}
       autoPlay
@@ -419,7 +432,7 @@ For the Men Who Wear Royalty, Not Just Suits.
   {/* Right Side: Image (25%) */}
   <div className="col-md-3 p-0">
     <img
-      src={LabelImage} 
+      src={dynamicLabelImage}
       alt="Right Side"
       className="img-fluid"
       style={{ height: "500px", width: "100%", objectFit: "cover" }}
@@ -429,7 +442,7 @@ For the Men Who Wear Royalty, Not Just Suits.
 {/* TEXT BAR WITH CONTINUOUS FADE-IN FADE-OUT */}
 <div className="bg-light text-center py-4">
   <span className="fw-bold text-uppercase fs-4 fade-in-out-text">
-    The Wedding Suit Collection â€“ Luxury Hand Embroidered
+    {dynamicFooterText}
   </span>
 </div>
 

@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useWindowWidth from "../../shared/hooks/useWindowWidth";
+import { useContentData, getSetting } from "../../utils/contentHelpers";
 import "../styles/StyleByHC.css";
 
 import img1 from "../../shared/assets/images/Designer.jpeg";
@@ -23,6 +24,8 @@ export default function StyleByHC() {
   const navigate = useNavigate();
   const [items, setItems] = useState(defaultItems);
   const windowWidth = useWindowWidth();
+  const { settings } = useContentData();
+  const sectionTitle = getSetting(settings, "home_style_by_hc_title") || "Style By HC";
 
   useEffect(() => {
     const fetchStyleCollections = async () => {
@@ -125,7 +128,7 @@ export default function StyleByHC() {
     <div style={{ position: "relative", width: "100%", height: isMobile ? "300px" : "500px" }}>
       {/* Style By HC label — fixed over the section, never scrolls */}
       <div style={labelStyle}>
-        Style By HC
+        {sectionTitle}
       </div>
 
       <div

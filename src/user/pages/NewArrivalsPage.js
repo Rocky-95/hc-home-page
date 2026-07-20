@@ -2,11 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import productService from "../../services/productService";
 import { useCart } from "../../context/CartContext";
+import { useContentData, getSetting, safeParse } from "../../utils/contentHelpers";
 import heroBg from "../../shared/assets/images/SuitsPage/LabelNew2.jpeg";
 import "../styles/NewArrivalsPage.css";
 
 const placeholder = "https://via.placeholder.com/400x533?text=HC";
-const MARQUEE_WORDS = ["NEW ARRIVALS", "·", "JUST DROPPED", "·", "LATEST CUTS", "·", "FRESH STYLES", "·", "HARRY CLINTON", "·"];
+const DEFAULT_MARQUEE_WORDS = ["NEW ARRIVALS", "·", "JUST DROPPED", "·", "LATEST CUTS", "·", "FRESH STYLES", "·", "HARRY CLINTON", "·"];
 
 const SkeletonCards = () =>
   Array.from({ length: 8 }).map((_, i) => (
@@ -21,6 +22,16 @@ const NewArrivalsPage = () => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const gridRef = useRef(null);
+  const { settings } = useContentData();
+
+  const getSettingValue = (key, fallback = "") => getSetting(settings, `new_arrivals_${key}`) || fallback;
+
+  const heroImage = getSettingValue("hero_bg") || heroBg;
+  const heroEyebrow = getSettingValue("hero_eyebrow", "Just Dropped");
+  const heroTitle = getSettingValue("hero_title", "New Arrivals");
+  const heroSubtitle = getSettingValue("hero_subtitle", "The latest additions,crafted for the modern gentleman.");
+  const heroCta = getSettingValue("hero_cta", "Explore Now");
+  const marqueeWords = safeParse(getSettingValue("marquee_words")) || DEFAULT_MARQUEE_WORDS;
 
   const [products, setProducts] = useState([]);
   const [media, setMedia] = useState([]);
@@ -86,15 +97,13 @@ const NewArrivalsPage = () => {
     <>
       {/* ── Hero ── */}
       <section className="na-hero">
-        <img src={heroBg} alt="New Arrivals" className="na-hero__bg" />
+        <img src={heroImage} alt={heroTitle} className="na-hero__bg" />
         <div className="na-hero__content">
-          <p className="na-hero__eyebrow">Just Dropped</p>
-          <h1 className="na-hero__title">New Arrivals</h1>
-          <p className="na-hero__sub">
-            The latest additions,crafted for the modern gentleman.
-          </p>
+          <p className="na-hero__eyebrow">{heroEyebrow}</p>
+          <h1 className="na-hero__title">{heroTitle}</h1>
+          <p className="na-hero__sub">{heroSubtitle}</p>
           <button className="na-hero__cta" onClick={scrollToGrid}>
-            Explore Now
+            {heroCta}
           </button>
         </div>
       </section>
@@ -102,7 +111,7 @@ const NewArrivalsPage = () => {
       {/* ── Marquee ── */}
       <div className="na-marquee">
         <div className="na-marquee__track">
-          {Array(4).fill(MARQUEE_WORDS).flat().map((w, i) => (
+          {Array(4).fill(marqueeWords).flat().map((w, i) => (
             <span key={i} className={w === "·" ? "na-marquee__dot" : "na-marquee__word"}>
               {w}
             </span>

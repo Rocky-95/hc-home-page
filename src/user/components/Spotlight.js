@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useWindowWidth from "../../shared/hooks/useWindowWidth";
+import { useContentData, getSetting } from "../../utils/contentHelpers";
 import img1 from "../../shared/assets/images/Designer.jpeg";
 import img2 from "../../shared/assets/images/Wedding.jpeg";
 import img3 from "../../shared/assets/images/SmartCasual.jpeg";
@@ -23,6 +24,8 @@ export default function Spotlight() {
   const [items, setItems] = useState(defaultItems);
   const [loading, setLoading] = useState(true);
   const windowWidth = useWindowWidth();
+  const { settings } = useContentData();
+  const sectionTitle = getSetting(settings, "home_spotlight_title") || "HC Spotlight";
 
   useEffect(() => {
     const fetchSpotlight = async () => {
@@ -127,7 +130,7 @@ export default function Spotlight() {
     <div style={{ position: "relative", width: "100%", height: isMobile ? "300px" : "500px" }}>
       {/* HC Spotlight label — fixed over the section, never scrolls */}
       <div style={spotlightLabelStyle}>
-        HC Spotlight
+        {sectionTitle}
       </div>
 
       <div

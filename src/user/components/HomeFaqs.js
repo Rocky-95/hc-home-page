@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import "../styles/HomeFaqs.css"; // 👈 We'll add mobile styles here
+import "../styles/HomeFaqs.css";
+import { useContentData, getSetting } from "../../utils/contentHelpers";
 import contentService from "../../services/contentService";
 
 const defaultFaqs = [
@@ -33,6 +34,8 @@ const defaultFaqs = [
 const HomeFaqs = () => {
   const [faqs, setFaqs] = useState(defaultFaqs);
   const [openId, setOpenId] = useState(1);
+  const { settings } = useContentData();
+  const sectionTitle = getSetting(settings, "home_faqs_title") || "FAQs";
 
   useEffect(() => {
     const fetchFaqs = async () => {
@@ -59,7 +62,7 @@ const HomeFaqs = () => {
 
   return (
     <div className="container my-5 home-faqs">
-      <h2 className="mb-4 text-center">FAQs</h2>
+      <h2 className="mb-4 text-center">{sectionTitle}</h2>
       <div className="accordion" id="faqAccordion">
         {faqs.map((faq) => {
           const isOpen = openId === faq.id;

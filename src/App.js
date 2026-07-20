@@ -30,6 +30,7 @@ const BookAppointmentPage = lazy(() => import("./user/pages/BookAppointmentPage"
 const NewArrivalsPage = lazy(() => import("./user/pages/NewArrivalsPage"));
 const HCSpotlightPage = lazy(() => import("./user/pages/HCSpotlightPage"));
 const TheVisionPage = lazy(() => import("./user/pages/TheVisionPage"));
+const ComingSoonPage = lazy(() => import("./user/pages/ComingSoonPage"));
 const StyleByHCPage = lazy(() => import("./user/pages/StyleByHCPage"));
 const EmbroideryPage = lazy(() => import("./user/pages/EmbroideryPage"));
 const AdminDashboard = lazy(() => import("./admin/pages/AdminDashboard"));
@@ -38,6 +39,13 @@ const AdminOrdersPage = lazy(() => import("./admin/pages/AdminOrdersPage"));
 const AdminAppointmentsPage = lazy(() => import("./admin/pages/AdminAppointmentsPage"));
 const AdminProductsPage = lazy(() => import("./admin/pages/AdminProductsPage"));
 const AdminUsersPage = lazy(() => import("./admin/pages/AdminUsersPage"));
+const AdminCategoriesPage = lazy(() => import("./admin/pages/AdminCategoriesPage"));
+const AdminSubCategoriesPage = lazy(() => import("./admin/pages/AdminSubCategoriesPage"));
+const AdminFaqsPage = lazy(() => import("./admin/pages/AdminFaqsPage"));
+const AdminSettingsPage = lazy(() => import("./admin/pages/AdminSettingsPage"));
+const AdminSupportContactsPage = lazy(() => import("./admin/pages/AdminSupportContactsPage"));
+const AdminLegalPagesPage = lazy(() => import("./admin/pages/AdminLegalPagesPage"));
+const AdminSpotlightMediaPage = lazy(() => import("./admin/pages/AdminSpotlightMediaPage"));
 const ProductPage = lazy(() =>
   import("./user/components/Categories/Suits/ProductPage")
 );
@@ -244,6 +252,13 @@ function AppRoutes({ splashDismissed, onSplashComplete }) {
           <Route path="appointments" element={<AdminAppointmentsPage />} />
           <Route path="products" element={<AdminProductsPage />} />
           <Route path="users" element={<AdminUsersPage />} />
+          <Route path="categories" element={<AdminCategoriesPage />} />
+          <Route path="subcategories" element={<AdminSubCategoriesPage />} />
+          <Route path="faqs" element={<AdminFaqsPage />} />
+          <Route path="settings" element={<AdminSettingsPage />} />
+          <Route path="support-contacts" element={<AdminSupportContactsPage />} />
+          <Route path="legal-pages" element={<AdminLegalPagesPage />} />
+          <Route path="spotlight-media" element={<AdminSpotlightMediaPage />} />
           <Route path=":moduleKey" element={<AdminCrudPage />} />
         </Route>
 
@@ -298,24 +313,21 @@ function AppRoutes({ splashDismissed, onSplashComplete }) {
           <Route path="/collection/travel-trouser" element={<TravelTrouser />} />
           <Route path="/collection/smart-casual-trouser" element={<SmartCasualTrouser />} />
 
-          <Route path="/tuxedo" element={<TuxedoCollection />} />
+          <Route path="/tuxedo" element={<ComingSoonPage title="Tuxedo Collection" />} />
           <Route
             path="/extreme-poppins"
-            element={<ExtremePoppinsCollection />}
+            element={<ComingSoonPage title="Extreme Poppins Collection" />}
           />
           <Route
             path="/gurkha-trousers"
-            element={<GurkhaTrouserCollection />}
+            element={<ComingSoonPage title="Gurkha Trousers Collection" />}
           />
           <Route
             path="/linen-shirts-trousers"
-            element={<LinenCollection />}
+            element={<ComingSoonPage title="Linen Collection" />}
           />
-          <Route path="/cigarettes" element={<CigaretteCollection />} />
-          <Route
-            path="/collections/product/:id"
-            element={<CollectionProductPage />}
-          />
+          <Route path="/cigarettes" element={<ComingSoonPage title="88 Cigarette Collection" />} />
+          <Route path="/coming-soon" element={<ComingSoonPage />} />
 
           <Route path="/services" element={<ServicePage />} />
           <Route path="/embroidery" element={<EmbroideryPage />} />

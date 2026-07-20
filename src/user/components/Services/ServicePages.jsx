@@ -1,5 +1,6 @@
 import { useState } from "react";
 import logo from "../../../shared/assets/images/HC-Logo-Golden.PNG";
+import { safeParse, getSetting, getSection, useContentData } from "../../../utils/contentHelpers";
 /* ─────────────────────────────────────────────
    SHARED CONSTANTS & HELPERS
 ───────────────────────────────────────────── */
@@ -9,6 +10,7 @@ const NAV_ITEMS = [
   { id: "styling", label: "Personal Styling" },
   { id: "tailoring", label: "Custom Tailoring" },
 ];
+
 /* ─────────────────────────────────────────────
    SHARED NAV BAR
 ───────────────────────────────────────────── */
@@ -146,9 +148,21 @@ const EMBROIDERY_GALLERY = [
   { label: "Bridal Panel", color: "#2d261e", accent: "#d4a06a" },
 ];
 
-function EmbroideryPage({ onBook }) {
+function EmbroideryPage({ onBook, data }) {
   const [activeTab, setActiveTab] = useState(0);
   const [hoveredCard, setHoveredCard] = useState(null);
+  const { settings, sections } = data || {};
+  const s = (key) => getSetting(settings || [], key);
+  const sec = (title) => getSection(sections || [], title);
+
+  const embroideryTechniques = safeParse(s("services_embroidery_techniques")) || EMBROIDERY_TECHNIQUES;
+  const embroideryGallery = safeParse(s("services_embroidery_gallery")) || EMBROIDERY_GALLERY;
+  const heroEyebrow = s("services_embroidery_hero_eyebrow") || sec("Embroidery Hero Eyebrow") || "Artisan Embroidery";
+  const heroTitle = s("services_embroidery_hero_title") || sec("Embroidery Hero Title") || "Thread by thread,\nstory by story.";
+  const heroBody = s("services_embroidery_hero_body") || sec("Embroidery Hero Body") || "Centuries-old embroidery traditions, reimagined for modern garments. Each stitch placed with intention — from bridal couture to everyday elegance.";
+  const heroTags = safeParse(s("services_embroidery_hero_tags")) || [["Hand Embroidered", "#c9a96e"], ["Machine Precision", "#7ab8a8"], ["Bespoke Designs", "#b87ab8"]];
+  const techniquesTitle = s("services_embroidery_techniques_title") || sec("Embroidery Techniques Title") || "Our Techniques";
+  const sampleTitle = s("services_embroidery_sample_title") || sec("Embroidery Sample Title") || "Sample Work";
 
   return (
     <div style={{ background: "#0f0d0b", minHeight: "100vh", paddingTop: "64px" }}>
@@ -179,7 +193,7 @@ function EmbroideryPage({ onBook }) {
           }}>
             <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#c9a96e" }} />
             <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "10px", letterSpacing: "0.22em", color: "#c9a96e", textTransform: "uppercase" }}>
-              Artisan Embroidery
+              {heroEyebrow}
             </span>
           </div>
 
@@ -190,8 +204,15 @@ function EmbroideryPage({ onBook }) {
             lineHeight: "1.0", letterSpacing: "-0.02em",
             margin: "0 0 24px 0",
           }}>
-            Thread by thread,<br />
-            <em style={{ color: "#c9a96e", fontWeight: "300" }}>story by story.</em>
+            {heroTitle.includes("\n")
+              ? heroTitle.split("\n").map((line, i) => (
+                  <span key={i}>
+                    {i === 0 && <>{line}<br /></>}
+                    {i === 1 && <em style={{ color: "#c9a96e", fontWeight: "300" }}>{line}</em>}
+                    {i > 1 && <span> {line}</span>}
+                  </span>
+                ))
+              : heroTitle}
           </h1>
 
           <p style={{
@@ -199,12 +220,11 @@ function EmbroideryPage({ onBook }) {
             fontSize: "16px", fontWeight: "300", color: "#7a7068",
             lineHeight: "1.9", maxWidth: "520px", margin: "0 0 48px 0",
           }}>
-            Centuries-old embroidery traditions, reimagined for modern garments.
-            Each stitch placed with intention — from bridal couture to everyday elegance.
+            {heroBody}
           </p>
 
           <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
-            {[["Hand Embroidered", "#c9a96e"], ["Machine Precision", "#7ab8a8"], ["Bespoke Designs", "#b87ab8"]].map(([label, color]) => (
+            {heroTags.map(([label, color]) => (
               <div key={label} style={{
                 display: "flex", alignItems: "center", gap: "8px",
                 fontFamily: "'DM Sans', sans-serif",
@@ -221,11 +241,11 @@ function EmbroideryPage({ onBook }) {
       {/* Techniques tabs */}
       <div style={{ padding: "64px 60px", background: "#13110e" }}>
         <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "10px", letterSpacing: "0.22em", color: "#5a5248", textTransform: "uppercase", marginBottom: "32px" }}>
-          Our Techniques
+          {techniquesTitle}
         </p>
 
         <div style={{ display: "flex", gap: "8px", marginBottom: "40px", flexWrap: "wrap" }}>
-          {EMBROIDERY_TECHNIQUES.map((t, i) => (
+          {embroideryTechniques.map((t, i) => (
             <button key={i}
               onClick={() => setActiveTab(i)}
               style={{
@@ -249,13 +269,13 @@ function EmbroideryPage({ onBook }) {
           maxWidth: "600px",
         }}>
           <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "10px", letterSpacing: "0.18em", color: "#5a5248", textTransform: "uppercase", margin: "0 0 12px 0" }}>
-            Origin: {EMBROIDERY_TECHNIQUES[activeTab].origin}
+            Origin: {embroideryTechniques[activeTab].origin}
           </p>
           <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "28px", fontWeight: "600", color: "#c9a96e", margin: "0 0 16px 0" }}>
-            {EMBROIDERY_TECHNIQUES[activeTab].name}
+            {embroideryTechniques[activeTab].name}
           </h3>
           <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "15px", fontWeight: "300", color: "#9a9088", lineHeight: "1.8", margin: 0 }}>
-            {EMBROIDERY_TECHNIQUES[activeTab].desc}
+            {embroideryTechniques[activeTab].desc}
           </p>
         </div>
       </div>
@@ -263,10 +283,10 @@ function EmbroideryPage({ onBook }) {
       {/* Gallery grid */}
       <div style={{ padding: "64px 60px", background: "#0f0d0b" }}>
         <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "10px", letterSpacing: "0.22em", color: "#5a5248", textTransform: "uppercase", marginBottom: "32px" }}>
-          Sample Work
+          {sampleTitle}
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "16px" }}>
-          {EMBROIDERY_GALLERY.map((g, i) => (
+          {embroideryGallery.map((g, i) => (
             <div key={i}
               onMouseEnter={() => setHoveredCard(i)}
               onMouseLeave={() => setHoveredCard(null)}
@@ -311,8 +331,18 @@ const ALTERATION_TYPES = [
   { icon: "◇", label: "Button & Fastener", desc: "Replacement, repositioning, or new buttonholes added.", time: "1 day" },
 ];
 
-function AlterationsPage({ onBook }) {
+function AlterationsPage({ onBook, data }) {
   const [hovered, setHovered] = useState(null);
+  const { settings, sections } = data || {};
+  const s = (key) => getSetting(settings || [], key);
+  const sec = (title) => getSection(sections || [], title);
+
+  const heroEyebrow = s("services_alterations_hero_eyebrow") || sec("Alterations Hero Eyebrow") || "Alterations Service";
+  const heroTitle = s("services_alterations_hero_title") || sec("Alterations Hero Title") || "Every garment\ndeserves to fit.";
+  const heroBody = s("services_alterations_hero_body") || sec("Alterations Hero Body") || "A great fit transforms how you feel. We alter off-the-rack and designer pieces alike — with precision, care, and respect for the original craft.";
+  const heroStats = safeParse(s("services_alterations_hero_stats")) || [["48hr", "Rush Available"], ["100%", "Satisfaction"], ["15+", "Years Experience"]];
+  const alterationTypes = safeParse(s("services_alterations_types")) || ALTERATION_TYPES;
+  const offerTitle = s("services_alterations_offer_title") || sec("Alterations Offer Title") || "What We Offer";
 
   return (
     <div style={{ background: "#f7f4ef", minHeight: "100vh", paddingTop: "64px" }}>
@@ -340,7 +370,7 @@ function AlterationsPage({ onBook }) {
               paddingLeft: "16px", marginBottom: "32px",
             }}>
               <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "10px", letterSpacing: "0.22em", color: "#8b8078", textTransform: "uppercase", margin: 0 }}>
-                Alterations Service
+                {heroEyebrow}
               </p>
             </div>
 
@@ -351,8 +381,15 @@ function AlterationsPage({ onBook }) {
               lineHeight: "1.05", letterSpacing: "-0.02em",
               margin: "0 0 24px 0",
             }}>
-              Every garment<br />
-              <em style={{ fontWeight: "300", color: "#8b7355" }}>deserves to fit.</em>
+              {heroTitle.includes("\n")
+                ? heroTitle.split("\n").map((line, i) => (
+                    <span key={i}>
+                      {i === 0 && <>{line}<br /></>}
+                      {i === 1 && <em style={{ fontWeight: "300", color: "#8b7355" }}>{line}</em>}
+                      {i > 1 && <span> {line}</span>}
+                    </span>
+                  ))
+                : heroTitle}
             </h1>
 
             <p style={{
@@ -360,11 +397,11 @@ function AlterationsPage({ onBook }) {
               fontSize: "15px", fontWeight: "300", color: "#6b6057",
               lineHeight: "1.85", margin: "0 0 36px 0",
             }}>
-              A great fit transforms how you feel. We alter off-the-rack and designer pieces alike — with precision, care, and respect for the original craft.
+              {heroBody}
             </p>
 
             <div style={{ display: "flex", gap: "32px" }}>
-              {[["48hr", "Rush Available"], ["100%", "Satisfaction"], ["15+", "Years Experience"]].map(([num, label]) => (
+              {heroStats.map(([num, label]) => (
                 <div key={label}>
                   <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "28px", fontWeight: "700", color: "#1a1714", margin: "0 0 4px 0" }}>{num}</p>
                   <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", color: "#8b8078", margin: 0, letterSpacing: "0.06em" }}>{label}</p>
@@ -407,10 +444,10 @@ function AlterationsPage({ onBook }) {
       {/* Service grid */}
       <div style={{ padding: "64px 60px", background: "#ffffff" }}>
         <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "10px", letterSpacing: "0.22em", color: "#a89f96", textTransform: "uppercase", marginBottom: "36px" }}>
-          What We Offer
+          {offerTitle}
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "16px" }}>
-          {ALTERATION_TYPES.map((item, i) => (
+          {alterationTypes.map((item, i) => (
             <div key={i}
               onMouseEnter={() => setHovered(i)}
               onMouseLeave={() => setHovered(null)}
@@ -497,8 +534,20 @@ const STYLING_PACKAGES = [
   },
 ];
 
-function StylingPage({ onBook }) {
+function StylingPage({ onBook, data }) {
   const [hoveredPkg, setHoveredPkg] = useState(null);
+  const { settings, sections } = data || {};
+  const s = (key) => getSetting(settings || [], key);
+  const sec = (title) => getSection(sections || [], title);
+
+  const heroEyebrow = s("services_styling_hero_eyebrow") || sec("Styling Hero Eyebrow") || "Personal Styling";
+  const heroTitle = s("services_styling_hero_title") || sec("Styling Hero Title") || "Dress the life\nyou're living.";
+  const heroBody = s("services_styling_hero_body") || sec("Styling Hero Body") || "Your wardrobe should feel effortless. Our stylists decode your lifestyle, body, and personality to build looks that are authentically, unapologetically you.";
+  const heroMoods = safeParse(s("services_styling_hero_moods")) || ["Classic", "Contemporary", "Minimalist", "Bold", "Eclectic"];
+  const stylingPackages = safeParse(s("services_styling_packages")) || STYLING_PACKAGES;
+  const packagesTitle = s("services_styling_packages_title") || sec("Styling Packages Title") || "Styling Packages";
+  const processSteps = safeParse(s("services_styling_process_steps")) || ["Style Consult", "Analysis", "Curation", "Final Reveal"];
+  const processTitle = s("services_styling_process_title") || sec("Styling Process Title") || "How It Works";
 
   return (
     <div style={{ background: "#0e0c10", minHeight: "100vh", paddingTop: "64px" }}>
@@ -528,7 +577,7 @@ function StylingPage({ onBook }) {
           }}>
             <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#b87ab8" }} />
             <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "10px", letterSpacing: "0.22em", color: "#b87ab8", textTransform: "uppercase" }}>
-              Personal Styling
+              {heroEyebrow}
             </span>
           </div>
 
@@ -539,8 +588,15 @@ function StylingPage({ onBook }) {
             lineHeight: "1.05", letterSpacing: "-0.02em",
             margin: "0 0 24px 0",
           }}>
-            Dress the life<br />
-            <em style={{ color: "#b87ab8", fontWeight: "300" }}>you're living.</em>
+            {heroTitle.includes("\n")
+              ? heroTitle.split("\n").map((line, i) => (
+                  <span key={i}>
+                    {i === 0 && <>{line}<br /></>}
+                    {i === 1 && <em style={{ color: "#b87ab8", fontWeight: "300" }}>{line}</em>}
+                    {i > 1 && <span> {line}</span>}
+                  </span>
+                ))
+              : heroTitle}
           </h1>
 
           <p style={{
@@ -548,12 +604,12 @@ function StylingPage({ onBook }) {
             fontSize: "16px", fontWeight: "300", color: "#6a6270",
             lineHeight: "1.9", maxWidth: "500px", margin: "0 0 48px 0",
           }}>
-            Your wardrobe should feel effortless. Our stylists decode your lifestyle, body, and personality to build looks that are authentically, unapologetically you.
+            {heroBody}
           </p>
 
           {/* Style moods */}
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-            {["Classic", "Contemporary", "Minimalist", "Bold", "Eclectic"].map(mood => (
+            {heroMoods.map(mood => (
               <div key={mood} style={{
                 background: "rgba(255,255,255,0.05)",
                 border: "1px solid rgba(255,255,255,0.1)",
@@ -572,10 +628,10 @@ function StylingPage({ onBook }) {
       {/* Packages */}
       <div style={{ padding: "64px 60px", background: "#13111a" }}>
         <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "10px", letterSpacing: "0.22em", color: "#4a4850", textTransform: "uppercase", marginBottom: "36px" }}>
-          Styling Packages
+          {packagesTitle}
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "20px" }}>
-          {STYLING_PACKAGES.map((pkg, i) => (
+          {stylingPackages.map((pkg, i) => (
             <div key={i}
               onMouseEnter={() => setHoveredPkg(i)}
               onMouseLeave={() => setHoveredPkg(null)}
@@ -636,11 +692,11 @@ function StylingPage({ onBook }) {
       {/* Process steps */}
       <div style={{ padding: "64px 60px", background: "#0e0c10" }}>
         <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "10px", letterSpacing: "0.22em", color: "#4a4850", textTransform: "uppercase", marginBottom: "40px" }}>
-          How It Works
+          {processTitle}
         </p>
         <div style={{ display: "flex", gap: "0", position: "relative" }}>
           <div style={{ position: "absolute", top: "20px", left: "20px", right: "20px", height: "1px", background: "rgba(255,255,255,0.08)" }} />
-          {["Style Consult", "Analysis", "Curation", "Final Reveal"].map((step, i) => (
+          {processSteps.map((step, i) => (
             <div key={step} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "16px", position: "relative" }}>
               <div style={{
                 width: "40px", height: "40px", borderRadius: "50%",
@@ -677,8 +733,22 @@ const TAILORING_STEPS = [
 
 const GARMENT_TYPES = ["Suit", "Sherwani", "Kurta Set", "Blazer", "Trousers", "Dress", "Lehenga", "Coat"];
 
-function TailoringPage({ onBook }) {
-  const [selectedGarment, setSelectedGarment] = useState("Suit");
+function TailoringPage({ onBook, data }) {
+  const { settings, sections } = data || {};
+  const s = (key) => getSetting(settings || [], key);
+  const sec = (title) => getSection(sections || [], title);
+  const garmentTypes = safeParse(s("services_tailoring_garment_types")) || GARMENT_TYPES;
+  const [selectedGarment, setSelectedGarment] = useState(garmentTypes[0] || "Suit");
+
+  const heroEyebrow = s("services_tailoring_hero_eyebrow") || sec("Tailoring Hero Eyebrow") || "Custom Tailoring";
+  const heroTitle = s("services_tailoring_hero_title") || sec("Tailoring Hero Title") || "Garments born\nfrom your vision.";
+  const heroBody = s("services_tailoring_hero_body") || sec("Tailoring Hero Body") || "Nothing off-the-shelf. Everything made for you, to you — from the first sketch to the final stitch.";
+  const startingPrice = s("services_tailoring_starting_price") || sec("Tailoring Starting Price") || "₹8,500";
+  const deliveryTime = s("services_tailoring_delivery_time") || sec("Tailoring Delivery Time") || "10–14 working days";
+  const fabricTitle = s("services_tailoring_fabric_title") || sec("Tailoring Fabric Title") || "200+ Fabrics";
+  const fabricSubtitle = s("services_tailoring_fabric_subtitle") || sec("Tailoring Fabric Subtitle") || "Italian Wools · Japanese Silks · Indian Linens";
+  const tailoringSteps = safeParse(s("services_tailoring_steps")) || TAILORING_STEPS;
+  const processTitle = s("services_tailoring_process_title") || sec("Tailoring Process Title") || "The Process";
 
   return (
     <div style={{ background: "#f9f6f0", minHeight: "100vh", paddingTop: "64px" }}>
@@ -695,7 +765,7 @@ function TailoringPage({ onBook }) {
             <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "32px" }}>
               <div style={{ width: "32px", height: "1px", background: "#8b7355" }} />
               <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "10px", letterSpacing: "0.22em", color: "#8b7355", textTransform: "uppercase", margin: 0 }}>
-                Custom Tailoring
+                {heroEyebrow}
               </p>
             </div>
 
@@ -706,8 +776,15 @@ function TailoringPage({ onBook }) {
               lineHeight: "1.05", letterSpacing: "-0.02em",
               margin: "0 0 24px 0",
             }}>
-              Garments born<br />
-              <em style={{ fontWeight: "300", color: "#8b7355" }}>from your vision.</em>
+              {heroTitle.includes("\n")
+                ? heroTitle.split("\n").map((line, i) => (
+                    <span key={i}>
+                      {i === 0 && <>{line}<br /></>}
+                      {i === 1 && <em style={{ fontWeight: "300", color: "#8b7355" }}>{line}</em>}
+                      {i > 1 && <span> {line}</span>}
+                    </span>
+                  ))
+                : heroTitle}
             </h1>
 
             <p style={{
@@ -715,7 +792,7 @@ function TailoringPage({ onBook }) {
               fontSize: "15px", fontWeight: "300", color: "#6b6057",
               lineHeight: "1.85", margin: "0 0 40px 0", maxWidth: "420px",
             }}>
-              Nothing off-the-shelf. Everything made for you, to you — from the first sketch to the final stitch.
+              {heroBody}
             </p>
 
             {/* Garment selector */}
@@ -723,7 +800,7 @@ function TailoringPage({ onBook }) {
               Select garment type
             </p>
             <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-              {GARMENT_TYPES.map(g => (
+              {garmentTypes.map(g => (
                 <button key={g}
                   onClick={() => setSelectedGarment(g)}
                   style={{
@@ -753,10 +830,10 @@ function TailoringPage({ onBook }) {
               </div>
               <div>
                 <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "16px", fontWeight: "600", color: "#1a1714", margin: "0 0 2px 0" }}>
-                  {selectedGarment} starting from ₹8,500
+                  {selectedGarment} starting from {startingPrice}
                 </p>
                 <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", color: "#8b8078", margin: 0 }}>
-                  Delivery in 10–14 working days
+                  Delivery in {deliveryTime}
                 </p>
               </div>
             </div>
@@ -793,8 +870,8 @@ function TailoringPage({ onBook }) {
               background: "rgba(26,23,20,0.85)", backdropFilter: "blur(8px)",
               borderRadius: "10px", padding: "14px 18px",
             }}>
-              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", color: "#c9a96e", letterSpacing: "0.12em", textTransform: "uppercase", margin: "0 0 4px 0" }}>200+ Fabrics</p>
-              <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "15px", color: "#f0ebe3", margin: 0 }}>Italian Wools · Japanese Silks · Indian Linens</p>
+              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", color: "#c9a96e", letterSpacing: "0.12em", textTransform: "uppercase", margin: "0 0 4px 0" }}>{fabricTitle}</p>
+              <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "15px", color: "#f0ebe3", margin: 0 }}>{fabricSubtitle}</p>
             </div>
           </div>
         </div>
@@ -803,10 +880,10 @@ function TailoringPage({ onBook }) {
       {/* 6-step process */}
       <div style={{ padding: "64px 60px", background: "#ffffff" }}>
         <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "10px", letterSpacing: "0.22em", color: "#a89f96", textTransform: "uppercase", marginBottom: "40px" }}>
-          The Process
+          {processTitle}
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "24px" }}>
-          {TAILORING_STEPS.map((step, i) => (
+          {tailoringSteps.map((step, i) => (
             <div key={i} style={{ display: "flex", gap: "20px" }}>
               <div style={{ flexShrink: 0 }}>
                 <div style={{
@@ -973,12 +1050,14 @@ function BookingModal({ onClose }) {
 export default function ServicesPage() {
   const [page, setPage] = useState("embroidery");
   const [showBooking, setShowBooking] = useState(false);
+  const { loading, settings, sections } = useContentData(["embroidery", "alterations", "styling", "tailoring", "services"]);
 
+  const data = { settings, sections };
   const pages = {
-    embroidery: <EmbroideryPage onBook={() => setShowBooking(true)} />,
-    alterations: <AlterationsPage onBook={() => setShowBooking(true)} />,
-    styling: <StylingPage onBook={() => setShowBooking(true)} />,
-    tailoring: <TailoringPage onBook={() => setShowBooking(true)} />,
+    embroidery: <EmbroideryPage onBook={() => setShowBooking(true)} data={data} />,
+    alterations: <AlterationsPage onBook={() => setShowBooking(true)} data={data} />,
+    styling: <StylingPage onBook={() => setShowBooking(true)} data={data} />,
+    tailoring: <TailoringPage onBook={() => setShowBooking(true)} data={data} />,
   };
 
   return (
@@ -990,12 +1069,15 @@ export default function ServicesPage() {
         input::placeholder { color: #a89f96; }
       `}</style>
 
-<NavBar
-  activePage={page}
-  onNavigate={(id) => setPage(id)}
-/>
+      <NavBar activePage={page} onNavigate={(id) => setPage(id)} />
       <div key={page} style={{ animation: "fadeIn 0.4s ease both" }}>
-        {pages[page]}
+        {loading ? (
+          <div className="d-flex justify-content-center align-items-center vh-100">
+            <div className="spinner-border" role="status"><span className="visually-hidden">Loading services...</span></div>
+          </div>
+        ) : (
+          pages[page]
+        )}
       </div>
 
       {showBooking && <BookingModal onClose={() => setShowBooking(false)} />}

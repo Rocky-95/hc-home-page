@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import productService from "../../services/productService";
 import ProductGrid from "./ProductGrid";
+import { safeParse, getSetting, useContentData } from "../../utils/contentHelpers";
 import "../styles/SuitsCategoryPage.css";
 
 const placeholderImage = "https://via.placeholder.com/400x500?text=Category";
@@ -17,6 +18,15 @@ const CategoryPage = ({
   const navigate = useNavigate();
   const [subcategories, setSubcategories] = useState(fallbackSubcategories);
   const [loading, setLoading] = useState(true);
+  const { settings } = useContentData();
+
+  const key = (suffix) => `category_${categorySlug.toLowerCase().replace(/\s+/g, "_")}_${suffix}`;
+  const s = (suffix) => getSetting(settings, key(suffix));
+
+  const dynamicHeroImage = s("hero_image") || heroImage;
+  const dynamicHeroTitle = s("hero_title") || heroTitle;
+  const dynamicHeroSubtitle = s("hero_subtitle") || heroSubtitle;
+  const dynamicMarquee = safeParse(s("marquee_words")) || marqueeWords;
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -43,8 +53,8 @@ const CategoryPage = ({
               link:
                 s.redirect_link ||
                 `/collection/${s.menu_subcategory_slug || s.menu_subcategory_name.toLowerCase().replace(/\s+/g, "-")}`,
-              image: fallbackSubcategories[idx]?.image || fallbackSubcategories[idx]?.video || placeholderImage,
-              video: fallbackSubcategories[idx]?.video || null,
+              image: s.menu_subcategory_image_url || s.image_url || fallbackSubcategories[idx]?.image || placeholderImage,
+              video: s.video_url || fallbackSubcategories[idx]?.video || null,
             }));
           if (filtered.length > 0) {
             setSubcategories(filtered);
@@ -107,10 +117,10 @@ const CategoryPage = ({
   return (
     <>
       <section className="hero-scroll position-relative container-fluid px-0">
-        <img src={heroImage} alt={heroTitle} className="hero-image img-fluid w-100" />
+        <img src={dynamicHeroImage} alt={dynamicHeroTitle} className="hero-image img-fluid w-100" />
         <div className="position-absolute text-white hero-overlay">
-          <h1 className="fw-bold display-4 mb-1">{heroTitle}</h1>
-          <h5 className="fw-normal mb-0">{heroSubtitle}</h5>
+          <h1 className="fw-bold display-4 mb-1">{dynamicHeroTitle}</h1>
+          <h5 className="fw-normal mb-0">{dynamicHeroSubtitle}</h5>
           <button
             className="btn btn-light btn-lg fw-semibold mt-3"
             style={{ borderRadius: "20px", padding: "0.5rem 1.5rem" }}
@@ -127,7 +137,7 @@ const CategoryPage = ({
       <div className="bg-light overflow-hidden">
         <div className="d-flex marquee-track py-4">
           {Array(4)
-            .fill(marqueeWords)
+            .fill(dynamicMarquee)
             .flat()
             .map((word, idx) => (
               <span key={idx} className="mx-4 fw-bold text-uppercase">

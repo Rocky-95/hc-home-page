@@ -1,7 +1,7 @@
 const axios = require("axios");
 const { CookieJar } = require("tough-cookie");
 
-const API_BASE = "https://dev.dine360.ca/backend/API/Harry-Clinton";
+const API_BASE = "https://dev.dine360.ca/backend/API/Harry-Clinton-DEV";
 
 const cookieJar = new CookieJar();
 

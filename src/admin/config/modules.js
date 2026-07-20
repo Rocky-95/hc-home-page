@@ -1,3 +1,23 @@
+import api from "../services/api";
+
+const loadProducts = async () => {
+  const res = await api.get("/Products");
+  const list = res.data?.data || res.data || [];
+  return list.map((p) => ({ value: p.product_id, label: p.product_name || p.product_slug || p.product_id }));
+};
+
+const loadCategories = async () => {
+  const res = await api.get("/Menu-Category");
+  const list = res.data?.data || res.data || [];
+  return list.map((c) => ({ value: c.menu_category_id, label: c.menu_category_name || c.menu_category_id }));
+};
+
+const loadRunningBars = async () => {
+  const res = await api.get("/Running-Bar");
+  const list = res.data?.data || res.data || [];
+  return list.map((r) => ({ value: r.running_bar_id, label: r.running_bar_name || r.running_bar_id }));
+};
+
 export const adminNavItems = [
   { path: "/admin", label: "Dashboard", icon: "📊" },
   { path: "/admin/users", label: "Users", icon: "�" },
@@ -19,6 +39,10 @@ export const adminNavItems = [
   { path: "/admin/shipments", label: "Shipments", icon: "🚛" },
   { path: "/admin/returns-refunds", label: "Returns & Refunds", icon: "↩️" },
   { path: "/admin/faqs", label: "FAQs", icon: "❓" },
+  { path: "/admin/support-contacts", label: "Support Contacts", icon: "📞" },
+  { path: "/admin/legal-pages", label: "Legal Pages", icon: "📜" },
+  { path: "/admin/spotlight-media", label: "Spotlight Media", icon: "🎥" },
+  { path: "/admin/settings", label: "Settings", icon: "⚙️" },
   { path: "/admin/newsletters", label: "Newsletters", icon: "📰" },
   { path: "/admin/reviews", label: "Reviews", icon: "⭐" },
   { path: "/admin/notifications", label: "Notifications", icon: "🔔" },
@@ -84,7 +108,7 @@ export const moduleConfigs = {
     fields: [
       { name: "menu_subcategory_name", label: "Sub Category Name", required: true },
       { name: "menu_subcategory_slug", label: "Slug" },
-      { name: "menu_category_id", label: "Category ID", type: "text" },
+      { name: "menu_category_id", label: "Category", type: "select", optionsLoader: loadCategories, required: true },
       { name: "redirect_link", label: "Redirect Link" },
       { name: "display_order", label: "Display Order", type: "number" },
       { name: "isactive", label: "Active", type: "checkbox" },
@@ -303,7 +327,7 @@ export const moduleConfigs = {
     module: "Running-Bar-Items",
     idField: "running_bar_item_id",
     fields: [
-      { name: "running_bar_id", label: "Running Bar ID", required: true },
+      { name: "running_bar_id", label: "Running Bar", type: "select", optionsLoader: loadRunningBars, required: true },
       { name: "itemsdata", label: "Item Text", required: true },
       { name: "duration_seconds", label: "Duration (seconds)", type: "number" },
       { name: "display_order", label: "Display Order", type: "number" },
@@ -316,9 +340,9 @@ export const moduleConfigs = {
     module: "Products-Media",
     idField: "product_media_id",
     fields: [
-      { name: "product_id", label: "Product ID", required: true },
+      { name: "product_id", label: "Product", type: "select", optionsLoader: loadProducts, required: true },
       { name: "media_type", label: "Media Type", type: "select", options: [{ value: "image", label: "Image" }, { value: "video", label: "Video" }] },
-      { name: "media_url", label: "Media URL", required: true },
+      { name: "media_url", label: "Media URL", type: "image", required: true },
       { name: "alt_text", label: "Alt Text" },
       { name: "display_order", label: "Display Order", type: "number" },
       { name: "isprimary", label: "Primary", type: "checkbox" },
@@ -367,11 +391,11 @@ export const moduleConfigs = {
     module: "Products-Seo",
     idField: "product_seo_id",
     fields: [
-      { name: "product_id", label: "Product ID", required: true },
+      { name: "product_id", label: "Product", type: "select", optionsLoader: loadProducts, required: true },
       { name: "seo_title", label: "SEO Title", required: true },
       { name: "seo_description", label: "SEO Description", type: "textarea" },
       { name: "seo_keywords", label: "SEO Keywords" },
-      { name: "og_image_url", label: "OG Image URL" },
+      { name: "og_image_url", label: "OG Image URL", type: "image" },
       { name: "isactive", label: "Active", type: "checkbox" },
     ],
     listFields: ["product_id", "seo_title", "seo_keywords", "isactive"],
