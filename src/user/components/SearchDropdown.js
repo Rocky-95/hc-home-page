@@ -194,8 +194,8 @@ const SearchDropdown = ({ onClose }) => {
                   <p className="sd-section__label">Collections</p>
                   {results.subcategories.map((s) => {
                     const path =
-                      s.redirect_link ||
-                      `/collection/${s.menu_subcategory_slug || s.menu_subcategory_name?.toLowerCase().replace(/\s+/g, "-")}`;
+                      (s.redirect_link || "").replace(/^\/collection\//, "/") ||
+                      `/${s.menu_subcategory_slug || s.menu_subcategory_name?.toLowerCase().replace(/\s+/g, "-")}`;
                     return (
                       <button
                         key={s.menu_subcategory_id}

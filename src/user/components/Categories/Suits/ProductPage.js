@@ -13,7 +13,6 @@ const ProductPage = () => {
 
   const [product, setProduct] = useState(null);
   const [media, setMedia] = useState([]);
-  const [variants, setVariants] = useState([]);
   const [sizes, setSizes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -68,7 +67,6 @@ const ProductPage = () => {
 
         setProduct(matched);
         setMedia(allMedia.filter((m) => m.product_id === matched.product_id));
-        setVariants(productVariants);
         setSizes(productSizes);
         setSelectedSize(productSizes.length === 1 ? productSizes[0].label : "");
       } catch (err) {

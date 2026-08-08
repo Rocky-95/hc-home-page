@@ -169,7 +169,7 @@ const AdminSubCategoriesPage = () => {
                 </div>
                 <div className="col-md-6">
                   <label className="form-label">Redirect Link</label>
-                  <input className="form-control" value={form.redirect_link} onChange={(e) => setForm((p) => ({ ...p, redirect_link: e.target.value }))} placeholder="/collection/..." />
+                  <input className="form-control" value={form.redirect_link} onChange={(e) => setForm((p) => ({ ...p, redirect_link: e.target.value }))} placeholder="/..." />
                 </div>
                 <div className="col-md-3">
                   <label className="form-label">Display Order</label>

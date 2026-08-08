@@ -22,7 +22,6 @@ const defaultItems = [
 export default function Spotlight() {
   const navigate = useNavigate();
   const [items, setItems] = useState(defaultItems);
-  const [loading, setLoading] = useState(true);
   const windowWidth = useWindowWidth();
   const { settings } = useContentData();
   const sectionTitle = getSetting(settings, "home_spotlight_title") || "HC Spotlight";
@@ -52,8 +51,6 @@ export default function Spotlight() {
         }
       } catch {
         // keep defaults
-      } finally {
-        setLoading(false);
       }
     };
     fetchSpotlight();

@@ -1,12 +1,14 @@
 import { lazy, Suspense, useState, useEffect } from "react";
-import { HashRouter, Route, Routes, useLocation, Navigate } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation, Navigate } from "react-router-dom";
 import PrivateRoute from "./shared/components/PrivateRoute";
 import LoginPopup from "./shared/components/LoginPopup";
+import ErrorBoundary from "./shared/components/ErrorBoundary";
 import Home from "./user/pages/Home";
 import SplashScreen from "./user/components/SplashScreen";
 import AdminLayout from "./admin/components/AdminLayout";
 import UserLayout from "./user/components/UserLayout";
 import { CartProvider } from "./context/CartContext";
+import "./services/apiRegistry";
 
 const Login = lazy(() => import("./user/pages/Login"));
 const Register = lazy(() => import("./user/pages/Register"));
@@ -33,6 +35,9 @@ const TheVisionPage = lazy(() => import("./user/pages/TheVisionPage"));
 const ComingSoonPage = lazy(() => import("./user/pages/ComingSoonPage"));
 const StyleByHCPage = lazy(() => import("./user/pages/StyleByHCPage"));
 const EmbroideryPage = lazy(() => import("./user/pages/EmbroideryPage"));
+const AlterationsPage = lazy(() => import("./user/pages/AlterationsPage"));
+const PersonalStylingPage = lazy(() => import("./user/pages/PersonalStylingPage"));
+const CustomTailoringPage = lazy(() => import("./user/pages/CustomTailoringPage"));
 const AdminDashboard = lazy(() => import("./admin/pages/AdminDashboard"));
 const AdminCrudPage = lazy(() => import("./admin/pages/AdminCrudPage"));
 const AdminOrdersPage = lazy(() => import("./admin/pages/AdminOrdersPage"));
@@ -41,6 +46,7 @@ const AdminProductsPage = lazy(() => import("./admin/pages/AdminProductsPage"));
 const AdminUsersPage = lazy(() => import("./admin/pages/AdminUsersPage"));
 const AdminCategoriesPage = lazy(() => import("./admin/pages/AdminCategoriesPage"));
 const AdminSubCategoriesPage = lazy(() => import("./admin/pages/AdminSubCategoriesPage"));
+const AdminCategorySyncPage = lazy(() => import("./admin/pages/AdminCategorySyncPage"));
 const AdminFaqsPage = lazy(() => import("./admin/pages/AdminFaqsPage"));
 const AdminSettingsPage = lazy(() => import("./admin/pages/AdminSettingsPage"));
 const AdminSupportContactsPage = lazy(() => import("./admin/pages/AdminSupportContactsPage"));
@@ -158,9 +164,6 @@ const LinenCollection = lazy(() =>
 const CigaretteCollection = lazy(() =>
   import("./user/components/Collections/88CigaretPage")
 );
-const CollectionProductPage = lazy(() =>
-  import("./user/components/Collections/ProductPage")
-);
 
 const ServicePage = lazy(() =>
   import("./user/components/Services/ServicePages.jsx")
@@ -236,23 +239,25 @@ function AppRoutes({ splashDismissed, onSplashComplete }) {
           onLogin={() => setShowLoginPopup(false)}
         />
       )}
-    <Suspense fallback={<RouteFallback />}>
-      <Routes>
-        {/* ADMIN */}
-        <Route
-          path="/admin"
-          element={
-            <PrivateRoute requiredRole="admin">
-              <AdminLayout />
-            </PrivateRoute>
-          }
-        >
+    <ErrorBoundary>
+      <Suspense fallback={<RouteFallback />}>
+        <Routes>
+          {/* ADMIN */}
+          <Route
+            path="/admin"
+            element={
+              <PrivateRoute requiredRole="admin">
+                <AdminLayout />
+              </PrivateRoute>
+            }
+          >
           <Route index element={<AdminDashboard />} />
           <Route path="orders" element={<AdminOrdersPage />} />
           <Route path="appointments" element={<AdminAppointmentsPage />} />
           <Route path="products" element={<AdminProductsPage />} />
           <Route path="users" element={<AdminUsersPage />} />
           <Route path="categories" element={<AdminCategoriesPage />} />
+          <Route path="category-sync" element={<AdminCategorySyncPage />} />
           <Route path="subcategories" element={<AdminSubCategoriesPage />} />
           <Route path="faqs" element={<AdminFaqsPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
@@ -279,58 +284,52 @@ function AppRoutes({ splashDismissed, onSplashComplete }) {
           <Route path="/trousers" element={<TrousersCategoryPage />} />
 
           {/* SUITS COLLECTION */}
-          <Route path="/collection/wedding" element={<Wedding />} />
-          <Route path="/collection/business" element={<Business />} />
-          <Route path="/collection/designer" element={<Designer />} />
-          <Route path="/collection/travel" element={<Travel />} />
-          <Route path="/collection/smart-casual" element={<SmartCasual />} />
+          <Route path="/wedding" element={<Wedding />} />
+          <Route path="/business" element={<Business />} />
+          <Route path="/designer" element={<Designer />} />
+          <Route path="/travel" element={<Travel />} />
+          <Route path="/smart-casual" element={<SmartCasual />} />
 
           {/* BABY SUITS COLLECTION */}
-          <Route path="/collection/wedding-baby" element={<WeddingBabySuit />} />
-          <Route path="/collection/business-baby" element={<BusinessBabySuit />} />
-          <Route path="/collection/designer-baby" element={<DesignerBabySuit />} />
-          <Route path="/collection/travel-baby" element={<TravelBabySuit />} />
-          <Route path="/collection/casual-baby" element={<SmartCasualBabySuit />} />
+          <Route path="/wedding-baby" element={<WeddingBabySuit />} />
+          <Route path="/business-baby" element={<BusinessBabySuit />} />
+          <Route path="/designer-baby" element={<DesignerBabySuit />} />
+          <Route path="/travel-baby" element={<TravelBabySuit />} />
+          <Route path="/casual-baby" element={<SmartCasualBabySuit />} />
 
           {/* INDOWESTERN COLLECTION */}
-          <Route path="/collection/indo-wedding" element={<WeddingIndoWestern />} />
-          <Route path="/collection/indo-business" element={<BusinessIndoWestern />} />
-          <Route path="/collection/indo-designer" element={<DesignerIndoWestern />} />
-          <Route path="/collection/indo-travel" element={<TravelIndoWestern />} />
-          <Route path="/collection/indo-casual" element={<SmartCasualIndoWestern />} />
+          <Route path="/indo-wedding" element={<WeddingIndoWestern />} />
+          <Route path="/indo-business" element={<BusinessIndoWestern />} />
+          <Route path="/indo-designer" element={<DesignerIndoWestern />} />
+          <Route path="/indo-travel" element={<TravelIndoWestern />} />
+          <Route path="/indo-casual" element={<SmartCasualIndoWestern />} />
 
           {/* SHIRTS COLLECTION */}
-          <Route path="/collection/wedding-shirts" element={<WeddingShirt />} />
-          <Route path="/collection/business-shirts" element={<BusinessShirt />} />
-          <Route path="/collection/designer-shirts" element={<DesignerShirt />} />
-          <Route path="/collection/travel-shirts" element={<TravelShirt />} />
-          <Route path="/collection/casual-shirts" element={<SmartCasualShirt />} />
+          <Route path="/wedding-shirts" element={<WeddingShirt />} />
+          <Route path="/business-shirts" element={<BusinessShirt />} />
+          <Route path="/designer-shirts" element={<DesignerShirt />} />
+          <Route path="/travel-shirts" element={<TravelShirt />} />
+          <Route path="/casual-shirts" element={<SmartCasualShirt />} />
 
           {/* TROUSERS COLLECTION */}
-          <Route path="/collection/wedding-trouser" element={<WeddingTrouser />} />
-          <Route path="/collection/business-trouser" element={<BusinessTrouser />} />
-          <Route path="/collection/designer-trouser" element={<DesignerTrouser />} />
-          <Route path="/collection/travel-trouser" element={<TravelTrouser />} />
-          <Route path="/collection/smart-casual-trouser" element={<SmartCasualTrouser />} />
+          <Route path="/wedding-trouser" element={<WeddingTrouser />} />
+          <Route path="/business-trouser" element={<BusinessTrouser />} />
+          <Route path="/designer-trouser" element={<DesignerTrouser />} />
+          <Route path="/travel-trouser" element={<TravelTrouser />} />
+          <Route path="/smart-casual-trouser" element={<SmartCasualTrouser />} />
 
-          <Route path="/tuxedo" element={<ComingSoonPage title="Tuxedo Collection" />} />
-          <Route
-            path="/extreme-poppins"
-            element={<ComingSoonPage title="Extreme Poppins Collection" />}
-          />
-          <Route
-            path="/gurkha-trousers"
-            element={<ComingSoonPage title="Gurkha Trousers Collection" />}
-          />
-          <Route
-            path="/linen-shirts-trousers"
-            element={<ComingSoonPage title="Linen Collection" />}
-          />
-          <Route path="/cigarettes" element={<ComingSoonPage title="88 Cigarette Collection" />} />
+          <Route path="/tuxedo" element={<TuxedoCollection />} />
+          <Route path="/extreme-poppins" element={<ExtremePoppinsCollection />} />
+          <Route path="/gurkha-trousers" element={<GurkhaTrouserCollection />} />
+          <Route path="/linen-shirts-trousers" element={<LinenCollection />} />
+          <Route path="/cigarettes" element={<CigaretteCollection />} />
           <Route path="/coming-soon" element={<ComingSoonPage />} />
 
           <Route path="/services" element={<ServicePage />} />
           <Route path="/embroidery" element={<EmbroideryPage />} />
+          <Route path="/alterations" element={<AlterationsPage />} />
+          <Route path="/personal-styling" element={<PersonalStylingPage />} />
+          <Route path="/custom-tailoring" element={<CustomTailoringPage />} />
           <Route path="/aboutUs" element={<AboutUs />} />
           <Route path="/about-designer" element={<AboutUsFull />} />
           <Route path="/contact-us" element={<ContactUs />} />
@@ -355,6 +354,7 @@ function AppRoutes({ splashDismissed, onSplashComplete }) {
         </Route>
       </Routes>
     </Suspense>
+    </ErrorBoundary>
     </>
   );
 }
@@ -364,12 +364,12 @@ function App() {
 
   return (
     <CartProvider>
-      <HashRouter>
+      <BrowserRouter>
         <AppRoutes
           splashDismissed={splashDismissed}
           onSplashComplete={() => setSplashDismissed(true)}
         />
-      </HashRouter>
+      </BrowserRouter>
     </CartProvider>
   );
 }

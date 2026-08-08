@@ -41,7 +41,7 @@ const fallbackContent = {
     {
       section_title: "7. Returns & Refunds",
       content:
-        "<p>Please refer to our <a href='/#/Policies'>Returns & Refunds Policy</a> for more details.</p>",
+        "<p>Please refer to our <a href='/Policies'>Returns & Refunds Policy</a> for more details.</p>",
     },
     {
       section_title: "8. Intellectual Property",

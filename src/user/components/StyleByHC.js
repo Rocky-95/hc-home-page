@@ -93,7 +93,7 @@ export default function StyleByHC() {
       setActiveIndex((prev) => (prev - 1 + items.length) % items.length);
     }, 2000);
     return () => clearInterval(interval);
-  }, [isPaused]);
+  }, [isPaused, items.length]);
 
   useEffect(() => {
     goToSlide(activeIndex);

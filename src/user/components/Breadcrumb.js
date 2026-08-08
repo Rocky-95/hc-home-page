@@ -3,7 +3,6 @@ import { Link, useLocation } from "react-router-dom";
 import "../styles/Breadcrumb.css";
 
 const pathLabels = {
-  "": "Home",
   "login": "Login",
   "register": "Register",
   "aboutUs": "About Us",
@@ -57,7 +56,9 @@ const pathLabels = {
 
 const Breadcrumb = () => {
   const location = useLocation();
-  const pathnames = location.pathname.split("/").filter((x) => x);
+  const pathnames = location.pathname
+    .split("/")
+    .filter((x) => x && x.trim() && !["collection", "product"].includes(x));
 
   return (
     <nav aria-label="breadcrumb" className="breadcrumb-wrap">
@@ -71,7 +72,10 @@ const Breadcrumb = () => {
         {pathnames.map((value, index) => {
           const to = "/" + pathnames.slice(0, index + 1).join("/");
           const isLast = index === pathnames.length - 1;
-          const label = pathLabels[value] || value.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+          const rawLabel = pathLabels[value] || value.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+          const label = rawLabel.trim();
+
+          if (!label) return null;
 
           return (
             <li key={to} className={`breadcrumb-item${isLast ? " active" : ""}`}>

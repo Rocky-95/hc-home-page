@@ -7,7 +7,6 @@ const ReviewsSection = ({ productId }) => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState(null);
-  const [userName, setUserName] = useState("");
   const [form, setForm] = useState({ rating: 5, review_title: "", review_text: "" });
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState({ text: "", isError: false });
@@ -24,7 +23,6 @@ const ReviewsSection = ({ productId }) => {
         const profile = profileRes.data?.data || profileRes.data;
         if (profile?.user_id) {
           setUserId(profile.user_id);
-          setUserName(profile.fullname || "");
         }
       } catch (err) {
         setMessage({ text: err.response?.data?.message || "Failed to load reviews", isError: true });

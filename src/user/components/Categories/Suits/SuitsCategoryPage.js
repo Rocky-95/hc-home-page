@@ -10,11 +10,11 @@ import suitsPageLabelImg from "../../../../shared/assets/images/SuitsPage/LabelN
 import "../../../styles/SuitsCategoryPage.css";
 
 const fallbackSubcategories = [
-  { name: "Wedding", image: weddingImg, link: "/collection/wedding" },
-  { name: "Business", video: businessVideo, link: "/collection/business" },
-  { name: "Designer", image: designerImg, link: "/collection/designer" },
-  { name: "Travel", image: travelImg, link: "/collection/travel" },
-  { name: "Smart Casual", image: smartCasualImg, link: "/collection/smart-casual" },
+  { name: "Wedding", image: weddingImg, link: "/wedding" },
+  { name: "Business", video: businessVideo, link: "/business" },
+  { name: "Designer", image: designerImg, link: "/designer" },
+  { name: "Travel", image: travelImg, link: "/travel" },
+  { name: "Smart Casual", image: smartCasualImg, link: "/smart-casual" },
 ];
 
 const SuitsCategoryPage = () => {

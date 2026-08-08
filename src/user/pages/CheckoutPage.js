@@ -83,7 +83,7 @@ const CheckoutPage = () => {
       }
     };
     fetchUserAndAddresses();
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     if (cartItems.length === 0 && !success) {

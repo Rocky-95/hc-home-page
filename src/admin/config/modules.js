@@ -1,4 +1,5 @@
 import api from "../services/api";
+import { generatedModuleConfigs, generatedNavItems } from "./generatedModules";
 
 const loadProducts = async () => {
   const res = await api.get("/Products");
@@ -46,6 +47,7 @@ export const adminNavItems = [
   { path: "/admin/newsletters", label: "Newsletters", icon: "📰" },
   { path: "/admin/reviews", label: "Reviews", icon: "⭐" },
   { path: "/admin/notifications", label: "Notifications", icon: "🔔" },
+  ...generatedNavItems,
 ];
 
 export const moduleConfigs = {
@@ -400,4 +402,5 @@ export const moduleConfigs = {
     ],
     listFields: ["product_id", "seo_title", "seo_keywords", "isactive"],
   },
+  ...generatedModuleConfigs,
 };

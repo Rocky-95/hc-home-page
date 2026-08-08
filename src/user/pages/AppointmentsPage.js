@@ -10,7 +10,6 @@ const AppointmentsPage = () => {
   const [timeSlots, setTimeSlots] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [userId, setUserId] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -24,7 +23,6 @@ const AppointmentsPage = () => {
 
         const profile = profileRes.data?.data || profileRes.data;
         const uid = profile?.user_id;
-        if (uid) setUserId(uid);
 
         const allAppointments = appointmentsRes.data?.data || appointmentsRes.data || [];
         const userAppointments = uid

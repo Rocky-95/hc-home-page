@@ -9,18 +9,18 @@ import labelImg from "../../../../shared/assets/images/IndoWestern/IndoWesternLa
 import "../../../styles/SuitsCategoryPage.css";
 
 const fallbackSubcategories = [
-  { name: "Wedding", image: weddingImg, link: "/collection/indo-wedding" },
-  { name: "Business", video: businessVideo, link: "/collection/indo-business" },
-  { name: "Designer", image: designerImg, link: "/collection/indo-designer" },
-  { name: "Travel", image: travelImg, link: "/collection/indo-travel" },
-  { name: "Smart Casual", image: smartCasualImg, link: "/collection/indo-casual" },
+  { name: "Wedding", image: weddingImg, link: "/indo-wedding" },
+  { name: "Business", video: businessVideo, link: "/indo-business" },
+  { name: "Designer", image: designerImg, link: "/indo-designer" },
+  { name: "Travel", image: travelImg, link: "/indo-travel" },
+  { name: "Smart Casual", image: smartCasualImg, link: "/indo-casual" },
 ];
 
 const IndoWesternCategoryPage = () => {
 
   return (
     <CategoryPage
-      categorySlug="indo-western"
+      categorySlug="indowestern"
       heroImage={labelImg}
       heroTitle="Own the Room"
       heroSubtitle="Power dressing starts with a perfectly tailored Indo-Western."

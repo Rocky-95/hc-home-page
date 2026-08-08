@@ -51,8 +51,8 @@ const CategoryPage = ({
             .map((s, idx) => ({
               name: s.menu_subcategory_name,
               link:
-                s.redirect_link ||
-                `/collection/${s.menu_subcategory_slug || s.menu_subcategory_name.toLowerCase().replace(/\s+/g, "-")}`,
+                (s.redirect_link || "").replace(/^\/collection\//, "/") ||
+                `/${s.menu_subcategory_slug || s.menu_subcategory_name.toLowerCase().replace(/\s+/g, "-")}`,
               image: s.menu_subcategory_image_url || s.image_url || fallbackSubcategories[idx]?.image || placeholderImage,
               video: s.video_url || fallbackSubcategories[idx]?.video || null,
             }));
@@ -84,18 +84,14 @@ const CategoryPage = ({
 
   const CategoryCard = ({ cat }) => (
     <div
-      className="card border-0 rounded-0 overflow-hidden shadow-sm w-100"
-      style={{ cursor: "pointer", transition: "transform 0.4s ease" }}
-      onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-      onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+      className="category-card card border-0 rounded-0 overflow-hidden shadow-sm w-100 h-100"
       onClick={() => cat.link && navigate(cat.link)}
     >
-      <div className="position-relative">
+      <div className="category-image-wrapper">
         {cat.video ? (
           <video
             src={cat.video}
-            className="w-100"
-            style={{ aspectRatio: "421.66 / 527.06", objectFit: "cover" }}
+            className="category-media w-100 h-100"
             autoPlay
             loop
             muted
@@ -105,8 +101,8 @@ const CategoryPage = ({
           <img
             src={cat.image}
             alt={cat.name}
-            className="w-100"
-            style={{ aspectRatio: "421.66 / 527.06", objectFit: "cover" }}
+            className="category-media w-100 h-100"
+            loading="lazy"
           />
         )}
         <div className="category-overlay">{cat.name}</div>

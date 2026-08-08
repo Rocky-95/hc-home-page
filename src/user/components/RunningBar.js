@@ -1,19 +1,21 @@
 import React, { useEffect, useRef, useState } from "react";
 import "../styles/RunningBar.css";
-import productService from "../../services/productService";
+// import productService from "../../services/productService";
 
 const DEFAULT_SENTENCES = [
-  "Grand Opening Soon in Trichy & Chennai!",
-  "Flat 50% off on all men's fashion items!",
-  "Free shipping for first-time users!",
+  "Closet under Construction!",
+  "Fashion Hub coming soon",
+  "New collection loading",
 ];
 
 const RunningBar = () => {
-  const [sentences, setSentences] = useState(DEFAULT_SENTENCES);
+  const sentences = DEFAULT_SENTENCES;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const intervalRef = useRef(null);
 
+  // API integration kept commented for re-use after demo
+  /*
   useEffect(() => {
     const fetchRunningBar = async () => {
       try {
@@ -36,6 +38,7 @@ const RunningBar = () => {
     };
     fetchRunningBar();
   }, []);
+  */
 
   useEffect(() => {
     if (!isPaused && sentences.length > 0) {

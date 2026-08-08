@@ -305,7 +305,7 @@ const AdminSpotlightMediaPage = () => {
                         className="form-control"
                         value={entryForm.redirect_link}
                         onChange={(e) => setEntryForm((f) => ({ ...f, redirect_link: e.target.value }))}
-                        placeholder="/collection/wedding"
+                        placeholder="/wedding"
                       />
                     </div>
                     <div className="col-md-6 d-flex align-items-end">
@@ -471,7 +471,7 @@ const AdminSpotlightMediaPage = () => {
                         className="form-control"
                         value={mediaForm.redirect_link}
                         onChange={(e) => setMediaForm((f) => ({ ...f, redirect_link: e.target.value }))}
-                        placeholder="/collection/travel"
+                        placeholder="/travel"
                       />
                     </div>
                     <div className="col-md-6">

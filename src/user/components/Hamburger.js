@@ -17,7 +17,6 @@ const Hamburger = () => {
   const navigate = useNavigate();
   const [isActive, setIsActive] = useState(false);
   const [categories, setCategories] = useState(defaultCategories);
-  const [subCategories, setSubCategories] = useState([]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -41,12 +40,8 @@ const Hamburger = () => {
   useEffect(() => {
     const fetchMenu = async () => {
       try {
-        const [catRes, subRes] = await Promise.all([
-          productService.getMenuCategories(),
-          productService.getMenuSubCategories(),
-        ]);
+        const catRes = await productService.getMenuCategories();
         const cats = catRes.data?.data || catRes.data || [];
-        const subs = subRes.data?.data || subRes.data || [];
         if (cats.length > 0) {
           setCategories(
             cats.map((c) => ({
@@ -55,13 +50,6 @@ const Hamburger = () => {
             }))
           );
         }
-        setSubCategories(
-          subs.map((s) => ({
-            label: s.menu_subcategory_name,
-            to: s.redirect_link || `/${s.menu_subcategory_slug || s.menu_subcategory_name.toLowerCase().replace(/\s+/g, "-")}`,
-            categoryId: s.menu_category_id,
-          }))
-        );
       } catch {
         // keep defaults
       }
@@ -115,9 +103,9 @@ const Hamburger = () => {
             <strong>SERVICES</strong>
             <ul>
               <li><Link to="/embroidery" onClick={() => setIsActive(false)}>Embroidery</Link></li>
-              <li><Link to="/services" onClick={() => setIsActive(false)}>Alterations</Link></li>
-              <li><Link to="/services" onClick={() => setIsActive(false)}>Personal Styling</Link></li>
-              <li><Link to="/services" onClick={() => setIsActive(false)}>Custom Tailoring</Link></li>
+              <li><Link to="/alterations" onClick={() => setIsActive(false)}>Alterations</Link></li>
+              <li><Link to="/personal-styling" onClick={() => setIsActive(false)}>Personal Styling</Link></li>
+              <li><Link to="/custom-tailoring" onClick={() => setIsActive(false)}>Custom Tailoring</Link></li>
             </ul>
           </div>
 {/* COLUMN 4 — IMAGE + TEXT + BUTTON (DESKTOP ONLY) */}

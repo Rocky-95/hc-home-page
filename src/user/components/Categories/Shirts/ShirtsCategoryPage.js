@@ -9,11 +9,11 @@ import labelImg from "../../../../shared/assets/images/Shirts-Collection.jpeg";
 import "../../../styles/SuitsCategoryPage.css";
 
 const fallbackSubcategories = [
-  { name: "Wedding", image: weddingImg, link: "/collection/wedding-shirts" },
-  { name: "Business", video: businessVideo, link: "/collection/business-shirts" },
-  { name: "Designer", image: designerImg, link: "/collection/designer-shirts" },
-  { name: "Travel", image: travelImg, link: "/collection/travel-shirts" },
-  { name: "Smart Casual", image: smartCasualImg, link: "/collection/casual-shirts" },
+  { name: "Wedding", image: weddingImg, link: "/wedding-shirts" },
+  { name: "Business", video: businessVideo, link: "/business-shirts" },
+  { name: "Designer", image: designerImg, link: "/designer-shirts" },
+  { name: "Travel", image: travelImg, link: "/travel-shirts" },
+  { name: "Smart Casual", image: smartCasualImg, link: "/casual-shirts" },
 ];
 
 const ShirtsCategoryPage = () => {
