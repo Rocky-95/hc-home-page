@@ -17,12 +17,14 @@ export const loadRazorpayScript = () => {
 
 const paymentService = {
   getPayments: () => apiClient.get("/Payments"),
+  getPaymentById: (id) => apiClient.get(`/Payments/${id}`),
   createPayment: (payload) => apiClient.post("/Payments", payload),
   updatePayment: (payload) => apiClient.put("/Payments", payload),
+  deletePayment: (payload) => apiClient.delete("/Payments", { data: payload }),
 
-  // Backend must expose these endpoints
-  createRazorpayOrder: (payload) => apiClient.post("/Payments/Create-Razorpay-Order", payload),
-  verifyRazorpayPayment: (payload) => apiClient.post("/Payments/Verify", payload),
+  // Razorpay endpoints are not in the current backend API spec; the backend team will add them.
+  // createRazorpayOrder: (payload) => apiClient.post("/Payments/Create-Razorpay-Order", payload),
+  // verifyRazorpayPayment: (payload) => apiClient.post("/Payments/Verify", payload),
 };
 
 export default paymentService;

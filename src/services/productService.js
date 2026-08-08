@@ -41,10 +41,10 @@ const productService = {
   getMenuVideos: () => apiClient.get("/Menu-Video"),
 
   // Reviews
-  getReviews: () => apiClient.get("/reviews"),
-  getReviewById: (id) => apiClient.get(`/reviews/${id}`),
-  getProductRatingSummary: () => apiClient.get("/product-rating-summary"),
-  getVariantRatingSummary: () => apiClient.get("/variant-rating-summary"),
+  getReviews: () => apiClient.get("/Reviews"),
+  getReviewById: (id) => apiClient.get(`/Reviews/${id}`),
+  getProductRatingSummary: () => apiClient.get("/Product-Rating-Summary"),
+  getVariantRatingSummary: () => apiClient.get("/Variant-Rating-Summary"),
 };
 
 export default productService;
