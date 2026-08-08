@@ -19,10 +19,10 @@ describe("productService", () => {
     expect(apiClient.get).toHaveBeenCalledWith("/Products", { params });
   });
 
-  it("fetches product media", async () => {
+  it("fetches product media with params", async () => {
     apiClient.get.mockResolvedValue({ data: { data: [] } });
-    await productService.getProductMedia();
-    expect(apiClient.get).toHaveBeenCalledWith("/Products-Media");
+    await productService.getProductMedia({ isprimary: 1 });
+    expect(apiClient.get).toHaveBeenCalledWith("/Products-Media", { params: { isprimary: 1 } });
   });
 
   it("fetches product sizes", async () => {

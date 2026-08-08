@@ -19,16 +19,10 @@ describe("Login", () => {
     expect(screen.getByRole("button", { name: /login with password/i })).toBeInTheDocument();
   });
 
-  it("shows validation error for empty email/password", async () => {
-    render(<BrowserRouter><Login /></BrowserRouter>);
-    fireEvent.click(screen.getByRole("button", { name: /login with password/i }));
-    await waitFor(() =>
-      expect(screen.getByText(/please enter email and password/i)).toBeInTheDocument()
-    );
-  });
-
-  it("calls password login service", async () => {
-    authService.passwordLogin.mockResolvedValue({ data: { data: { token: "abc", user: {} } } });
+  it("submits password login with entered values", async () => {
+    authService.passwordLogin.mockResolvedValue({
+      data: { Status: "1", Response: { token: "abc", user: {} } },
+    });
     render(<BrowserRouter><Login /></BrowserRouter>);
     fireEvent.change(screen.getByPlaceholderText(/enter your email/i), {
       target: { value: "test@example.com" },
@@ -37,6 +31,17 @@ describe("Login", () => {
       target: { value: "password" },
     });
     fireEvent.click(screen.getByRole("button", { name: /login with password/i }));
-    await waitFor(() => expect(authService.passwordLogin).toHaveBeenCalled());
+    await waitFor(() =>
+      expect(authService.passwordLogin).toHaveBeenCalledWith({
+        email_id: "test@example.com",
+        password: "password",
+      })
+    );
+  });
+
+  it("disables password login button until fields are filled", () => {
+    render(<BrowserRouter><Login /></BrowserRouter>);
+    const btn = screen.getByRole("button", { name: /login with password/i });
+    expect(btn).toBeDisabled();
   });
 });
