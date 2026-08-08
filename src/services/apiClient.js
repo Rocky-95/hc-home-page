@@ -28,10 +28,14 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const status = error.response?.status;
+    if (status === 401) {
+      const alreadyOnLogin = typeof window !== "undefined" && window.location.pathname === "/login";
       localStorage.removeItem("hc_token");
       localStorage.removeItem("hc_user");
-      window.location.href = "/login";
+      if (!alreadyOnLogin && typeof window !== "undefined") {
+        window.location.href = "/login";
+      }
     }
     return Promise.reject(error);
   }

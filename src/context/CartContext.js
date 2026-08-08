@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
+import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from "react";
 import cartService from "../services/cartService";
 import userService from "../services/userService";
 import orderService from "../services/orderService";
+import { safeJsonParse } from "../shared/utils";
 
 const CartContext = createContext();
 
@@ -24,18 +25,9 @@ export const CartProvider = ({ children }) => {
 
   // Load localStorage fallback
   useEffect(() => {
-    try {
-      const savedCart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || "[]");
-      const savedWishlist = JSON.parse(localStorage.getItem(WISHLIST_STORAGE_KEY) || "[]");
-      const savedCoupon = JSON.parse(localStorage.getItem(COUPON_STORAGE_KEY) || "null");
-      setCartItems(savedCart);
-      setWishlistItems(savedWishlist);
-      setAppliedCoupon(savedCoupon);
-    } catch {
-      setCartItems([]);
-      setWishlistItems([]);
-      setAppliedCoupon(null);
-    }
+    setCartItems(safeJsonParse(localStorage.getItem(CART_STORAGE_KEY), []));
+    setWishlistItems(safeJsonParse(localStorage.getItem(WISHLIST_STORAGE_KEY), []));
+    setAppliedCoupon(safeJsonParse(localStorage.getItem(COUPON_STORAGE_KEY), null));
   }, []);
 
   // Detect login and fetch user cart/wishlist
@@ -299,15 +291,27 @@ export const CartProvider = ({ children }) => {
     [isLoggedIn]
   );
 
-  const cartCount = cartItems.reduce((sum, item) => sum + (item.qty || 1), 0);
-  const cartTotal = cartItems.reduce((sum, item) => sum + (item.unit_price || 0) * (item.qty || 1), 0);
+  const cartCount = useMemo(
+    () => cartItems.reduce((sum, item) => sum + (item.qty || 1), 0),
+    [cartItems]
+  );
+  const cartTotal = useMemo(
+    () => cartItems.reduce((sum, item) => sum + (item.unit_price || 0) * (item.qty || 1), 0),
+    [cartItems]
+  );
 
-  const discountAmount = appliedCoupon
-    ? appliedCoupon.discount_type === "percent"
-      ? Math.round(cartTotal * (appliedCoupon.discount_value / 100) * 100) / 100
-      : Math.min(appliedCoupon.discount_value, cartTotal)
-    : 0;
-  const discountedTotal = Math.max(0, cartTotal - discountAmount);
+  const discountAmount = useMemo(() => {
+    if (!appliedCoupon) return 0;
+    if (appliedCoupon.discount_type === "percent") {
+      return Math.round(cartTotal * (appliedCoupon.discount_value / 100) * 100) / 100;
+    }
+    return Math.min(appliedCoupon.discount_value, cartTotal);
+  }, [cartTotal, appliedCoupon]);
+
+  const discountedTotal = useMemo(
+    () => Math.max(0, cartTotal - discountAmount),
+    [cartTotal, discountAmount]
+  );
 
   const applyCoupon = useCallback(async (code) => {
     setCouponError("");

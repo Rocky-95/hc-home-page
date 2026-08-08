@@ -227,7 +227,7 @@ function AppRoutes({ splashDismissed, onSplashComplete }) {
   }
 
   // Redirect admin to /admin when landing on /
-  if (isRoot && roleCode === "ADMIN") {
+  if (isRoot && roleCode?.toLowerCase().includes("admin")) {
     return <Navigate to="/admin" replace />;
   }
 

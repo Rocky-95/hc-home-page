@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { safeJsonParse } from "../../shared/utils";
 import appointmentService from "../../services/appointmentService";
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -32,7 +33,7 @@ const BookAppointmentPage = () => {
       return;
     }
 
-    const user = JSON.parse(localStorage.getItem("hc_user") || "{}");
+    const user = safeJsonParse(localStorage.getItem("hc_user"), {});
     setForm((prev) => ({
       ...prev,
       name: user.full_name || "",
@@ -80,7 +81,7 @@ const BookAppointmentPage = () => {
     setSubmitting(true);
     setMessage({ text: "", isError: false });
     try {
-      const user = JSON.parse(localStorage.getItem("hc_user") || "{}");
+      const user = safeJsonParse(localStorage.getItem("hc_user"), {});
       const userId = user.user_id || user.id;
       await appointmentService.createCustomAppointment({
         ...form,

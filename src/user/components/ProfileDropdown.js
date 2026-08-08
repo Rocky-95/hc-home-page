@@ -1,10 +1,11 @@
 import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { isAdminUser, safeJsonParse } from "../../shared/utils";
 import "../styles/ProfileDropdown.css";
 
 const ProfileDropdown = ({ onClose }) => {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("hc_user"));
+  const user = safeJsonParse(localStorage.getItem("hc_user"), null);
 
   const dropdownRef = useRef(); // 🔥 reference
 
@@ -89,7 +90,7 @@ const ProfileDropdown = ({ onClose }) => {
             My Orders
           </div>
 
-          {(user.role?.toLowerCase() === "admin" || user.role_code === "ADMIN") && (
+          {isAdminUser(user) && (
             <div
               className="dropdown-item"
               onClick={() => handleNavigate("/admin")}

@@ -1,5 +1,6 @@
 import React from "react";
 import { Navigate, Outlet, useNavigate } from "react-router-dom";
+import { isAdminUser, safeJsonParse } from "../../shared/utils";
 import AdminSidebar from "./AdminSidebar";
 
 const AdminLayout = () => {
@@ -7,13 +8,8 @@ const AdminLayout = () => {
   const token = localStorage.getItem("hc_token");
   const session = localStorage.getItem("hc_session");
   const isAuthenticated = token || session;
-  const user = JSON.parse(localStorage.getItem("hc_user") || "null");
-  const isAdmin =
-    user &&
-    (user.role?.toLowerCase() === "admin" ||
-      user.role_code === "ADMIN" ||
-      user.role?.toLowerCase().includes("admin") ||
-      user.role_code?.toLowerCase().includes("admin"));
+  const user = safeJsonParse(localStorage.getItem("hc_user"), null);
+  const isAdmin = isAdminUser(user);
 
   if (!isAuthenticated || !isAdmin) {
     return <Navigate to="/login" replace />;
