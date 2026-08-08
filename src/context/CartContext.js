@@ -41,7 +41,8 @@ export const CartProvider = ({ children }) => {
   // Detect login and fetch user cart/wishlist
   useEffect(() => {
     const token = localStorage.getItem("hc_token");
-    if (!token) {
+    const session = localStorage.getItem("hc_session");
+    if (!token && !session) {
       setIsLoggedIn(false);
       setLoading(false);
       return;
