@@ -3,17 +3,13 @@ import CategoryPage from "../../CategoryPage";
 import weddingImg from "../../../../shared/assets/images/SuitsPage/WeddingNew.jpeg";
 import businessVideo from "../../../../shared/assets/video/suitsPage/BusinessCategory.mp4";
 import designerImg from "../../../../shared/assets/images/SuitsPage/DesignerNew.jpeg";
-import travelImg from "../../../../shared/assets/images/SuitsPage/TravelNew.jpeg";
-import smartCasualImg from "../../../../shared/assets/images/SuitsPage/SmartCasualNew.jpeg";
-import labelImg from "../../../../shared/assets/images/SuitsPage/LabelNew1.jpeg";
+import labelImg from "../../../../shared/assets/images/SuitsPage/LabelNew2.jpeg";
 import "../../../styles/SuitsCategoryPage.css";
 
 const fallbackSubcategories = [
-  { name: "Wedding", image: weddingImg, link: "/wedding-trouser" },
-  { name: "Business", video: businessVideo, link: "/business-trouser" },
+  { name: "Formal", image: weddingImg, link: "/coming-soon" },
+  { name: "Casual", video: businessVideo, link: "/smart-casual-trouser" },
   { name: "Designer", image: designerImg, link: "/designer-trouser" },
-  { name: "Travel", image: travelImg, link: "/travel-trouser" },
-  { name: "Smart Casual", image: smartCasualImg, link: "/smart-casual-trouser" },
 ];
 
 const TrousersCategoryPage = () => {
@@ -24,7 +20,7 @@ const TrousersCategoryPage = () => {
       heroImage={labelImg}
       heroTitle="Own the Room"
       heroSubtitle="Power dressing starts with perfectly tailored trousers."
-      marqueeWords={["WEDDING", "BUSINESS", "DESIGNER", "TRAVEL", "SMARTCASUAL"]}
+      marqueeWords={["Formal", "Casual", "Designer"]}
       fallbackSubcategories={fallbackSubcategories}
     />
   );

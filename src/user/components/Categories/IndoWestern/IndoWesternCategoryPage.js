@@ -9,11 +9,11 @@ import labelImg from "../../../../shared/assets/images/IndoWestern/IndoWesternLa
 import "../../../styles/SuitsCategoryPage.css";
 
 const fallbackSubcategories = [
-  { name: "Wedding", image: weddingImg, link: "/indo-wedding" },
-  { name: "Business", video: businessVideo, link: "/indo-business" },
-  { name: "Designer", image: designerImg, link: "/indo-designer" },
-  { name: "Travel", image: travelImg, link: "/indo-travel" },
-  { name: "Smart Casual", image: smartCasualImg, link: "/indo-casual" },
+  { name: "Wedding Indo Western", image: weddingImg, link: "/indo-wedding" },
+  { name: "Designer IW", video: businessVideo, link: "/indo-designer" },
+  { name: "Wedding Guest IW", image: designerImg, link: "/coming-soon" },
+  { name: "Haldi IW", image: travelImg, link: "/coming-soon" },
+  { name: "Sangeet IW", image: smartCasualImg, link: "/coming-soon" },
 ];
 
 const IndoWesternCategoryPage = () => {
@@ -24,7 +24,7 @@ const IndoWesternCategoryPage = () => {
       heroImage={labelImg}
       heroTitle="Own the Room"
       heroSubtitle="Power dressing starts with a perfectly tailored Indo-Western."
-      marqueeWords={["WEDDING", "BUSINESS", "DESIGNER", "TRAVEL", "SMARTCASUAL"]}
+      marqueeWords={["Wedding Indo Western", "Designer IW", "Wedding Guest IW", "Haldi IW", "Sangeet IW"]}
       fallbackSubcategories={fallbackSubcategories}
     />
   );

@@ -25,7 +25,7 @@ const SuitsCategoryPage = () => {
       heroImage={suitsPageLabelImg}
       heroTitle="Own the Room"
       heroSubtitle="Power dressing starts with a perfectly tailored suit."
-      marqueeWords={["WEDDING", "BUSINESS", "DESIGNER", "TRAVEL", "SMARTCASUAL"]}
+      marqueeWords={["Wedding", "Business", "Designer", "Travel", "Smart casual"]}
       fallbackSubcategories={fallbackSubcategories}
     />
   );

@@ -9,11 +9,11 @@ import labelImg from "../../../../shared/assets/images/Shirts-Collection.jpeg";
 import "../../../styles/SuitsCategoryPage.css";
 
 const fallbackSubcategories = [
-  { name: "Wedding", image: weddingImg, link: "/wedding-shirts" },
-  { name: "Business", video: businessVideo, link: "/business-shirts" },
+  { name: "Formal", image: weddingImg, link: "/coming-soon" },
+  { name: "Casual", video: businessVideo, link: "/casual-shirts" },
   { name: "Designer", image: designerImg, link: "/designer-shirts" },
-  { name: "Travel", image: travelImg, link: "/travel-shirts" },
-  { name: "Smart Casual", image: smartCasualImg, link: "/casual-shirts" },
+  { name: "Ceremonial", image: travelImg, link: "/coming-soon" },
+  { name: "Business", image: smartCasualImg, link: "/business-shirts" },
 ];
 
 const ShirtsCategoryPage = () => {
@@ -24,7 +24,7 @@ const ShirtsCategoryPage = () => {
       heroImage={labelImg}
       heroTitle="New Arrivals"
       heroSubtitle="Power dressing starts with a perfectly tailored shirt."
-      marqueeWords={["WEDDING", "BUSINESS", "DESIGNER", "TRAVEL", "SMARTCASUAL"]}
+      marqueeWords={["Formal", "Casual", "Designer", "Ceremonial", "Business"]}
       fallbackSubcategories={fallbackSubcategories}
     />
   );

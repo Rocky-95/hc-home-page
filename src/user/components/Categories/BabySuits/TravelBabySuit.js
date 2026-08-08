@@ -30,20 +30,20 @@ const TravelBabySuit = () => (
   <SubcategoryPage
     slug="babysuits-travel"
     heroVideo={weddingVideo}
-    heroTitle="Velvet Royal Series"
+    heroTitle="Travel Baby Suits"
     heroSubtitle="For the Men Who Wear Royalty, Not Just Suits."
-    marqueeWords={["Pick your Handcrafted elegance for unforgettable moments."]}
+    marqueeWords={["Travel Baby Suits"]}
     leftImage={leftImg}
     centerVideo={centerVideo}
     rightImage={rightImg}
     sliderImages={[sliderImg1, sliderImg2, sliderImg3]}
     labelVideo={LabelVideo}
     labelImage={LabelImage}
-    descriptionTitle="Regal Black & Gold Hand-Embroidered Tuxedo"
+    descriptionTitle="The Travel Baby Suits Edit"
     descriptionText="Command attention with this masterpiece of craftsmanship: a luxurious black velvet tuxedo intricately hand-embroidered with golden threadwork and shimmering sequins. The blazer features an ornate front design, extending seamlessly to an equally detailed back, showcasing royal patterns inspired by heritage artistry. Paired with a sleek black shirt, bow tie, and trousers, the look is finished with a golden pocket square for the perfect touch of elegance.
 
 This outfit blends modern tailoring with timeless hand embroidery, making it the ideal choice for weddings, receptions, red carpet events, and any occasion where sophistication meets grandeur."
-    footerText="The Wedding Suit Collection – Luxury Hand Embroidered"
+    footerText="The Travel Baby Suits Collection"
     fallbackCategories={fallbackCategories}
     productKeywords={["baby", "travel"]}
     productGridKeyword=""

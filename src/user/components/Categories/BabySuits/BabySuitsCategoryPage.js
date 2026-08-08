@@ -9,11 +9,11 @@ import labelImg from "../../../../shared/assets/images/BabySuits/FirstBirthdayCa
 import "../../../styles/SuitsCategoryPage.css";
 
 const fallbackSubcategories = [
-  { name: "Wedding", image: weddingImg, link: "/wedding-baby" },
-  { name: "Business", video: businessVideo, link: "/business-baby" },
-  { name: "Designer", image: designerImg, link: "/designer-baby" },
-  { name: "Travel", image: travelImg, link: "/travel-baby" },
-  { name: "Smart Casual", image: smartCasualImg, link: "/casual-baby" },
+  { name: "Baby First Birthday Suits", video: businessVideo, link: "/coming-soon" },
+  { name: "Baptism & Christening Suits", image: designerImg, link: "/coming-soon" },
+  { name: "Wedding & Ring Bearer Suits", image: weddingImg, link: "/wedding-baby" },
+  { name: "Family Photoshoot Suits", image: travelImg, link: "/coming-soon" },
+  { name: "Formal & Party Wear Suits", image: smartCasualImg, link: "/coming-soon" },
 ];
 
 const BabySuitsCategoryPage = () => {
@@ -24,7 +24,7 @@ const BabySuitsCategoryPage = () => {
       heroImage={labelImg}
       heroTitle="Own the Room"
       heroSubtitle="Power dressing starts with perfectly tailored baby suits."
-      marqueeWords={["WEDDING", "BUSINESS", "DESIGNER", "TRAVEL", "SMARTCASUAL"]}
+      marqueeWords={["Baby First Birthday Suits", "Baptism & Christening Suits", "Wedding & Ring Bearer Suits", "Family Photoshoot Suits", "Formal & Party Wear Suits"]}
       fallbackSubcategories={fallbackSubcategories}
     />
   );

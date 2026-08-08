@@ -27,12 +27,12 @@ const DesignerPage = () => {
   const { s } = useSubcategorySettings("designer");
 
   const dynamicHeroVideo = s("hero_video") || weddingVideo;
-  const dynamicHeroTitle = s("hero_title") || "Velvet Royal Series";
+  const dynamicHeroTitle = s("hero_title") || "Designer";
   const dynamicHeroSubtitle =
     s("hero_subtitle") || "For the Men Who Wear Royalty, Not Just Suits.";
   const dynamicMarquee =
     safeParse(s("marquee_words")) || [
-      "Pick your Handcrafted elegance for unforgettable moments.",
+      "Designer",
     ];
   const dynamicLeftImage = s("left_image") || leftImg;
   const dynamicCenterVideo = s("center_video") || centerVideo;
@@ -42,12 +42,12 @@ const DesignerPage = () => {
   const dynamicLabelVideo = s("label_video") || LabelVideo;
   const dynamicLabelImage = s("label_image") || LabelImage;
   const dynamicDescriptionTitle =
-    s("description_title") || "Regal Black & Gold Hand-Embroidered Tuxedo";
+    s("description_title") || "The Designer Edit";
   const dynamicDescriptionText =
     s("description_text") ||
     "Command attention with this masterpiece of craftsmanship: a luxurious black velvet tuxedo intricately hand-embroidered with golden threadwork and shimmering sequins. The blazer features an ornate front design, extending seamlessly to an equally detailed back, showcasing royal patterns inspired by heritage artistry. Paired with a sleek black shirt, bow tie, and trousers, the look is finished with a golden pocket square for the perfect touch of elegance.\n\nThis outfit blends modern tailoring with timeless hand embroidery, making it the ideal choice for weddings, receptions, red carpet events, and any occasion where sophistication meets grandeur.";
   const dynamicFooterText =
-    s("footer_text") || "The Wedding Suit Collection – Luxury Hand Embroidered";
+    s("footer_text") || "The Designer Collection";
 
 const categories =[
   { 
