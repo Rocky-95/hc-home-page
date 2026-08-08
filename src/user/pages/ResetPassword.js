@@ -10,6 +10,8 @@ const ResetPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState({ text: "", type: "" });
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -60,7 +62,7 @@ const ResetPassword = () => {
 
   return (
     <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
-      <div className="card shadow-lg p-4" style={{ width: "400px", borderRadius: "12px" }}>
+      <div className="card shadow-lg p-4" style={{ width: "100%", maxWidth: "400px", borderRadius: "12px" }}>
         <h3 className="text-center mb-4">Reset Password</h3>
         {message.text && (
           <div className={`alert alert-${message.type} py-2`} role="alert">
@@ -73,6 +75,7 @@ const ResetPassword = () => {
             <input
               type="email"
               className="form-control border-dark"
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -83,6 +86,7 @@ const ResetPassword = () => {
             <input
               type="text"
               className="form-control border-dark"
+              autoComplete="off"
               value={token}
               onChange={(e) => setToken(e.target.value)}
               required
@@ -90,25 +94,67 @@ const ResetPassword = () => {
           </div>
           <div className="mb-3">
             <label className="form-label">New Password</label>
-            <input
-              type="password"
-              className="form-control border-dark"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <div className="position-relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                className="form-control border-dark"
+                autoComplete="new-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: "absolute",
+                  right: "10px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "#555",
+                  padding: 0,
+                }}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                <i className={showPassword ? "bi bi-eye-slash" : "bi bi-eye"}></i>
+              </button>
+            </div>
           </div>
           <div className="mb-3">
             <label className="form-label">Confirm New Password</label>
-            <input
-              type="password"
-              className="form-control border-dark"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
+            <div className="position-relative">
+              <input
+                type={showConfirm ? "text" : "password"}
+                className="form-control border-dark"
+                autoComplete="new-password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirm(!showConfirm)}
+                style={{
+                  position: "absolute",
+                  right: "10px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "#555",
+                  padding: 0,
+                }}
+                aria-label={showConfirm ? "Hide password" : "Show password"}
+              >
+                <i className={showConfirm ? "bi bi-eye-slash" : "bi bi-eye"}></i>
+              </button>
+            </div>
           </div>
-          <button type="submit" className="btn btn-dark w-100" disabled={loading}>
+          <button type="submit" className="btn btn-dark w-100" disabled={!email.trim() || !token.trim() || !password.trim() || !confirmPassword.trim() || loading}>
             {loading ? "Resetting..." : "Reset Password"}
           </button>
         </form>

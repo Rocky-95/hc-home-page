@@ -18,6 +18,7 @@ function Login() {
   const [otpLoading, setOtpLoading] = useState(false);
   const [otpVerifyLoading, setOtpVerifyLoading] = useState(false);
   const [otpMessage, setOtpMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSendOtp = async () => {
     if (!otpEmail.trim()) { setOtpMessage("Enter email or mobile."); return; }
@@ -69,6 +70,10 @@ function Login() {
 
   const handleLogin = async () => {
     setError("");
+    if (!email.trim() || !password.trim()) {
+      setError("Please enter email and password.");
+      return;
+    }
     setIsLoading(true);
 
     try {
@@ -140,17 +145,24 @@ function Login() {
             <input
               type="text"
               placeholder="Enter OTP from email"
+              autoComplete="one-time-code"
               style={styles.input}
               value={otpCode}
               onChange={(e) => setOtpCode(e.target.value)}
             />
-            <button style={styles.button} onClick={handleVerifyOtp} disabled={otpVerifyLoading}>
+            <button style={styles.button} onClick={handleVerifyOtp} disabled={otpVerifyLoading || !otpCode.trim()}>
               {otpVerifyLoading ? "Verifying..." : "Verify OTP & Login"}
             </button>
+            <p style={{ textAlign: "center", marginTop: "12px", fontSize: "13px" }}>
+              Didn't receive?{" "}
+              <span style={styles.registerLink} onClick={handleSendOtp}>
+                {otpLoading ? "Sending..." : "Resend OTP"}
+              </span>
+            </p>
           </>
         )}
         {!otpSent && (
-          <button style={styles.button} onClick={handleSendOtp} disabled={otpLoading}>
+          <button style={styles.button} onClick={handleSendOtp} disabled={otpLoading || !otpEmail.trim()}>
             {otpLoading ? "Sending..." : "Send OTP"}
           </button>
         )}
@@ -167,8 +179,9 @@ function Login() {
         {/* EMAIL */}
         <label style={styles.label}>Email ID</label>
         <input
-          type="text"
+          type="email"
           placeholder="Enter your email"
+          autoComplete="email"
           style={styles.input}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -176,13 +189,24 @@ function Login() {
 
         {/* PASSWORD */}
         <label style={styles.label}>Password</label>
-        <input
-          type="password"
-          placeholder="Enter password"
-          style={styles.input}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        <div style={{ position: "relative" }}>
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Enter password"
+            autoComplete="current-password"
+            style={styles.input}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            style={styles.eyeBtn}
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            <i className={showPassword ? "bi bi-eye-slash" : "bi bi-eye"}></i>
+          </button>
+        </div>
 
         <p style={{ textAlign: "right", marginBottom: "15px", fontSize: "13px" }}>
           <span
@@ -194,7 +218,7 @@ function Login() {
         </p>
 
         {/* LOGIN BUTTON */}
-        <button style={styles.button} onClick={handleLogin} disabled={isLoading}>
+        <button style={styles.button} onClick={handleLogin} disabled={isLoading || !email.trim() || !password.trim()}>
           {isLoading ? "Logging in..." : "Login with Password"}
         </button>
 
@@ -214,18 +238,22 @@ function Login() {
 
 const styles = {
   container: {
-    height: "100vh",
+    minHeight: "100vh",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
+    padding: "20px",
     fontFamily: "MAINLUX, Arial, sans-serif",
-    backgroundColor: "#fff",
+    backgroundColor: "#f8f9fa",
   },
   card: {
-    width: "360px",
+    width: "90%",
+    maxWidth: "400px",
     padding: "25px",
     borderRadius: "15px",
     border: "1px solid #ddd",
+    backgroundColor: "#fff",
+    boxShadow: "0 8px 32px rgba(0,0,0,0.08)",
   },
   title: {
     textAlign: "center",
@@ -242,6 +270,18 @@ const styles = {
     marginBottom: "15px",
     borderRadius: "8px",
     border: "1px solid #ccc",
+  },
+  eyeBtn: {
+    position: "absolute",
+    right: "12px",
+    top: "50%",
+    transform: "translateY(-50%)",
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    fontSize: "16px",
+    color: "#555",
+    padding: "0",
   },
   button: {
     width: "100%",

@@ -24,6 +24,14 @@
 
 :root {
   --font-mainlux: "MAINLUX", Arial, sans-serif;
+
+  /* Harry Clinton brand palette */
+  --hc-primary: #000000;
+  --hc-accent: #c9a96e;
+  --hc-bg: #f8f9fa;
+  --hc-surface: #ffffff;
+  --hc-text: #111111;
+  --hc-muted: #555555;
 }
 
 html,

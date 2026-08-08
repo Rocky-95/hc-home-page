@@ -73,13 +73,13 @@ const FAQs = () => {
         </div>
       </div>
 
-      <footer className="text-center" style={{ backgroundColor: "#343a40", color: "#fff", padding: "1rem 0" }}>
+      <footer className="text-center" style={{ backgroundColor: "var(--hc-primary)", color: "#fff", padding: "1rem 0" }}>
         <div className="container">
           <p className="mb-1">© 2025 Harry Clinton. All rights reserved.</p>
           <p className="mb-0">
-            <Link to="/" style={{ color: "#ffc107" }}>Home</Link> |{" "}
-            <Link to="/FAQs" style={{ color: "#ffc107" }}>FAQs</Link> |{" "}
-            <Link to="/contact-us" style={{ color: "#ffc107" }}>Contact</Link>
+            <Link to="/" style={{ color: "var(--hc-accent)" }}>Home</Link> |{" "}
+            <Link to="/FAQs" style={{ color: "var(--hc-accent)" }}>FAQs</Link> |{" "}
+            <Link to="/contact-us" style={{ color: "var(--hc-accent)" }}>Contact</Link>
           </p>
         </div>
       </footer>

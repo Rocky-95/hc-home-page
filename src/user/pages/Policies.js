@@ -132,7 +132,7 @@ const Policies = () => {
   }, []);
 
   return (
-    <div style={{ fontFamily: "'Segoe UI', sans-serif", backgroundColor: "#f8f9fa" }}>
+    <div className="bg-light min-vh-100">
       <div className="container py-5">
         <h1 className="text-center mb-4">Our Policies</h1>
 
@@ -156,7 +156,7 @@ const Policies = () => {
               ))}
             </ul>
 
-            <div className="tab-content" id="policyTabsContent" style={{ padding: "30px 20px", backgroundColor: "#fff", borderRadius: "6px", marginTop: "20px", boxShadow: "0 0 10px rgba(0,0,0,0.05)" }}>
+            <div className="tab-content card shadow p-4 mt-3" id="policyTabsContent">
               {tabs.map((tab) => (
                 <div className={`tab-pane fade${activeTab === tab.id ? " show active" : ""}`} id={tab.id} role="tabpanel" key={tab.id}>
                   <h4>{tab.title}</h4>

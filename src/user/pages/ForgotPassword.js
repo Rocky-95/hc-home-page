@@ -44,7 +44,7 @@ const ForgotPassword = () => {
 
   return (
     <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
-      <div className="card shadow-lg p-4" style={{ width: "400px", borderRadius: "12px" }}>
+      <div className="card shadow-lg p-4" style={{ width: "100%", maxWidth: "400px", borderRadius: "12px" }}>
         <h3 className="text-center mb-4">Forgot Password</h3>
         {message.text && (
           <div className={`alert alert-${message.type} py-2`} role="alert">
@@ -58,12 +58,13 @@ const ForgotPassword = () => {
               type="email"
               className="form-control border-dark"
               placeholder="Enter your email"
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
-          <button type="submit" className="btn btn-dark w-100" disabled={loading}>
+          <button type="submit" className="btn btn-dark w-100" disabled={!email.trim() || loading}>
             {loading ? "Sending..." : "Send Reset Link"}
           </button>
         </form>

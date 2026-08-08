@@ -5,6 +5,7 @@ import authService from "../../services/authService";
 const Register = () => {
   const navigate = useNavigate();
   const [message, setMessage] = useState({ text: "", type: "" });
+  const [showPassword, setShowPassword] = useState(false);
 
   const [formData, setFormData] = useState({
     full_name: "",
@@ -73,7 +74,7 @@ const Register = () => {
 
       <div
         className="card shadow-lg p-4"
-        style={{ width: "400px", borderRadius: "12px" }}
+        style={{ width: "100%", maxWidth: "400px", borderRadius: "12px" }}
       >
         <h3 className="text-center mb-4">Register</h3>
 
@@ -95,6 +96,7 @@ const Register = () => {
               value={formData.full_name}
               onChange={handleChange}
               required
+              autoComplete="name"
             />
           </div>
 
@@ -109,6 +111,7 @@ const Register = () => {
               value={formData.email_id}
               onChange={handleChange}
               required
+              autoComplete="email"
             />
           </div>
 
@@ -123,21 +126,43 @@ const Register = () => {
               value={formData.mobile_number}
               onChange={handleChange}
               required
+              autoComplete="tel"
             />
           </div>
 
           {/* Password */}
           <div className="mb-3">
             <label className="form-label">Password</label>
-            <input
-              type="password"
-              name="password"
-              className="form-control border-dark"
-              placeholder="Create a strong password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
+            <div className="position-relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                className="form-control border-dark"
+                placeholder="Create a strong password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                autoComplete="new-password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: "absolute",
+                  right: "10px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "#555",
+                  padding: 0,
+                }}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                <i className={showPassword ? "bi bi-eye-slash" : "bi bi-eye"}></i>
+              </button>
+            </div>
           </div>
 
           {/* Privacy & Terms – Inline */}
@@ -152,11 +177,11 @@ const Register = () => {
             />
             <label className="form-check-label" htmlFor="policy">
               Accept{" "}
-              <Link to="/privacy" target="_blank">
+              <Link to="/privacy-policy" target="_blank">
                 Privacy 
               </Link>{" "}
               &{" "}
-              <Link to="/terms" target="_blank">
+              <Link to="/terms-and-conditions" target="_blank">
                 Terms
               </Link>
             </label>
@@ -167,6 +192,7 @@ const Register = () => {
             type="submit"
             className="btn w-100"
             style={{ backgroundColor: "black", color: "white" }}
+            disabled={!formData.full_name.trim() || !formData.email_id.trim() || !formData.mobile_number.trim() || !formData.password.trim() || !formData.acceptPolicy}
           >
             Register
           </button>
