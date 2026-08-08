@@ -31,7 +31,7 @@ const SearchPage = () => {
       setLoading(true);
       setError("");
       try {
-        const [productsRes, mediaRes, variantsRes, attrValuesRes, attrsRes, sizesRes, clothTypesRes] = await Promise.all([
+        const responses = await Promise.allSettled([
           productService.getProducts(),
           productService.getProductMedia(),
           productService.getProductVariants(),
@@ -40,8 +40,12 @@ const SearchPage = () => {
           productService.getProductSizes(),
           productService.getProductClothTypes(),
         ]);
-        const apiProducts = productsRes.data?.data || productsRes.data || [];
-        const apiMedia = mediaRes.data?.data || mediaRes.data || [];
+        const getData = (i) =>
+          responses[i].status === "fulfilled"
+            ? responses[i].value.data?.data || responses[i].value.data || []
+            : [];
+        const apiProducts = getData(0);
+        const apiMedia = getData(1);
 
         const normalizedQuery = query.trim().toLowerCase();
         const filtered = apiProducts.filter((p) => {
@@ -63,11 +67,11 @@ const SearchPage = () => {
         });
 
         setProducts(mapped);
-        setVariants(variantsRes.data?.data || variantsRes.data || []);
-        setAttributeValues(attrValuesRes.data?.data || attrValuesRes.data || []);
-        setAttributes(attrsRes.data?.data || attrsRes.data || []);
-        setSizes(sizesRes.data?.data || sizesRes.data || []);
-        setClothTypes(clothTypesRes.data?.data || clothTypesRes.data || []);
+        setVariants(getData(2));
+        setAttributeValues(getData(3));
+        setAttributes(getData(4));
+        setSizes(getData(5));
+        setClothTypes(getData(6));
       } catch (err) {
         setError(err.response?.data?.message || "Failed to search products");
       } finally {
@@ -75,6 +79,10 @@ const SearchPage = () => {
       }
     };
     fetchProducts();
+  }, [query]);
+
+  useEffect(() => {
+    document.title = query ? `Search: ${query} | Harry Clinton` : "Search Products | Harry Clinton";
   }, [query]);
 
   const colorAttributeId = useMemo(() => {
@@ -169,6 +177,7 @@ const SearchPage = () => {
                   <img
                     src={product.image}
                     alt={product.name}
+                    loading="lazy"
                     className="card-img-top"
                     style={{ objectFit: "cover", height: "280px" }}
                   />

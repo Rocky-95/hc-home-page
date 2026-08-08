@@ -70,6 +70,12 @@ const CategoryPage = ({
   }, [categorySlug, fallbackSubcategories]);
 
   useEffect(() => {
+    document.title = `${dynamicHeroTitle} | Harry Clinton`;
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) metaDescription.setAttribute("content", dynamicHeroSubtitle);
+  }, [dynamicHeroTitle, dynamicHeroSubtitle]);
+
+  useEffect(() => {
     const handleScroll = () => {
       const img = document.querySelector(".hero-image");
       if (!img) return;

@@ -25,16 +25,16 @@ const ProductPage = () => {
       setLoading(true);
       setError("");
       try {
-        const [productsRes, mediaRes, variantsRes, sizesRes] = await Promise.all([
+        const [productsRes, mediaRes, variantsRes, sizesRes] = await Promise.allSettled([
           productService.getProducts(),
           productService.getProductMedia(),
           productService.getProductVariants(),
           productService.getProductSizes(),
         ]);
-        const products = productsRes.data?.data || productsRes.data || [];
-        const allMedia = mediaRes.data?.data || mediaRes.data || [];
-        const allVariants = variantsRes.data?.data || variantsRes.data || [];
-        const allSizes = sizesRes.data?.data || sizesRes.data || [];
+        const products = productsRes.status === "fulfilled" ? (productsRes.value.data?.data || productsRes.value.data || []) : [];
+        const allMedia = mediaRes.status === "fulfilled" ? (mediaRes.value.data?.data || mediaRes.value.data || []) : [];
+        const allVariants = variantsRes.status === "fulfilled" ? (variantsRes.value.data?.data || variantsRes.value.data || []) : [];
+        const allSizes = sizesRes.status === "fulfilled" ? (sizesRes.value.data?.data || sizesRes.value.data || []) : [];
 
         const matched =
           products.find((p) => p.product_slug === id || p.product_id === id) ||
@@ -77,6 +77,14 @@ const ProductPage = () => {
     };
     fetchProduct();
   }, [id]);
+
+  useEffect(() => {
+    if (product) {
+      document.title = `${product.product_name} | Harry Clinton`;
+      const metaDescription = document.querySelector('meta[name="description"]');
+      if (metaDescription) metaDescription.setAttribute("content", product.short_description || "");
+    }
+  }, [product]);
 
   const mainImage = useMemo(() => {
     const primary = media.find((m) => m.isprimary === 1 || m.isprimary === true);

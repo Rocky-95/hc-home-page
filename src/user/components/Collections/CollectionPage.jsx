@@ -15,6 +15,7 @@ const CollectionPage = ({
   description,
   bannerImage,
 }) => {
+  const [collectionMeta, setCollectionMeta] = useState({ title, eyebrow, description, bannerImage });
   const [searchTerm, setSearchTerm] = useState("");
   const [products, setProducts] = useState([]);
   const [variants, setVariants] = useState([]);
@@ -33,9 +34,41 @@ const CollectionPage = ({
   const [error, setError] = useState("");
 
   useEffect(() => {
+    const fetchMeta = async () => {
+      try {
+        const [collectionsRes, mediaRes] = await Promise.allSettled([
+          productService.getStyleCollections(),
+          productService.getStyleCollectionMedia(),
+        ]);
+        const collections = collectionsRes.status === "fulfilled" ? (collectionsRes.value.data?.data || collectionsRes.value.data || []) : [];
+        const media = mediaRes.status === "fulfilled" ? (mediaRes.value.data?.data || mediaRes.value.data || []) : [];
+
+        const matched = collections.find((sc) =>
+          (sc.style_collection_slug || sc.style_collection_name?.toLowerCase().replace(/\s+/g, "-")) === category
+        );
+
+        if (matched) {
+          const matchedMedia =
+            media.find((m) => m.style_collection_id === matched.style_collection_id && m.isprimary) ||
+            media.find((m) => m.style_collection_id === matched.style_collection_id);
+          setCollectionMeta({
+            title: matched.title || matched.style_collection_name || title,
+            eyebrow: matched.eyebrow || matched.eyebrow_text || matched.subtitle || eyebrow,
+            description: matched.description || matched.short_description || description,
+            bannerImage: matchedMedia?.media_url || matched.banner_image_url || matched.image_url || bannerImage,
+          });
+        }
+      } catch {
+        // keep hardcoded props as fallback
+      }
+    };
+    fetchMeta();
+  }, [category, title, eyebrow, description, bannerImage]);
+
+  useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const [productsRes, mediaRes, variantsRes, attrValuesRes, attrsRes, sizesRes, clothTypesRes] = await Promise.all([
+        const responses = await Promise.allSettled([
           productService.getProducts({ category }),
           productService.getProductMedia(),
           productService.getProductVariants(),
@@ -44,8 +77,12 @@ const CollectionPage = ({
           productService.getProductSizes(),
           productService.getProductClothTypes(),
         ]);
-        const apiProducts = productsRes.data?.data || productsRes.data || [];
-        const apiMedia = mediaRes.data?.data || mediaRes.data || [];
+        const getData = (i) =>
+          responses[i].status === "fulfilled"
+            ? responses[i].value.data?.data || responses[i].value.data || []
+            : [];
+        const apiProducts = getData(0);
+        const apiMedia = getData(1);
         const mapped = apiProducts
           .filter((p) => !category || (p.category || "").toLowerCase() === category.toLowerCase())
           .map((p) => {
@@ -71,11 +108,11 @@ const CollectionPage = ({
             };
           });
         setProducts(mapped.length > 0 ? mapped : fallbackProducts.filter((p) => p.category === category));
-        setVariants(variantsRes.data?.data || variantsRes.data || []);
-        setAttributeValues(attrValuesRes.data?.data || attrValuesRes.data || []);
-        setAttributes(attrsRes.data?.data || attrsRes.data || []);
-        setSizes(sizesRes.data?.data || sizesRes.data || []);
-        setClothTypes(clothTypesRes.data?.data || clothTypesRes.data || []);
+        setVariants(getData(2));
+        setAttributeValues(getData(3));
+        setAttributes(getData(4));
+        setSizes(getData(5));
+        setClothTypes(getData(6));
       } catch (err) {
         setError("Unable to load products from the server.");
         setProducts(fallbackProducts.filter((p) => p.category === category));
@@ -103,6 +140,12 @@ const CollectionPage = ({
     const prices = products.map((p) => p.price);
     return { min: Math.min(...prices), max: Math.max(...prices) };
   }, [products]);
+
+  useEffect(() => {
+    document.title = `${collectionMeta.title} | Harry Clinton`;
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) metaDescription.setAttribute("content", collectionMeta.description || "");
+  }, [collectionMeta]);
 
   const collectionProducts = useMemo(() => {
     const normalizedSearch = searchTerm.trim().toLowerCase();
@@ -146,12 +189,12 @@ const CollectionPage = ({
   return (
     <main className="collection-page">
       <section className="collection-hero">
-        <img src={bannerImage} alt="" className="collection-hero__image" />
+        <img src={collectionMeta.bannerImage} alt="" className="collection-hero__image" />
         <div className="collection-hero__overlay" />
         <div className="collection-hero__content">
-          <span>{eyebrow}</span>
-          <h1>{title}</h1>
-          <p>{description}</p>
+          <span>{collectionMeta.eyebrow}</span>
+          <h1>{collectionMeta.title}</h1>
+          <p>{collectionMeta.description}</p>
           <a href="#collection-products" className="collection-hero__action">
             Explore collection <FaArrowRight />
           </a>
@@ -162,7 +205,7 @@ const CollectionPage = ({
         <div className="collection-catalog__heading">
           <div>
             <span className="collection-kicker">Curated by House of Cavani</span>
-            <h2>{title}</h2>
+            <h2>{collectionMeta.title}</h2>
           </div>
 
           <label className="collection-search">

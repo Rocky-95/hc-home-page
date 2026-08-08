@@ -75,6 +75,7 @@ const ProductGrid = ({ keyword = "" }) => {
                 <img
                   src={product.image}
                   alt={product.name}
+                  loading="lazy"
                   className="card-img-top"
                   style={{ objectFit: "cover", height: "280px" }}
                 />
