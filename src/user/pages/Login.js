@@ -55,12 +55,20 @@ function Login() {
       const roles = response.roles || user?.roles || [];
       const primaryRole = roles[0] || {};
       const roleCode = primaryRole.role_code || "CUSTOMER";
+      const roleName = primaryRole.role_name || "Customer";
       if (token) localStorage.setItem("hc_token", token);
       localStorage.setItem("hc_session", "1");
-      localStorage.setItem("hc_user", JSON.stringify({ ...user, role_code: roleCode }));
+      localStorage.setItem("hc_user", JSON.stringify({ ...user, role: roleName, role_code: roleCode }));
       localStorage.setItem("hc_role", roleCode);
-      if (roleCode === "ADMIN") navigate("/admin");
-      else navigate(redirectTo || "/");
+      if (
+        roleCode === "ADMIN" ||
+        roleCode.toLowerCase().includes("admin") ||
+        roleName.toLowerCase().includes("admin")
+      ) {
+        navigate("/admin");
+      } else {
+        navigate(redirectTo || "/");
+      }
     } catch (err) {
       setOtpMessage(err.response?.data?.Message || "OTP verification failed.");
     } finally {
@@ -107,7 +115,11 @@ function Login() {
       localStorage.setItem("hc_user", JSON.stringify(normalizedUser));
       localStorage.setItem("hc_role", roleCode);
 
-      if (roleCode === "ADMIN") {
+      if (
+        roleCode === "ADMIN" ||
+        roleCode.toLowerCase().includes("admin") ||
+        roleName.toLowerCase().includes("admin")
+      ) {
         navigate("/admin");
       } else {
         navigate(redirectTo || "/");
