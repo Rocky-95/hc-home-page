@@ -5,6 +5,7 @@ import { useToast } from "../components/ToastProvider";
 import { useConfirm } from "../components/ConfirmProvider";
 import Modal from "../components/Modal";
 import { validateMediaFile } from "../utils/mediaValidation";
+import ActiveToggle from "../components/ActiveToggle";
 
 const RCU = "ADMIN_PORTAL";
 const unwrap = (res) => res.data?.data || res.data || [];
@@ -43,6 +44,14 @@ const AdminStyleCollectionsPage = () => {
   const openEdit = (c) => setWorkspace({ ...c });
   const closeWorkspace = () => { setWorkspace(null); fetchCollections(); };
 
+  const toggleCollectionActive = async (c, nextActive) => {
+    try {
+      await apiClient.put("/Style-Collections", { style_collection_id: c.style_collection_id, isactive: nextActive ? 1 : 0, luu: RCU });
+      toast.success(`Collection ${nextActive ? "activated" : "deactivated"}.`);
+      fetchCollections();
+    } catch (err) { toast.error(err.response?.data?.message || "Failed to update status."); }
+  };
+
   return (
     <div>
       <h3 className="mb-4">Style by HC — Collections</h3>
@@ -62,7 +71,7 @@ const AdminStyleCollectionsPage = () => {
                       <td><strong>{c.collection_name}</strong></td>
                       <td><code>{c.collection_slug}</code></td>
                       <td>{c.display_order}</td>
-                      <td><span className={`badge bg-${c.isactive ? "success" : "secondary"}`}>{c.isactive ? "Yes" : "No"}</span></td>
+                      <td><ActiveToggle active={!!c.isactive} onToggle={(next) => toggleCollectionActive(c, next)} /></td>
                       <td><button className="btn btn-sm btn-outline-dark" onClick={() => openEdit(c)}>Open</button></td>
                     </tr>
                   ))}

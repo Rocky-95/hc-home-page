@@ -3,6 +3,7 @@ import api from "../services/api";
 import { useToast } from "../components/ToastProvider";
 import { useConfirm } from "../components/ConfirmProvider";
 import Modal from "../components/Modal";
+import ActiveToggle from "../components/ActiveToggle";
 
 const RCU = "ADMIN_PORTAL";
 
@@ -62,6 +63,16 @@ const AdminFaqsPage = () => {
       fetchFaqs();
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to save FAQ.");
+    }
+  };
+
+  const toggleFaqActive = async (f, nextActive) => {
+    try {
+      await api.put("/FAQs", { faq_id: f.faq_id, isactive: nextActive ? 1 : 0, luu: RCU });
+      toast.success(`FAQ ${nextActive ? "activated" : "deactivated"}.`);
+      fetchFaqs();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to update status.");
     }
   };
 
@@ -152,7 +163,7 @@ const AdminFaqsPage = () => {
                     <td><strong>{f.question}</strong></td>
                     <td style={{ maxWidth: 400, whiteSpace: "pre-wrap" }}>{f.answer}</td>
                     <td>{f.display_order}</td>
-                    <td><span className={`badge bg-${f.isactive ? "success" : "secondary"}`}>{f.isactive ? "Yes" : "No"}</span></td>
+                    <td><ActiveToggle active={!!f.isactive} onToggle={(next) => toggleFaqActive(f, next)} /></td>
                     <td>
                       <button className="btn btn-sm btn-outline-dark me-1" onClick={() => startEdit(f)}>Edit</button>
                       <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(f)}>Delete</button>

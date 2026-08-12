@@ -3,6 +3,7 @@ import apiClient from "../../services/apiClient";
 import { useToast } from "../components/ToastProvider";
 import { useConfirm } from "../components/ConfirmProvider";
 import Modal from "../components/Modal";
+import ActiveToggle from "../components/ActiveToggle";
 
 const RCU = "ADMIN_PORTAL";
 const unwrap = (res) => res.data?.data || res.data || [];
@@ -33,6 +34,14 @@ const AdminRunningBarPage = () => {
   const openEdit = (b) => setWorkspace({ ...b });
   const closeWorkspace = () => { setWorkspace(null); fetchBars(); };
 
+  const toggleBarActive = async (b, nextActive) => {
+    try {
+      await apiClient.put("/Running-Bar", { running_bar_id: b.running_bar_id, isactive: nextActive ? 1 : 0, luu: RCU });
+      toast.success(`Running bar ${nextActive ? "activated" : "deactivated"}.`);
+      fetchBars();
+    } catch (err) { toast.error(err.response?.data?.message || "Failed to update status."); }
+  };
+
   return (
     <div>
       <h3 className="mb-4">Running Bars</h3>
@@ -50,7 +59,7 @@ const AdminRunningBarPage = () => {
                   bars.map((b) => (
                     <tr key={b.running_bar_id}>
                       <td><strong>{b.running_bar_name}</strong></td>
-                      <td><span className={`badge bg-${b.isactive ? "success" : "secondary"}`}>{b.isactive ? "Yes" : "No"}</span></td>
+                      <td><ActiveToggle active={!!b.isactive} onToggle={(next) => toggleBarActive(b, next)} /></td>
                       <td><button className="btn btn-sm btn-outline-dark" onClick={() => openEdit(b)}>Open</button></td>
                     </tr>
                   ))}
@@ -129,6 +138,13 @@ const RunningBarWorkspace = ({ bar, onClose, toast, confirm }) => {
     try { await apiClient.delete("/Running-Bar-Items", { data: { running_bar_item_id: i.running_bar_item_id, luu: RCU } }); toast.success("Item deleted."); loadItems(barId); }
     catch { toast.error("Delete failed."); }
   };
+  const toggleItemActive = async (i, nextActive) => {
+    try {
+      await apiClient.put("/Running-Bar-Items", { running_bar_item_id: i.running_bar_item_id, isactive: nextActive ? 1 : 0, luu: RCU });
+      toast.success(`Item ${nextActive ? "activated" : "deactivated"}.`);
+      loadItems(barId);
+    } catch (err) { toast.error(err.response?.data?.message || "Failed to update status."); }
+  };
 
   return (
     <div>
@@ -166,12 +182,13 @@ const RunningBarWorkspace = ({ bar, onClose, toast, confirm }) => {
               <button className="btn btn-dark btn-sm" onClick={openNewItem}>+ Add Item</button>
             </div>
             <table className="table table-sm table-bordered align-middle mb-0">
-              <thead className="table-light"><tr><th>Text</th><th>Duration</th><th>Order</th><th>Actions</th></tr></thead>
+              <thead className="table-light"><tr><th>Text</th><th>Duration</th><th>Order</th><th>Active</th><th>Actions</th></tr></thead>
               <tbody>
-                {items.length === 0 ? <tr><td colSpan={4} className="text-center text-muted">No items yet.</td></tr> :
+                {items.length === 0 ? <tr><td colSpan={5} className="text-center text-muted">No items yet.</td></tr> :
                   items.map((i) => (
                     <tr key={i.running_bar_item_id}>
                       <td>{i.itemsdata}</td><td>{i.duration_seconds}s</td><td>{i.display_order}</td>
+                      <td><ActiveToggle active={!!i.isactive} onToggle={(next) => toggleItemActive(i, next)} /></td>
                       <td>
                         <button className="btn btn-sm btn-outline-dark me-1" onClick={() => openEditItem(i)}>Edit</button>
                         <button className="btn btn-sm btn-outline-danger" onClick={() => deleteItem(i)}>Delete</button>

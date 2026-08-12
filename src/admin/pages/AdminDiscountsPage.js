@@ -3,6 +3,7 @@ import apiClient from "../../services/apiClient";
 import { useToast } from "../components/ToastProvider";
 import { useConfirm } from "../components/ConfirmProvider";
 import Modal from "../components/Modal";
+import ActiveToggle from "../components/ActiveToggle";
 
 const RCU = "ADMIN_PORTAL";
 const unwrap = (res) => res.data?.data || res.data || [];
@@ -53,6 +54,14 @@ const AdminDiscountsPage = () => {
   const openEdit = (d) => setWorkspace({ ...d });
   const closeWorkspace = () => { setWorkspace(null); fetchDiscounts(); };
 
+  const toggleDiscountActive = async (d, nextActive) => {
+    try {
+      await apiClient.put("/Discounts", { discount_id: d.discount_id, isactive: nextActive ? 1 : 0, luu: RCU });
+      toast.success(`Discount ${nextActive ? "activated" : "deactivated"}.`);
+      fetchDiscounts();
+    } catch (err) { toast.error(err.response?.data?.message || "Failed to update status."); }
+  };
+
   return (
     <div>
       <h3 className="mb-4">Discounts</h3>
@@ -72,7 +81,7 @@ const AdminDiscountsPage = () => {
                       <td><strong>{d.discount_name}</strong></td>
                       <td>{d.discount_type}</td>
                       <td>{d.discount_type?.toLowerCase().startsWith("percent") ? `${d.discount_value}%` : `₹${d.discount_value}`}</td>
-                      <td><span className={`badge bg-${d.isactive ? "success" : "secondary"}`}>{d.isactive ? "Yes" : "No"}</span></td>
+                      <td><ActiveToggle active={!!d.isactive} onToggle={(next) => toggleDiscountActive(d, next)} /></td>
                       <td><button className="btn btn-sm btn-outline-dark" onClick={() => openEdit(d)}>Open</button></td>
                     </tr>
                   ))}

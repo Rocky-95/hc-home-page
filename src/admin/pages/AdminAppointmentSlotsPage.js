@@ -3,6 +3,7 @@ import apiClient from "../../services/apiClient";
 import { useToast } from "../components/ToastProvider";
 import { useConfirm } from "../components/ConfirmProvider";
 import Modal from "../components/Modal";
+import ActiveToggle from "../components/ActiveToggle";
 
 const RCU = "ADMIN_PORTAL";
 const unwrap = (res) => res.data?.data || res.data || [];
@@ -37,6 +38,14 @@ const AdminAppointmentSlotsPage = () => {
   const openEdit = (d) => setWorkspace({ ...d });
   const closeWorkspace = () => { setWorkspace(null); fetchDateSlots(); };
 
+  const toggleDateAvailable = async (d, nextAvailable) => {
+    try {
+      await apiClient.put("/Appointment-Date-Slots", { appointment_date_slot_id: d.appointment_date_slot_id, isavailable: nextAvailable ? 1 : 0, luu: RCU });
+      toast.success(`Date ${nextAvailable ? "marked available" : "marked unavailable"}.`);
+      fetchDateSlots();
+    } catch (err) { toast.error(err.response?.data?.message || "Failed to update status."); }
+  };
+
   return (
     <div>
       <h3 className="mb-4">Appointment Availability</h3>
@@ -55,7 +64,7 @@ const AdminAppointmentSlotsPage = () => {
                     <tr key={d.appointment_date_slot_id}>
                       <td><strong>{d.slot_date}</strong></td>
                       <td>{d.slot_duration_minutes} min</td>
-                      <td><span className={`badge bg-${d.isavailable ? "success" : "secondary"}`}>{d.isavailable ? "Yes" : "No"}</span></td>
+                      <td><ActiveToggle active={!!d.isavailable} onToggle={(next) => toggleDateAvailable(d, next)} /></td>
                       <td>{d.notes}</td>
                       <td><button className="btn btn-sm btn-outline-dark" onClick={() => openEdit(d)}>Open</button></td>
                     </tr>

@@ -5,6 +5,7 @@ import { useToast } from "../components/ToastProvider";
 import { useConfirm } from "../components/ConfirmProvider";
 import Modal from "../components/Modal";
 import { validateMediaFile } from "../utils/mediaValidation";
+import ActiveToggle from "../components/ActiveToggle";
 
 const RCU = "ADMIN_PORTAL";
 const unwrap = (res) => res.data?.data || res.data || [];
@@ -37,6 +38,14 @@ const AdminSpotlightMediaPage = () => {
   const openEdit = (e) => setWorkspace({ ...e });
   const closeWorkspace = () => { setWorkspace(null); fetchEntries(); };
 
+  const toggleEntryActive = async (entry, nextActive) => {
+    try {
+      await apiClient.put("/Spotlight-Entries", { spotlight_entry_id: entry.spotlight_entry_id, isactive: nextActive ? 1 : 0, luu: RCU });
+      toast.success(`Entry ${nextActive ? "activated" : "deactivated"}.`);
+      fetchEntries();
+    } catch (err) { toast.error(err.response?.data?.message || "Failed to update status."); }
+  };
+
   const filtered = entries.filter((e) => `${e.title || ""} ${e.subtitle || ""}`.toLowerCase().includes(search.toLowerCase()));
 
   return (
@@ -58,7 +67,7 @@ const AdminSpotlightMediaPage = () => {
                     <tr key={e.spotlight_entry_id}>
                       <td><strong>{e.title}</strong></td>
                       <td>{e.subtitle}</td>
-                      <td><span className={`badge bg-${e.isactive ? "success" : "secondary"}`}>{e.isactive ? "Yes" : "No"}</span></td>
+                      <td><ActiveToggle active={!!e.isactive} onToggle={(next) => toggleEntryActive(e, next)} /></td>
                       <td><button className="btn btn-sm btn-outline-dark" onClick={() => openEdit(e)}>Open</button></td>
                     </tr>
                   ))}

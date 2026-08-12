@@ -3,6 +3,7 @@ import apiClient from "../../services/apiClient";
 import { useToast } from "../components/ToastProvider";
 import { useConfirm } from "../components/ConfirmProvider";
 import Modal from "../components/Modal";
+import ActiveToggle from "../components/ActiveToggle";
 
 const RCU = "ADMIN_PORTAL";
 const unwrap = (res) => res.data?.data || res.data || [];
@@ -36,6 +37,14 @@ const AdminCategoriesPage = () => {
   const openEdit = (c) => setWorkspace({ ...c });
   const closeWorkspace = () => { setWorkspace(null); fetchCategories(); };
 
+  const toggleCategoryActive = async (c, nextActive) => {
+    try {
+      await apiClient.put("/Menu-Category", { menu_category_id: c.menu_category_id, isactive: nextActive ? 1 : 0, luu: RCU });
+      toast.success(`Category ${nextActive ? "activated" : "deactivated"}.`);
+      fetchCategories();
+    } catch (err) { toast.error(err.response?.data?.message || "Failed to update status."); }
+  };
+
   const filtered = categories.filter((c) =>
     c.menu_category_name?.toLowerCase().includes(search.toLowerCase()) ||
     c.menu_category_slug?.toLowerCase().includes(search.toLowerCase())
@@ -61,7 +70,7 @@ const AdminCategoriesPage = () => {
                       <td><strong>{c.menu_category_name}</strong></td>
                       <td><code>{c.menu_category_slug}</code></td>
                       <td>{c.display_order}</td>
-                      <td><span className={`badge bg-${c.isactive ? "success" : "secondary"}`}>{c.isactive ? "Yes" : "No"}</span></td>
+                      <td><ActiveToggle active={!!c.isactive} onToggle={(next) => toggleCategoryActive(c, next)} /></td>
                       <td><button className="btn btn-sm btn-outline-dark" onClick={() => openEdit(c)}>Open</button></td>
                     </tr>
                   ))}
@@ -146,6 +155,13 @@ const CategoryWorkspace = ({ category, onClose, toast, confirm }) => {
     try { await apiClient.delete("/Menu-Sub-Category", { data: { menu_subcategory_id: s.menu_subcategory_id, luu: RCU } }); toast.success("Subcategory deleted."); loadSubs(categoryId); }
     catch { toast.error("Delete failed."); }
   };
+  const toggleSubActive = async (s, nextActive) => {
+    try {
+      await apiClient.put("/Menu-Sub-Category", { menu_subcategory_id: s.menu_subcategory_id, isactive: nextActive ? 1 : 0, luu: RCU });
+      toast.success(`Subcategory ${nextActive ? "activated" : "deactivated"}.`);
+      loadSubs(categoryId);
+    } catch (err) { toast.error(err.response?.data?.message || "Failed to update status."); }
+  };
 
   return (
     <div>
@@ -188,12 +204,13 @@ const CategoryWorkspace = ({ category, onClose, toast, confirm }) => {
               <button className="btn btn-dark btn-sm" onClick={openNewSub}>+ Add Subcategory</button>
             </div>
             <table className="table table-sm table-bordered align-middle mb-0">
-              <thead className="table-light"><tr><th>Name</th><th>Slug</th><th>Order</th><th>Actions</th></tr></thead>
+              <thead className="table-light"><tr><th>Name</th><th>Slug</th><th>Order</th><th>Active</th><th>Actions</th></tr></thead>
               <tbody>
-                {subs.length === 0 ? <tr><td colSpan={4} className="text-center text-muted">No subcategories yet.</td></tr> :
+                {subs.length === 0 ? <tr><td colSpan={5} className="text-center text-muted">No subcategories yet.</td></tr> :
                   subs.map((s) => (
                     <tr key={s.menu_subcategory_id}>
                       <td>{s.menu_subcategory_name}</td><td><code>{s.menu_subcategory_slug}</code></td><td>{s.display_order}</td>
+                      <td><ActiveToggle active={!!s.isactive} onToggle={(next) => toggleSubActive(s, next)} /></td>
                       <td>
                         <button className="btn btn-sm btn-outline-dark me-1" onClick={() => openEditSub(s)}>Edit</button>
                         <button className="btn btn-sm btn-outline-danger" onClick={() => deleteSub(s)}>Delete</button>

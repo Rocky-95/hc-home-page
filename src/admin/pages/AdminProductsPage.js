@@ -5,6 +5,7 @@ import { useToast } from "../components/ToastProvider";
 import { useConfirm } from "../components/ConfirmProvider";
 import Modal from "../components/Modal";
 import { validateMediaFile } from "../utils/mediaValidation";
+import ActiveToggle from "../components/ActiveToggle";
 
 const RCU = "ADMIN_PORTAL";
 
@@ -81,6 +82,14 @@ const AdminProductsPage = () => {
   const openEditProduct = (p) => setWorkspaceProduct({ ...p });
   const closeWorkspace = () => { setWorkspaceProduct(null); fetchProducts(); };
 
+  const toggleProductActive = async (p, nextActive) => {
+    try {
+      await apiClient.put("/Products", { product_id: p.product_id, isactive: nextActive ? 1 : 0, luu: RCU });
+      toast.success(`Product ${nextActive ? "activated" : "deactivated"}.`);
+      fetchProducts();
+    } catch (err) { toast.error(err.response?.data?.message || "Failed to update status."); }
+  };
+
   return (
     <div>
       <h3 className="mb-4">Product Management</h3>
@@ -112,7 +121,7 @@ const AdminProductsPage = () => {
                             <td><strong>{p.product_name}</strong><br /><small className="text-muted">{p.short_description}</small></td>
                             <td><code>{p.product_slug}</code></td>
                             <td>₹{p.base_price}</td>
-                            <td><span className={`badge bg-${p.isactive ? "success" : "secondary"}`}>{p.isactive ? "Yes" : "No"}</span></td>
+                            <td><ActiveToggle active={!!p.isactive} onToggle={(next) => toggleProductActive(p, next)} /></td>
                             <td><button className="btn btn-sm btn-outline-dark" onClick={() => openEditProduct(p)}>Open</button></td>
                           </tr>
                         ))}

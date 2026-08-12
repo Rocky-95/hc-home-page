@@ -3,6 +3,7 @@ import { FiChevronUp, FiChevronDown } from "react-icons/fi";
 import apiClient from "../../services/apiClient";
 import { useToast } from "../components/ToastProvider";
 import { useConfirm } from "../components/ConfirmProvider";
+import ActiveToggle from "../components/ActiveToggle";
 
 const RCU = "ADMIN_PORTAL";
 
@@ -145,14 +146,7 @@ const AdminUsersPage = () => {
                         ))}
                     </td>
                     <td>
-                      <div className="form-check form-switch mb-0">
-                        <input
-                          className="form-check-input"
-                          type="checkbox"
-                          checked={!!user.isactive}
-                          onChange={() => handleToggleActive(user)}
-                        />
-                      </div>
+                      <ActiveToggle active={!!user.isactive} onToggle={() => handleToggleActive(user)} />
                     </td>
                     <td>
                       <button

@@ -3,6 +3,7 @@ import apiClient from "../../services/apiClient";
 import { useToast } from "../components/ToastProvider";
 import { useConfirm } from "../components/ConfirmProvider";
 import Modal from "../components/Modal";
+import ActiveToggle from "../components/ActiveToggle";
 
 const RCU = "ADMIN_PORTAL";
 const unwrap = (res) => res.data?.data || res.data || [];
@@ -61,6 +62,14 @@ const AdminSupportContactsPage = () => {
     if (!ok) return;
     try { await apiClient.delete("/Support-Contacts", { data: { support_contact_id: c.support_contact_id, luu: RCU } }); toast.success("Contact deleted."); fetchContacts(); }
     catch (err) { toast.error(err.response?.data?.message || "Delete failed."); }
+  };
+
+  const toggleContactActive = async (c, nextActive) => {
+    try {
+      await apiClient.put("/Support-Contacts", { support_contact_id: c.support_contact_id, isactive: nextActive ? 1 : 0, luu: RCU });
+      toast.success(`Contact ${nextActive ? "activated" : "deactivated"}.`);
+      fetchContacts();
+    } catch (err) { toast.error(err.response?.data?.message || "Failed to update status."); }
   };
 
   const startEdit = (c) => {
@@ -125,7 +134,7 @@ const AdminSupportContactsPage = () => {
                   <td>{c.contact_name}</td>
                   <td>{c.contact_email}</td>
                   <td>{c.contact_number}</td>
-                  <td><span className={`badge bg-${c.isactive ? "success" : "secondary"}`}>{c.isactive ? "Yes" : "No"}</span></td>
+                  <td><ActiveToggle active={!!c.isactive} onToggle={(next) => toggleContactActive(c, next)} /></td>
                   <td>
                     <button className="btn btn-sm btn-outline-dark me-1" onClick={() => startEdit(c)}>Edit</button>
                     <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(c)}>Delete</button>

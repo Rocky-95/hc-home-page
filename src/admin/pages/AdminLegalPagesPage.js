@@ -3,6 +3,7 @@ import apiClient from "../../services/apiClient";
 import { useToast } from "../components/ToastProvider";
 import { useConfirm } from "../components/ConfirmProvider";
 import Modal from "../components/Modal";
+import ActiveToggle from "../components/ActiveToggle";
 
 const RCU = "ADMIN_PORTAL";
 const unwrap = (res) => res.data?.data || res.data || [];
@@ -37,6 +38,14 @@ const AdminLegalPagesPage = () => {
   const openEdit = (h) => setWorkspace({ ...h });
   const closeWorkspace = () => { setWorkspace(null); fetchHeaders(); };
 
+  const toggleHeaderActive = async (h, nextActive) => {
+    try {
+      await apiClient.put("/Legal-Page-Headers", { id: h.id, is_active: nextActive ? 1 : 0, luu: RCU });
+      toast.success(`Page ${nextActive ? "activated" : "deactivated"}.`);
+      fetchHeaders();
+    } catch (err) { toast.error(err.response?.data?.message || "Failed to update status."); }
+  };
+
   const filtered = headers.filter((h) => `${h.page_title || ""} ${h.page_type || ""}`.toLowerCase().includes(search.toLowerCase()));
 
   return (
@@ -58,7 +67,7 @@ const AdminLegalPagesPage = () => {
                     <tr key={h.id}>
                       <td><strong>{h.page_title}</strong></td>
                       <td><code>{h.page_type}</code></td>
-                      <td><span className={`badge bg-${h.is_active ? "success" : "secondary"}`}>{h.is_active ? "Yes" : "No"}</span></td>
+                      <td><ActiveToggle active={!!h.is_active} onToggle={(next) => toggleHeaderActive(h, next)} /></td>
                       <td><button className="btn btn-sm btn-outline-dark" onClick={() => openEdit(h)}>Open</button></td>
                     </tr>
                   ))}
@@ -148,6 +157,13 @@ const LegalPageWorkspace = ({ header, onClose, toast, confirm }) => {
     try { await apiClient.delete("/Legal-Page-Sections", { data: { id: s.id, luu: RCU } }); toast.success("Section deleted."); loadSections(core.page_type); }
     catch { toast.error("Delete failed."); }
   };
+  const toggleSectionActive = async (s, nextActive) => {
+    try {
+      await apiClient.put("/Legal-Page-Sections", { id: s.id, is_active: nextActive ? 1 : 0, luu: RCU });
+      toast.success(`Section ${nextActive ? "activated" : "deactivated"}.`);
+      loadSections(core.page_type);
+    } catch (err) { toast.error(err.response?.data?.message || "Failed to update status."); }
+  };
 
   return (
     <div>
@@ -198,7 +214,8 @@ const LegalPageWorkspace = ({ header, onClose, toast, confirm }) => {
                   <div className="accordion-item" key={s.id}>
                     <h2 className="accordion-header d-flex justify-content-between align-items-center px-3 py-2 bg-light">
                       <span className="fw-semibold">{s.section_title} <small className="text-muted">(Order: {s.section_order})</small></span>
-                      <div>
+                      <div className="d-flex align-items-center gap-2">
+                        <ActiveToggle active={!!s.is_active} onToggle={(next) => toggleSectionActive(s, next)} />
                         <button className="btn btn-sm btn-outline-dark me-1" onClick={() => openEditSection(s)}>Edit</button>
                         <button className="btn btn-sm btn-outline-danger" onClick={() => deleteSection(s)}>Delete</button>
                       </div>
