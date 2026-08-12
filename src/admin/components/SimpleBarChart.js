@@ -22,7 +22,7 @@ const SimpleBarChart = ({ data, width = 600, height = 300 }) => {
         const y = height - padding - barHeight;
         return (
           <g key={i}>
-            <rect x={x} y={y} width={barWidth} height={barHeight} fill="#0d6efd" rx={4} />
+            <rect x={x} y={y} width={barWidth} height={barHeight} fill="#b08d57" rx={4} />
             <text x={x + barWidth / 2} y={y - 8} textAnchor="middle" fontSize="12" fill="#333">
               {d.value}
             </text>

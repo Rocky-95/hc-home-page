@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import api from "../services/api";
+import { useConfirm } from "../components/ConfirmProvider";
 
 const RCU = "ADMIN_PORTAL";
 
@@ -63,17 +64,18 @@ const AdminCategorySyncPage = () => {
   const [loading, setLoading] = useState(false);
   const [log, setLog] = useState([]);
   const [done, setDone] = useState(false);
+  const confirm = useConfirm();
 
   const addLog = (msg) => setLog((prev) => [...prev, msg]);
 
   const handleSync = async () => {
-    if (
-      !window.confirm(
-        "This will DELETE every category and subcategory in the database, then recreate them from the master list. Continue?"
-      )
-    ) {
-      return;
-    }
+    const ok = await confirm({
+      title: "Rebuild all categories?",
+      message: "This will DELETE every category and subcategory in the database, then recreate them from the master list below. This cannot be undone.",
+      confirmLabel: "Delete & Rebuild",
+      danger: true,
+    });
+    if (!ok) return;
 
     setLoading(true);
     setLog([]);

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import SimpleBarChart from "../components/SimpleBarChart";
 import { buildService } from "../services/crudService";
 
@@ -44,7 +45,7 @@ const AdminDashboard = () => {
         const categories = extract(results[2]);
         const products = extract(results[3]);
         const appointments = extract(results[4]);
-        const revenue = orders.reduce((sum, o) => sum + (parseFloat(o.total_price) || 0), 0);
+        const revenue = orders.reduce((sum, o) => sum + (parseFloat(o.total_amount) || 0), 0);
 
         setStats({
           users: users.length,
@@ -90,14 +91,14 @@ const AdminDashboard = () => {
       <div className="row g-4 mb-4">
         {statCards.map((stat, idx) => (
           <div className="col-md-4 col-sm-6" key={idx}>
-            <a href={`#${stat.link}`} style={{ textDecoration: "none" }}>
+            <Link to={stat.link} style={{ textDecoration: "none" }}>
               <div className="card text-white h-100" style={{ backgroundColor: stat.color, cursor: "pointer" }}>
                 <div className="card-body">
                   <h6 className="card-title text-white-50">{stat.label}</h6>
                   <p className="card-text fs-2 fw-bold mb-0">{stat.value}</p>
                 </div>
               </div>
-            </a>
+            </Link>
           </div>
         ))}
       </div>

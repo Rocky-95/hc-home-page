@@ -4,11 +4,15 @@ import { moduleConfigs } from "../config/modules";
 import { buildService } from "../services/crudService";
 import DataTable from "../components/DataTable";
 import CrudForm from "../components/CrudForm";
-import ConfirmModal from "../components/ConfirmModal";
+import { useToast } from "../components/ToastProvider";
+import { useConfirm } from "../components/ConfirmProvider";
+import Modal from "../components/Modal";
 
 const AdminCrudPage = () => {
   const { moduleKey } = useParams();
   const config = moduleConfigs[moduleKey];
+  const toast = useToast();
+  const confirm = useConfirm();
 
   const service = useMemo(() => {
     if (!config) return null;
@@ -17,32 +21,30 @@ const AdminCrudPage = () => {
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
-  const [deleteItem, setDeleteItem] = useState(null);
   const [search, setSearch] = useState("");
 
   const loadData = useCallback(async () => {
     if (!service) return;
     setLoading(true);
-    setError("");
     try {
       const res = await service.list();
       const list = Array.isArray(res) ? res : res.data || [];
       setData(list);
     } catch (err) {
-      setError(err.response?.data?.message || err.message || "Failed to load data.");
+      toast.error(err.response?.data?.message || err.message || "Failed to load data.");
     } finally {
       setLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [service]);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
 
-  const idField = config.idField || "id";
+  const idField = config?.idField || "id";
 
   const normalizeValues = (values) => {
     const normalized = { ...values };
@@ -59,14 +61,16 @@ const AdminCrudPage = () => {
       const payload = normalizeValues(values);
       if (editingItem?.[idField]) {
         await service.update({ ...payload, [idField]: editingItem[idField] });
+        toast.success(`${config.label} updated.`);
       } else {
         await service.create(payload);
+        toast.success(`${config.label} created.`);
       }
       setShowForm(false);
       setEditingItem(null);
       loadData();
     } catch (err) {
-      setError(err.response?.data?.message || err.message || "Failed to save.");
+      toast.error(err.response?.data?.message || err.message || "Failed to save.");
     }
   };
 
@@ -75,15 +79,32 @@ const AdminCrudPage = () => {
     setShowForm(true);
   };
 
-  const handleDelete = async () => {
-    if (!deleteItem) return;
+  const handleToggleActive = async (item, nextActive) => {
+    const activeField = item.isactive !== undefined ? "isactive" : "is_active";
     try {
-      await service.remove(deleteItem[idField]);
-      setDeleteItem(null);
+      await service.update({ [idField]: item[idField], [activeField]: nextActive ? 1 : 0 });
+      toast.success(`${config.label.replace(/s$/i, "")} ${nextActive ? "activated" : "deactivated"}.`);
       loadData();
     } catch (err) {
-      setError(err.response?.data?.message || err.message || "Failed to delete.");
-      setDeleteItem(null);
+      toast.error(err.response?.data?.message || err.message || "Failed to update status.");
+    }
+  };
+
+  const handleDelete = async (item) => {
+    const singular = config.label.replace(/s$/i, "").toLowerCase();
+    const ok = await confirm({
+      title: `Delete this ${singular}?`,
+      message: "This action cannot be undone.",
+      confirmLabel: "Delete",
+      danger: true,
+    });
+    if (!ok) return;
+    try {
+      await service.remove(item[idField]);
+      toast.success(`${config.label} deleted.`);
+      loadData();
+    } catch (err) {
+      toast.error(err.response?.data?.message || err.message || "Failed to delete.");
     }
   };
 
@@ -122,37 +143,25 @@ const AdminCrudPage = () => {
         </div>
       </div>
 
-      {error && <div className="alert alert-danger">{error}</div>}
-
       {showForm && (
-        <div className="card mb-4">
-          <div className="card-body">
-            <h5 className="card-title">{editingItem ? "Edit" : "Create"} {config.label}</h5>
-            <CrudForm
-              fields={config.fields}
-              initialValues={editingItem || {}}
-              onSubmit={handleSubmit}
-              onCancel={() => { setShowForm(false); setEditingItem(null); }}
-            />
-          </div>
-        </div>
+        <Modal title={`${editingItem ? "Edit" : "Create"} ${config.label}`} onClose={() => { setShowForm(false); setEditingItem(null); }} size="lg">
+          <CrudForm
+            fields={config.fields}
+            initialValues={editingItem || {}}
+            onSubmit={handleSubmit}
+            onCancel={() => { setShowForm(false); setEditingItem(null); }}
+          />
+        </Modal>
       )}
 
       <DataTable
         fields={listFields}
         data={filteredData}
         onEdit={handleEdit}
-        onDelete={setDeleteItem}
+        onDelete={handleDelete}
+        onToggleActive={handleToggleActive}
         loading={loading}
         idField={idField}
-      />
-
-      <ConfirmModal
-        show={!!deleteItem}
-        title="Confirm Delete"
-        message={`Are you sure you want to delete this ${config.label.toLowerCase()}?`}
-        onConfirm={handleDelete}
-        onCancel={() => setDeleteItem(null)}
       />
     </div>
   );

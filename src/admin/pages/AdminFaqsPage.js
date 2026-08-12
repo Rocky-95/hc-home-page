@@ -1,5 +1,8 @@
 import React, { useEffect, useState, useCallback } from "react";
 import api from "../services/api";
+import { useToast } from "../components/ToastProvider";
+import { useConfirm } from "../components/ConfirmProvider";
+import Modal from "../components/Modal";
 
 const RCU = "ADMIN_PORTAL";
 
@@ -17,12 +20,8 @@ const AdminFaqsPage = () => {
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [message, setMessage] = useState({ text: "", isError: false });
-
-  const flash = (text, isError = false) => {
-    setMessage({ text, isError });
-    setTimeout(() => setMessage({ text: "", isError: false }), 4000);
-  };
+  const toast = useToast();
+  const confirm = useConfirm();
 
   const fetchFaqs = useCallback(async () => {
     setLoading(true);
@@ -31,10 +30,11 @@ const AdminFaqsPage = () => {
       setFaqs(r.data?.data || r.data || []);
     } catch {
       setFaqs([]);
-      flash("Failed to load FAQs.", true);
+      toast.error("Failed to load FAQs.");
     } finally {
       setLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -51,28 +51,29 @@ const AdminFaqsPage = () => {
       };
       if (editing) {
         await api.put("/FAQs", { ...payload, faq_id: editing.faq_id, luu: RCU });
-        flash("FAQ updated.");
+        toast.success("FAQ updated.");
       } else {
         await api.post("/FAQs", { ...payload, rcu: RCU });
-        flash("FAQ created.");
+        toast.success("FAQ created.");
       }
       setShowForm(false);
       setEditing(null);
       setForm(emptyFaq);
       fetchFaqs();
     } catch (err) {
-      flash(err.response?.data?.message || "Failed to save FAQ.", true);
+      toast.error(err.response?.data?.message || "Failed to save FAQ.");
     }
   };
 
   const handleDelete = async (f) => {
-    if (!window.confirm(`Delete "${f.question}"?`)) return;
+    const ok = await confirm({ title: `Delete "${f.question}"?`, message: "This action cannot be undone.", confirmLabel: "Delete", danger: true });
+    if (!ok) return;
     try {
       await api.delete("/FAQs", { data: { faq_id: f.faq_id, luu: RCU } });
-      flash("FAQ deleted.");
+      toast.success("FAQ deleted.");
       fetchFaqs();
     } catch (err) {
-      flash(err.response?.data?.message || "Delete failed.", true);
+      toast.error(err.response?.data?.message || "Delete failed.");
     }
   };
 
@@ -95,7 +96,6 @@ const AdminFaqsPage = () => {
   return (
     <div>
       <h3 className="mb-4">FAQ Management</h3>
-      {message.text && <div className={`alert ${message.isError ? "alert-danger" : "alert-success"} py-2`}>{message.text}</div>}
 
       <div className="d-flex justify-content-between align-items-center mb-3">
         <input className="form-control w-auto" placeholder="Search FAQs..." value={search} onChange={(e) => setSearch(e.target.value)} style={{ minWidth: 220 }} />
@@ -105,37 +105,34 @@ const AdminFaqsPage = () => {
       </div>
 
       {showForm && (
-        <div className="card mb-4">
-          <div className="card-body">
-            <h5>{editing ? "Edit FAQ" : "New FAQ"}</h5>
-            <form onSubmit={handleSubmit}>
-              <div className="row g-3">
-                <div className="col-md-12">
-                  <label className="form-label">Question *</label>
-                  <input className="form-control" value={form.question} onChange={(e) => setForm((p) => ({ ...p, question: e.target.value }))} required />
-                </div>
-                <div className="col-md-12">
-                  <label className="form-label">Answer *</label>
-                  <textarea className="form-control" rows={4} value={form.answer} onChange={(e) => setForm((p) => ({ ...p, answer: e.target.value }))} required />
-                </div>
-                <div className="col-md-3">
-                  <label className="form-label">Display Order</label>
-                  <input type="number" className="form-control" value={form.display_order} onChange={(e) => setForm((p) => ({ ...p, display_order: e.target.value }))} />
-                </div>
-                <div className="col-md-3 d-flex align-items-end">
-                  <div className="form-check mb-2">
-                    <input type="checkbox" className="form-check-input" checked={form.isactive} onChange={(e) => setForm((p) => ({ ...p, isactive: e.target.checked }))} id="faqActive" />
-                    <label className="form-check-label" htmlFor="faqActive">Active</label>
-                  </div>
+        <Modal title={editing ? "Edit FAQ" : "New FAQ"} onClose={() => { setShowForm(false); setEditing(null); setForm(emptyFaq); }} size="lg">
+          <form onSubmit={handleSubmit}>
+            <div className="row g-3">
+              <div className="col-md-12">
+                <label className="form-label">Question *</label>
+                <input className="form-control" value={form.question} onChange={(e) => setForm((p) => ({ ...p, question: e.target.value }))} required />
+              </div>
+              <div className="col-md-12">
+                <label className="form-label">Answer * (HTML allowed)</label>
+                <textarea className="form-control" rows={4} value={form.answer} onChange={(e) => setForm((p) => ({ ...p, answer: e.target.value }))} required />
+              </div>
+              <div className="col-md-3">
+                <label className="form-label">Display Order</label>
+                <input type="number" className="form-control" value={form.display_order} onChange={(e) => setForm((p) => ({ ...p, display_order: e.target.value }))} />
+              </div>
+              <div className="col-md-3 d-flex align-items-end">
+                <div className="form-check mb-2">
+                  <input type="checkbox" className="form-check-input" checked={form.isactive} onChange={(e) => setForm((p) => ({ ...p, isactive: e.target.checked }))} id="faqActive" />
+                  <label className="form-check-label" htmlFor="faqActive">Active</label>
                 </div>
               </div>
-              <div className="mt-3 d-flex gap-2">
-                <button type="submit" className="btn btn-dark">{editing ? "Update" : "Create"} FAQ</button>
-                <button type="button" className="btn btn-outline-secondary" onClick={() => { setShowForm(false); setEditing(null); setForm(emptyFaq); }}>Cancel</button>
-              </div>
-            </form>
-          </div>
-        </div>
+            </div>
+            <div className="mt-3 d-flex gap-2">
+              <button type="submit" className="btn btn-dark">{editing ? "Update" : "Create"} FAQ</button>
+              <button type="button" className="btn btn-outline-secondary" onClick={() => { setShowForm(false); setEditing(null); setForm(emptyFaq); }}>Cancel</button>
+            </div>
+          </form>
+        </Modal>
       )}
 
       {loading ? (

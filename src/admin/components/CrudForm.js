@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
 import authService from "../../services/authService";
+import { validateMediaFile } from "../utils/mediaValidation";
+import { useToast } from "./ToastProvider";
 
 const CrudForm = ({ fields, initialValues, onSubmit, onCancel }) => {
   const [values, setValues] = useState({});
   const [dynamicOptions, setDynamicOptions] = useState({});
   const [uploading, setUploading] = useState({});
+  const toast = useToast();
 
   useEffect(() => {
     const defaults = {};
@@ -34,6 +37,13 @@ const CrudForm = ({ fields, initialValues, onSubmit, onCancel }) => {
   const handleImageUpload = useCallback(async (fieldName, e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    const { valid, error } = validateMediaFile(file, { allowVideo: false });
+    if (!valid) { toast.error(error); e.target.value = ""; return; }
+
+    const previewUrl = URL.createObjectURL(file);
+    setValues((prev) => ({ ...prev, [fieldName]: previewUrl }));
+
     setUploading((prev) => ({ ...prev, [fieldName]: true }));
     try {
       const fd = new FormData();
@@ -41,13 +51,13 @@ const CrudForm = ({ fields, initialValues, onSubmit, onCancel }) => {
       fd.append("path", "ADMIN_UPLOAD");
       const res = await authService.uploadFile(fd);
       const url = res.data?.url || res.data?.data?.url || res.data?.fileUrl || "";
-      setValues((prev) => ({ ...prev, [fieldName]: url || URL.createObjectURL(file) }));
+      if (url) setValues((prev) => ({ ...prev, [fieldName]: url }));
     } catch {
-      setValues((prev) => ({ ...prev, [fieldName]: URL.createObjectURL(file) }));
+      // keep the local preview URL as the value if upload failed
     } finally {
       setUploading((prev) => ({ ...prev, [fieldName]: false }));
     }
-  }, []);
+  }, [toast]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -113,11 +123,12 @@ const CrudForm = ({ fields, initialValues, onSubmit, onCancel }) => {
                 <div className="col-md-6">
                   <input
                     type="file"
-                    accept="image/*"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
                     className="form-control"
                     onChange={(e) => handleImageUpload(field.name, e)}
                     disabled={uploading[field.name]}
                   />
+                  <div className="form-text">JPG, PNG, WEBP, or GIF.</div>
                   {uploading[field.name] && <div className="form-text">Uploading...</div>}
                 </div>
                 <div className="col-md-6">

@@ -1,6 +1,10 @@
 import React from "react";
+import { FiInbox } from "react-icons/fi";
+import ActiveToggle from "./ActiveToggle";
 
-const DataTable = ({ fields, data, onEdit, onDelete, loading, idField = "id" }) => {
+const ACTIVE_FIELD_NAMES = ["isactive", "is_active"];
+
+const DataTable = ({ fields, data, onEdit, onDelete, onToggleActive, loading, idField = "id" }) => {
   if (loading) {
     return (
       <div className="text-center py-5">
@@ -14,7 +18,7 @@ const DataTable = ({ fields, data, onEdit, onDelete, loading, idField = "id" }) 
   if (!data || data.length === 0) {
     return (
       <div className="text-center py-5 text-muted">
-        <div style={{ fontSize: "2rem" }}>📭</div>
+        <FiInbox size={32} style={{ opacity: 0.5 }} />
         <p className="mt-2">No records found.</p>
       </div>
     );
@@ -41,6 +45,9 @@ const DataTable = ({ fields, data, onEdit, onDelete, loading, idField = "id" }) 
                   let display;
                   if (field.format) {
                     display = field.format(value, row);
+                  } else if (ACTIVE_FIELD_NAMES.includes(field.name) && onToggleActive) {
+                    const active = value === true || value === 1;
+                    display = <ActiveToggle active={active} onToggle={(next) => onToggleActive(row, next)} />;
                   } else if (typeof value === "boolean" || value === 1 || value === 0) {
                     const active = value === true || value === 1;
                     display = (

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import orderService from "../../services/orderService";
 import userService from "../../services/userService";
+import { useToast } from "../components/ToastProvider";
 
 const statusOptions = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"];
 const shipmentStatusOptions = ["created", "in_transit", "out_for_delivery", "delivered", "returned"];
@@ -16,10 +17,9 @@ const AdminOrdersPage = () => {
   const [users, setUsers] = useState([]);
   const [statusMaster, setStatusMaster] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
   const [expanded, setExpanded] = useState({});
   const [activeTab, setActiveTab] = useState({}); // orderId -> 'status' | 'shipment' | 'returns'
+  const toast = useToast();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,31 +43,29 @@ const AdminOrdersPage = () => {
         setUsers(usersRes.data?.data || usersRes.data || []);
         setStatusMaster(statusMasterRes.data?.data || statusMasterRes.data || []);
       } catch (err) {
-        setError(err.response?.data?.message || "Failed to load orders.");
+        toast.error(err.response?.data?.message || "Failed to load orders.");
       } finally {
         setLoading(false);
       }
     };
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getUserName = (userId) => {
     const user = users.find((u) => u.user_id === userId || u.id === userId);
-    return user?.full_name || user?.email_id || "Guest";
+    return user?.full_name || user?.email || "Guest";
   };
 
   const getItemsForOrder = (orderId) => orderItems.filter((item) => item.order_id === orderId);
   const getLatestStatus = (orderId) => {
     const orderStatuses = statuses
       .filter((s) => s.order_id === orderId)
-      .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
-    return orderStatuses[0]?.status_name || "Pending";
+      .sort((a, b) => new Date(b.orderstatustime || 0) - new Date(a.orderstatustime || 0));
+    return orderStatuses[0]?.orderstatus || "Pending";
   };
   const getShipmentForOrder = (orderId) => shipments.find((s) => s.order_id === orderId);
-  const getReturnsForOrder = (orderId) => returns.filter((r) => {
-    const item = orderItems.find((i) => i.order_item_id === r.order_item_id);
-    return item?.order_id === orderId;
-  });
+  const getReturnsForOrder = (orderId) => returns.filter((r) => r.order_id === orderId);
 
   const getOrCreateStatus = async (statusName) => {
     const code = statusName.toUpperCase();
@@ -79,8 +77,8 @@ const AdminOrdersPage = () => {
       const res = await orderService.createOrderStatusMaster({
         status_name: statusName,
         status_code: code,
-        status_description: `${statusName} order status`,
-        isactive: 1,
+        display_order: master.length + 1,
+        iscancelled_status: code === "CANCELLED" ? 1 : 0,
         rcu: "admin",
       });
       status = res.data?.data || res.data;
@@ -95,22 +93,22 @@ const AdminOrdersPage = () => {
     try {
       const status = await getOrCreateStatus(newStatus);
       if (!status?.order_status_id) {
-        setError("Could not resolve order status.");
+        toast.error("Could not resolve order status.");
         return;
       }
       await orderService.createOrderStatusHistory({
         order_id: orderId,
         order_status_id: status.order_status_id,
         orderstatus: newStatus,
-        notes: `Status updated to ${newStatus}`,
+        orderstatusby: "admin",
+        remarks: `Status updated to ${newStatus}`,
         rcu: "admin",
       });
       const statusesRes = await orderService.getOrderStatusHistory();
       setStatuses(statusesRes.data?.data || statusesRes.data || []);
-      setMessage(`Order status updated to ${newStatus}.`);
-      setTimeout(() => setMessage(""), 3000);
+      toast.success(`Order status updated to ${newStatus}.`);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to update status.");
+      toast.error(err.response?.data?.message || "Failed to update status.");
     }
   };
 
@@ -128,11 +126,10 @@ const AdminOrdersPage = () => {
       await orderService.createShipment(payload);
       const shipmentsRes = await orderService.getShipments();
       setShipments(shipmentsRes.data?.data || shipmentsRes.data || []);
-      setMessage("Shipment created.");
-      setTimeout(() => setMessage(""), 3000);
+      toast.success("Shipment created.");
       form.reset();
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to create shipment.");
+      toast.error(err.response?.data?.message || "Failed to create shipment.");
     }
   };
 
@@ -159,10 +156,9 @@ const AdminOrdersPage = () => {
       }
       const shipmentsRes = await orderService.getShipments();
       setShipments(shipmentsRes.data?.data || shipmentsRes.data || []);
-      setMessage("Shipment status updated.");
-      setTimeout(() => setMessage(""), 3000);
+      toast.success("Shipment status updated.");
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to update shipment.");
+      toast.error(err.response?.data?.message || "Failed to update shipment.");
     }
   };
 
@@ -176,10 +172,9 @@ const AdminOrdersPage = () => {
       });
       const returnsRes = await orderService.getReturns();
       setReturns(returnsRes.data?.data || returnsRes.data || []);
-      setMessage(`Return request ${newStatus}.`);
-      setTimeout(() => setMessage(""), 3000);
+      toast.success(`Return request ${newStatus}.`);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to update return.");
+      toast.error(err.response?.data?.message || "Failed to update return.");
     }
   };
 
@@ -189,7 +184,7 @@ const AdminOrdersPage = () => {
   };
 
   const sortedOrders = useMemo(() => {
-    return [...orders].sort((a, b) => new Date(b.order_date || b.created_at || 0) - new Date(a.order_date || a.created_at || 0));
+    return [...orders].sort((a, b) => new Date(b.placed_at || 0) - new Date(a.placed_at || 0));
   }, [orders]);
 
   if (loading) {
@@ -205,8 +200,6 @@ const AdminOrdersPage = () => {
   return (
     <div>
       <h3 className="mb-4">Order Management</h3>
-      {message && <div className="alert alert-success">{message}</div>}
-      {error && <div className="alert alert-danger">{error}</div>}
 
       {sortedOrders.length === 0 ? (
         <p className="text-muted">No orders found.</p>
@@ -228,13 +221,13 @@ const AdminOrdersPage = () => {
                   >
                     <div className="d-flex justify-content-between w-100 me-3">
                       <span>
-                        <strong>{order.order_number || order.order_id}</strong>
+                        <strong>{order.order_number || "Order"}</strong>
                         <span className="text-muted ms-3">{getUserName(order.user_id)}</span>
                       </span>
                       <span>
                         <span className="badge bg-dark me-2">{status}</span>
                         <span className="badge bg-light text-dark border me-2">{order.payment_status}</span>
-                        <span className="fw-bold">&#8377;{(order.total_price || 0).toLocaleString("en-IN")}</span>
+                        <span className="fw-bold">&#8377;{(order.total_amount || 0).toLocaleString("en-IN")}</span>
                       </span>
                     </div>
                   </button>
@@ -279,10 +272,10 @@ const AdminOrdersPage = () => {
                             <ul className="list-unstyled small mt-1">
                               {statuses
                                 .filter((s) => s.order_id === order.order_id)
-                                .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
+                                .sort((a, b) => new Date(b.orderstatustime || 0) - new Date(a.orderstatustime || 0))
                                 .map((s, idx) => (
                                   <li key={idx}>
-                                    {new Date(s.created_at || Date.now()).toLocaleString("en-IN")} — {s.status_name}
+                                    {new Date(s.orderstatustime || Date.now()).toLocaleString("en-IN")} — {s.orderstatus}
                                   </li>
                                 ))}
                             </ul>
@@ -319,9 +312,9 @@ const AdminOrdersPage = () => {
                             <p className="text-muted">No items.</p>
                           )}
                           <div className="d-flex justify-content-between">
-                            <span className="text-muted">Subtotal: &#8377;{(order.subtotal_price || 0).toLocaleString("en-IN")}</span>
+                            <span className="text-muted">Subtotal: &#8377;{(order.subtotal || 0).toLocaleString("en-IN")}</span>
                             <span className="text-muted">Tax: &#8377;{(order.tax_amount || 0).toLocaleString("en-IN")}</span>
-                            <span className="text-muted">Shipping: &#8377;{(order.shipping_price || 0).toLocaleString("en-IN")}</span>
+                            <span className="text-muted">Shipping: &#8377;{(order.shipping_amount || 0).toLocaleString("en-IN")}</span>
                           </div>
                         </div>
                       )}
@@ -335,7 +328,7 @@ const AdminOrdersPage = () => {
                               </p>
                               <p className="mb-1">
                                 <strong>Courier:</strong>{" "}
-                                {couriers.find((c) => c.courier_partner_id === shipment.courier_partner_id)?.partner_name || "N/A"}
+                                {couriers.find((c) => c.courier_partner_id === shipment.courier_partner_id)?.courier_name || "N/A"}
                               </p>
                               <div className="mb-3">
                                 <label className="form-label">Shipment Status</label>
@@ -360,7 +353,7 @@ const AdminOrdersPage = () => {
                                     <option value="">Select Courier</option>
                                     {couriers.map((c) => (
                                       <option key={c.courier_partner_id} value={c.courier_partner_id}>
-                                        {c.partner_name}
+                                        {c.courier_name}
                                       </option>
                                     ))}
                                   </select>

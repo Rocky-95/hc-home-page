@@ -104,7 +104,7 @@ const HelpCenter = () => {
                     </button>
                   </h2>
                   <div className={`accordion-collapse collapse${isOpen ? " show" : ""}`}>
-                    <div className="accordion-body">{g.answer || g.description}</div>
+                    <div className="accordion-body" dangerouslySetInnerHTML={{ __html: g.answer || g.description }} />
                   </div>
                 </div>
               );

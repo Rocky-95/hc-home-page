@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import appointmentService from "../../services/appointmentService";
 import userService from "../../services/userService";
+import { useToast } from "../components/ToastProvider";
+import { useConfirm } from "../components/ConfirmProvider";
 
 const statusOptions = ["Pending", "Approved", "Completed", "Cancelled"];
 
@@ -10,10 +12,10 @@ const AdminAppointmentsPage = () => {
   const [timeSlots, setTimeSlots] = useState([]);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
   const [expanded, setExpanded] = useState({});
   const [statusUpdates, setStatusUpdates] = useState({});
+  const toast = useToast();
+  const confirm = useConfirm();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,17 +31,18 @@ const AdminAppointmentsPage = () => {
         setTimeSlots(timeSlotsRes.data?.data || timeSlotsRes.data || []);
         setUsers(usersRes.data?.data || usersRes.data || []);
       } catch (err) {
-        setError(err.response?.data?.message || "Failed to load appointments.");
+        toast.error(err.response?.data?.message || "Failed to load appointments.");
       } finally {
         setLoading(false);
       }
     };
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getUserName = (userId) => {
     const user = users.find((u) => u.user_id === userId || u.id === userId);
-    return user?.full_name || user?.email_id || "Guest";
+    return user?.full_name || user?.email || "Guest";
   };
 
   const getSlotDate = (slotId) => {
@@ -63,15 +66,15 @@ const AdminAppointmentsPage = () => {
       });
       const res = await appointmentService.getCustomAppointments();
       setAppointments(res.data?.data || res.data || []);
-      setMessage(`Appointment ${newStatus.toLowerCase()}.`);
-      setTimeout(() => setMessage(""), 3000);
+      toast.success(`Appointment ${newStatus.toLowerCase()}.`);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to update appointment status.");
+      toast.error(err.response?.data?.message || "Failed to update appointment status.");
     }
   };
 
   const handleCancel = async (appointmentId) => {
-    if (!window.confirm("Cancel this appointment?")) return;
+    const ok = await confirm({ title: "Cancel this appointment?", message: "This action cannot be undone.", confirmLabel: "Cancel Appointment", danger: true });
+    if (!ok) return;
     try {
       await appointmentService.deleteCustomAppointment({
         appointment_id: appointmentId,
@@ -79,10 +82,9 @@ const AdminAppointmentsPage = () => {
       });
       const res = await appointmentService.getCustomAppointments();
       setAppointments(res.data?.data || res.data || []);
-      setMessage("Appointment cancelled.");
-      setTimeout(() => setMessage(""), 3000);
+      toast.success("Appointment cancelled.");
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to cancel appointment.");
+      toast.error(err.response?.data?.message || "Failed to cancel appointment.");
     }
   };
 
@@ -109,8 +111,6 @@ const AdminAppointmentsPage = () => {
   return (
     <div>
       <h3 className="mb-4">Appointment Management</h3>
-      {message && <div className="alert alert-success">{message}</div>}
-      {error && <div className="alert alert-danger">{error}</div>}
 
       {sortedAppointments.length === 0 ? (
         <p className="text-muted">No appointments found.</p>

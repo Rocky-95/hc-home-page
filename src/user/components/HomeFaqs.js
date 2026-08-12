@@ -82,7 +82,7 @@ const HomeFaqs = () => {
                 id={`collapse${faq.id}`}
                 className={`accordion-collapse collapse ${isOpen ? "show" : ""}`}
               >
-                <div className="accordion-body">{faq.answer}</div>
+                <div className="accordion-body" dangerouslySetInnerHTML={{ __html: faq.answer }} />
               </div>
             </div>
           );

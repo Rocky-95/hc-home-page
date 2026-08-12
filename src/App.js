@@ -8,7 +8,6 @@ import SplashScreen from "./user/components/SplashScreen";
 import AdminLayout from "./admin/components/AdminLayout";
 import UserLayout from "./user/components/UserLayout";
 import { CartProvider } from "./context/CartContext";
-import "./services/apiRegistry";
 
 const Login = lazy(() => import("./user/pages/Login"));
 const Register = lazy(() => import("./user/pages/Register"));
@@ -45,13 +44,16 @@ const AdminAppointmentsPage = lazy(() => import("./admin/pages/AdminAppointments
 const AdminProductsPage = lazy(() => import("./admin/pages/AdminProductsPage"));
 const AdminUsersPage = lazy(() => import("./admin/pages/AdminUsersPage"));
 const AdminCategoriesPage = lazy(() => import("./admin/pages/AdminCategoriesPage"));
-const AdminSubCategoriesPage = lazy(() => import("./admin/pages/AdminSubCategoriesPage"));
 const AdminCategorySyncPage = lazy(() => import("./admin/pages/AdminCategorySyncPage"));
 const AdminFaqsPage = lazy(() => import("./admin/pages/AdminFaqsPage"));
 const AdminSettingsPage = lazy(() => import("./admin/pages/AdminSettingsPage"));
 const AdminSupportContactsPage = lazy(() => import("./admin/pages/AdminSupportContactsPage"));
 const AdminLegalPagesPage = lazy(() => import("./admin/pages/AdminLegalPagesPage"));
 const AdminSpotlightMediaPage = lazy(() => import("./admin/pages/AdminSpotlightMediaPage"));
+const AdminStyleCollectionsPage = lazy(() => import("./admin/pages/AdminStyleCollectionsPage"));
+const AdminAppointmentSlotsPage = lazy(() => import("./admin/pages/AdminAppointmentSlotsPage"));
+const AdminDiscountsPage = lazy(() => import("./admin/pages/AdminDiscountsPage"));
+const AdminRunningBarPage = lazy(() => import("./admin/pages/AdminRunningBarPage"));
 const ProductPage = lazy(() =>
   import("./user/components/Categories/Suits/ProductPage")
 );
@@ -258,12 +260,15 @@ function AppRoutes({ splashDismissed, onSplashComplete }) {
           <Route path="users" element={<AdminUsersPage />} />
           <Route path="categories" element={<AdminCategoriesPage />} />
           <Route path="category-sync" element={<AdminCategorySyncPage />} />
-          <Route path="subcategories" element={<AdminSubCategoriesPage />} />
           <Route path="faqs" element={<AdminFaqsPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
           <Route path="support-contacts" element={<AdminSupportContactsPage />} />
           <Route path="legal-pages" element={<AdminLegalPagesPage />} />
           <Route path="spotlight-media" element={<AdminSpotlightMediaPage />} />
+          <Route path="style-collections-workspace" element={<AdminStyleCollectionsPage />} />
+          <Route path="appointment-slots" element={<AdminAppointmentSlotsPage />} />
+          <Route path="discounts-workspace" element={<AdminDiscountsPage />} />
+          <Route path="running-bar" element={<AdminRunningBarPage />} />
           <Route path=":moduleKey" element={<AdminCrudPage />} />
         </Route>
 

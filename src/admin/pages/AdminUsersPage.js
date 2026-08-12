@@ -1,5 +1,8 @@
 import React, { useEffect, useState, useCallback } from "react";
+import { FiChevronUp, FiChevronDown } from "react-icons/fi";
 import apiClient from "../../services/apiClient";
+import { useToast } from "../components/ToastProvider";
+import { useConfirm } from "../components/ConfirmProvider";
 
 const RCU = "ADMIN_PORTAL";
 
@@ -12,12 +15,8 @@ const AdminUsersPage = () => {
   const [expanded, setExpanded] = useState({});
   const [assigningRole, setAssigningRole] = useState({});
   const [selectedRole, setSelectedRole] = useState({});
-  const [message, setMessage] = useState({ text: "", isError: false });
-
-  const flash = (text, isError = false) => {
-    setMessage({ text, isError });
-    setTimeout(() => setMessage({ text: "", isError: false }), 4000);
-  };
+  const toast = useToast();
+  const confirm = useConfirm();
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
@@ -44,7 +43,7 @@ const AdminUsersPage = () => {
 
   const handleAssignRole = async (userId) => {
     const roleId = selectedRole[userId];
-    if (!roleId) { flash("Select a role first.", true); return; }
+    if (!roleId) { toast.error("Select a role first."); return; }
     setAssigningRole((prev) => ({ ...prev, [userId]: true }));
     try {
       const role = roles.find((r) => r.role_id === roleId);
@@ -55,22 +54,23 @@ const AdminUsersPage = () => {
         role_name: role?.role_name,
         role_code: role?.role_code,
       });
-      flash("Role assigned.");
+      toast.success("Role assigned.");
       fetchAll();
     } catch (err) {
-      flash(err.response?.data?.message || "Failed to assign role.", true);
+      toast.error(err.response?.data?.message || "Failed to assign role.");
     } finally { setAssigningRole((prev) => ({ ...prev, [userId]: false })); }
   };
 
   const handleRemoveRole = async (userRoleId) => {
-    if (!window.confirm("Remove this role from user?")) return;
+    const ok = await confirm({ title: "Remove this role from user?", confirmLabel: "Remove", danger: true });
+    if (!ok) return;
     try {
       await apiClient.delete("/User-Roles/remove", {
         data: { user_role_id: userRoleId, luu: RCU },
       });
-      flash("Role removed.");
+      toast.success("Role removed.");
       fetchAll();
-    } catch (err) { flash("Failed to remove role.", true); }
+    } catch (err) { toast.error("Failed to remove role."); }
   };
 
   const handleToggleActive = async (user) => {
@@ -80,15 +80,15 @@ const AdminUsersPage = () => {
         isactive: !user.isactive,
         luu: RCU,
       });
-      flash(`User ${!user.isactive ? "activated" : "deactivated"}.`);
+      toast.success(`User ${!user.isactive ? "activated" : "deactivated"}.`);
       fetchAll();
-    } catch { flash("Failed to update user.", true); }
+    } catch { toast.error("Failed to update user."); }
   };
 
   const filtered = users.filter((u) =>
     u.full_name?.toLowerCase().includes(search.toLowerCase()) ||
-    u.email_id?.toLowerCase().includes(search.toLowerCase()) ||
-    u.mobile_number?.includes(search)
+    u.email?.toLowerCase().includes(search.toLowerCase()) ||
+    u.phone_number?.includes(search)
   );
 
   if (loading) return <div className="text-center py-5"><div className="spinner-border" /></div>;
@@ -99,12 +99,6 @@ const AdminUsersPage = () => {
         <h3 className="mb-0">User Management</h3>
         <span className="badge bg-secondary fs-6">{users.length} users</span>
       </div>
-
-      {message.text && (
-        <div className={`alert ${message.isError ? "alert-danger" : "alert-success"} py-2`}>
-          {message.text}
-        </div>
-      )}
 
       <input
         className="form-control mb-3"
@@ -138,11 +132,9 @@ const AdminUsersPage = () => {
                   <tr>
                     <td>
                       <strong>{user.full_name || "—"}</strong>
-                      <br />
-                      <small className="text-muted">{user.user_id?.slice(0, 8)}...</small>
                     </td>
-                    <td>{user.email_id}</td>
-                    <td>{user.mobile_number || "—"}</td>
+                    <td>{user.email}</td>
+                    <td>{user.phone_number || "—"}</td>
                     <td>
                       {assignedRoles.length === 0
                         ? <span className="text-muted">No roles</span>
@@ -167,7 +159,7 @@ const AdminUsersPage = () => {
                         className="btn btn-sm btn-outline-dark"
                         onClick={() => handleToggle(user.user_id)}
                       >
-                        {expanded[user.user_id] ? "▲ Hide" : "▼ Manage"}
+                        {expanded[user.user_id] ? <><FiChevronUp size={13} className="me-1" />Hide</> : <><FiChevronDown size={13} className="me-1" />Manage</>}
                       </button>
                     </td>
                   </tr>
@@ -228,8 +220,7 @@ const AdminUsersPage = () => {
                           <div className="mt-3 row">
                             <div className="col-md-6">
                               <small className="text-muted">
-                                <strong>Joined:</strong> {user.created_at ? new Date(user.created_at).toLocaleDateString() : "N/A"}<br />
-                                <strong>User ID:</strong> {user.user_id}
+                                <strong>Joined:</strong> {user.rcm ? new Date(user.rcm).toLocaleDateString() : "N/A"}
                               </small>
                             </div>
                           </div>
