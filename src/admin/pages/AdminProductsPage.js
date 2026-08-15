@@ -5,6 +5,7 @@ import { useToast } from "../components/ToastProvider";
 import { useConfirm } from "../components/ConfirmProvider";
 import Modal from "../components/Modal";
 import { validateMediaFile } from "../utils/mediaValidation";
+import { resolveUploadUrl } from "../utils/resolveUploadUrl";
 import ActiveToggle from "../components/ActiveToggle";
 
 const RCU = "ADMIN_PORTAL";
@@ -409,7 +410,8 @@ const ProductWorkspace = ({ product, sizes, clothTypes, attributes, onClose, toa
       fd.append("file", file);
       fd.append("path", "PRODUCT_IMAGE");
       const uploadRes = await authService.uploadFile(fd);
-      const url = uploadRes.data?.url || uploadRes.data?.data?.url || uploadRes.data?.virtualPath || "";
+      const raw = uploadRes.data?.url || uploadRes.data?.data?.url || uploadRes.data?.virtualPath || "";
+      const url = resolveUploadUrl(raw);
       if (!url) throw new Error("Upload succeeded but no file URL was returned.");
 
       await apiClient.post("/Products-Media", {

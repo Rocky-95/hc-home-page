@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import authService from "../../services/authService";
 import { validateMediaFile } from "../utils/mediaValidation";
+import { resolveUploadUrl } from "../utils/resolveUploadUrl";
 import { useToast } from "./ToastProvider";
 
 const CrudForm = ({ fields, initialValues, onSubmit, onCancel }) => {
@@ -12,7 +13,8 @@ const CrudForm = ({ fields, initialValues, onSubmit, onCancel }) => {
   useEffect(() => {
     const defaults = {};
     fields.forEach((field) => {
-      defaults[field.name] = initialValues?.[field.name] ?? (field.type === "checkbox" ? false : "");
+      const fallback = field.type === "checkbox" ? (field.defaultValue ?? false) : (field.defaultValue ?? "");
+      defaults[field.name] = initialValues?.[field.name] ?? fallback;
     });
     setValues(defaults);
   }, [initialValues, fields]);
@@ -50,11 +52,19 @@ const CrudForm = ({ fields, initialValues, onSubmit, onCancel }) => {
       fd.append("file", file);
       fd.append("path", "ADMIN_UPLOAD");
       const res = await authService.uploadFile(fd);
-      const url = res.data?.url || res.data?.data?.url || res.data?.fileUrl || "";
-      if (url) setValues((prev) => ({ ...prev, [fieldName]: url }));
-    } catch {
-      // keep the local preview URL as the value if upload failed
+      const raw = res.data?.url || res.data?.data?.url || res.data?.virtualPath || res.data?.fileUrl || "";
+      const url = resolveUploadUrl(raw);
+      if (url) {
+        setValues((prev) => ({ ...prev, [fieldName]: url }));
+      } else {
+        toast.error("Upload succeeded but no file URL was returned.");
+        setValues((prev) => ({ ...prev, [fieldName]: "" }));
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Upload failed.");
+      setValues((prev) => ({ ...prev, [fieldName]: "" }));
     } finally {
+      URL.revokeObjectURL(previewUrl);
       setUploading((prev) => ({ ...prev, [fieldName]: false }));
     }
   }, [toast]);
@@ -72,6 +82,8 @@ const CrudForm = ({ fields, initialValues, onSubmit, onCancel }) => {
     });
     onSubmit(normalized);
   };
+
+  const isUploading = Object.values(uploading).some(Boolean);
 
   return (
     <form onSubmit={handleSubmit}>
@@ -139,6 +151,7 @@ const CrudForm = ({ fields, initialValues, onSubmit, onCancel }) => {
                     value={values[field.name] ?? ""}
                     onChange={handleChange}
                     placeholder="Or enter URL"
+                    required={field.required}
                   />
                 </div>
                 {values[field.name] && (
@@ -166,8 +179,8 @@ const CrudForm = ({ fields, initialValues, onSubmit, onCancel }) => {
         );
       })}
       <div className="d-flex gap-2">
-        <button type="submit" className="btn btn-success">
-          Save
+        <button type="submit" className="btn btn-success" disabled={isUploading}>
+          {isUploading ? "Uploading..." : "Save"}
         </button>
         <button type="button" className="btn btn-secondary" onClick={onCancel}>
           Cancel

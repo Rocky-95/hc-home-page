@@ -3,6 +3,7 @@ import apiClient from "../../services/apiClient";
 import authService from "../../services/authService";
 import { useToast } from "../components/ToastProvider";
 import { validateMediaFile } from "../utils/mediaValidation";
+import { resolveUploadUrl } from "../utils/resolveUploadUrl";
 
 const RCU = "ADMIN_PORTAL";
 const unwrap = (res) => res.data?.data || res.data || [];
@@ -72,7 +73,8 @@ const AdminSettingsPage = () => {
       fd.append("file", file);
       fd.append("path", "SITE_BRANDING");
       const res = await authService.uploadFile(fd);
-      const url = res.data?.url || res.data?.data?.url || res.data?.virtualPath || "";
+      const raw = res.data?.url || res.data?.data?.url || res.data?.virtualPath || "";
+      const url = resolveUploadUrl(raw);
       if (url) { setForm((f) => ({ ...f, [field]: url })); toast.success("Logo uploaded."); }
       else toast.error("Upload failed.");
     } catch { toast.error("Upload failed."); }
