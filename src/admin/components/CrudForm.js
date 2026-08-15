@@ -38,11 +38,12 @@ const CrudForm = ({ fields, initialValues, onSubmit, onCancel }) => {
     setValues((prev) => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
   };
 
-  const handleImageUpload = useCallback(async (fieldName, e) => {
+  const handleMediaUpload = useCallback(async (fieldName, kind, e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const { valid, error } = validateMediaFile(file, { allowVideo: false });
+    const validateOpts = kind === "video" ? { videoOnly: true } : { allowVideo: false };
+    const { valid, error } = validateMediaFile(file, validateOpts);
     if (!valid) { toast.error(error); e.target.value = ""; return; }
 
     const previewUrl = URL.createObjectURL(file);
@@ -141,7 +142,7 @@ const CrudForm = ({ fields, initialValues, onSubmit, onCancel }) => {
                     type="file"
                     accept="image/jpeg,image/png,image/webp,image/gif"
                     className="form-control"
-                    onChange={(e) => handleImageUpload(field.name, e)}
+                    onChange={(e) => handleMediaUpload(field.name, "image", e)}
                     disabled={uploading[field.name]}
                   />
                   <div className="form-text">JPG, PNG, WEBP, or GIF.</div>
@@ -164,6 +165,42 @@ const CrudForm = ({ fields, initialValues, onSubmit, onCancel }) => {
                       src={values[field.name]}
                       alt="preview"
                       style={{ height: 80, objectFit: "cover", borderRadius: 6 }}
+                      onError={(e) => (e.target.style.display = "none")}
+                    />
+                  </div>
+                )}
+              </div>
+            ) : field.type === "video" ? (
+              <div className="row g-2">
+                <div className="col-md-6">
+                  <input
+                    type="file"
+                    accept="video/mp4,video/webm,video/quicktime"
+                    className="form-control"
+                    onChange={(e) => handleMediaUpload(field.name, "video", e)}
+                    disabled={uploading[field.name]}
+                  />
+                  <div className="form-text">MP4, WEBM, or MOV.</div>
+                  {uploading[field.name] && <UploadProgressBar percent={uploadProgress[field.name] || 0} />}
+                </div>
+                <div className="col-md-6">
+                  <input
+                    className="form-control"
+                    type="text"
+                    name={field.name}
+                    value={values[field.name] ?? ""}
+                    onChange={handleChange}
+                    placeholder="Or enter URL"
+                    required={field.required}
+                  />
+                </div>
+                {values[field.name] && (
+                  <div className="col-12">
+                    <video
+                      src={values[field.name]}
+                      controls
+                      muted
+                      style={{ height: 120, borderRadius: 6 }}
                       onError={(e) => (e.target.style.display = "none")}
                     />
                   </div>

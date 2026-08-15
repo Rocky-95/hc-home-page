@@ -433,7 +433,7 @@ export const moduleConfigs = {
     idField: "menu_video_id",
     fields: [
       { name: "video_type", label: "Video Type", type: "select", options: [{ value: "youtube", label: "YouTube" }, { value: "upload", label: "Uploaded File" }] },
-      { name: "video_url", label: "Video URL", required: true },
+      { name: "video_url", label: "Video URL", type: "video", required: true },
       { name: "poster_image_url", label: "Poster Image URL", type: "image" },
       { name: "autoplay", label: "Autoplay", type: "checkbox" },
       { name: "loop_video", label: "Loop", type: "checkbox" },
