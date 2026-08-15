@@ -352,7 +352,7 @@ export const moduleConfigs = {
     fields: [
       { name: "product_id", label: "Product", type: "select", optionsLoader: loadProducts, required: true },
       { name: "media_type", label: "Media Type", type: "select", options: [{ value: "image", label: "Image" }, { value: "video", label: "Video" }] },
-      { name: "media_url", label: "Media URL", type: "image", required: true },
+      { name: "media_url", label: "Media URL", type: "media", required: true },
       { name: "alt_text", label: "Alt Text" },
       { name: "display_order", label: "Display Order", type: "number" },
       { name: "isprimary", label: "Primary", type: "checkbox" },
