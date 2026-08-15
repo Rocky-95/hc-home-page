@@ -9,9 +9,12 @@ const authService = {
   forgotPassword: (payload) => apiClient.post("/Auth/Forgot-Password", payload),
   forgotPasswordConfirm: (payload) =>
     apiClient.post("/Auth/Forgot-Password-Confirm", payload),
-  uploadFile: (formData) =>
+  uploadFile: (formData, onUploadProgress) =>
     apiClient.post("/FileUpload", formData, {
       headers: { "Content-Type": "multipart/form-data" },
+      onUploadProgress: onUploadProgress
+        ? (evt) => onUploadProgress(evt.total ? Math.round((evt.loaded / evt.total) * 100) : 0)
+        : undefined,
     }),
 };
 

@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useCallback } from "react";
-import apiClient from "../../services/apiClient";
+import apiClient from "../services/api";
 import authService from "../../services/authService";
 import { useToast } from "../components/ToastProvider";
 import { validateMediaFile } from "../utils/mediaValidation";
 import { resolveUploadUrl } from "../utils/resolveUploadUrl";
+import UploadProgressBar from "../components/UploadProgressBar";
 
 const RCU = "ADMIN_PORTAL";
 const unwrap = (res) => res.data?.data || res.data || [];
@@ -29,6 +30,7 @@ const AdminSettingsPage = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState({});
+  const [uploadProgress, setUploadProgress] = useState({});
   const [previews, setPreviews] = useState({});
   const toast = useToast();
 
@@ -68,11 +70,12 @@ const AdminSettingsPage = () => {
     setPreviews((p) => ({ ...p, [field]: previewUrl }));
 
     setUploading((u) => ({ ...u, [field]: true }));
+    setUploadProgress((p) => ({ ...p, [field]: 0 }));
     try {
       const fd = new FormData();
-      fd.append("file", file);
       fd.append("path", "SITE_BRANDING");
-      const res = await authService.uploadFile(fd);
+      fd.append("file", file);
+      const res = await authService.uploadFile(fd, (pct) => setUploadProgress((p) => ({ ...p, [field]: pct })));
       const raw = res.data?.url || res.data?.data?.url || res.data?.virtualPath || "";
       const url = resolveUploadUrl(raw);
       if (url) { setForm((f) => ({ ...f, [field]: url })); toast.success("Logo uploaded."); }
@@ -80,6 +83,7 @@ const AdminSettingsPage = () => {
     } catch { toast.error("Upload failed."); }
     finally {
       setUploading((u) => ({ ...u, [field]: false }));
+      setUploadProgress((p) => ({ ...p, [field]: 0 }));
       URL.revokeObjectURL(previewUrl);
       setPreviews((p) => ({ ...p, [field]: null }));
     }
@@ -113,7 +117,7 @@ const AdminSettingsPage = () => {
       ) : (
         form[field] && <img src={form[field]} alt={label} style={{ height: 60, objectFit: "contain" }} onError={(e) => (e.target.style.display = "none")} />
       )}
-      {uploading[field] && <div className="form-text">Uploading...</div>}
+      {uploading[field] && <UploadProgressBar percent={uploadProgress[field] || 0} />}
     </div>
   );
 

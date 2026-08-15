@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import apiClient from "../../services/apiClient";
+import apiClient from "../services/api";
 import { useToast } from "../components/ToastProvider";
 import { useConfirm } from "../components/ConfirmProvider";
 import Modal from "../components/Modal";

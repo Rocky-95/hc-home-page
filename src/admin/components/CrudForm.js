@@ -3,11 +3,13 @@ import authService from "../../services/authService";
 import { validateMediaFile } from "../utils/mediaValidation";
 import { resolveUploadUrl } from "../utils/resolveUploadUrl";
 import { useToast } from "./ToastProvider";
+import UploadProgressBar from "./UploadProgressBar";
 
 const CrudForm = ({ fields, initialValues, onSubmit, onCancel }) => {
   const [values, setValues] = useState({});
   const [dynamicOptions, setDynamicOptions] = useState({});
   const [uploading, setUploading] = useState({});
+  const [uploadProgress, setUploadProgress] = useState({});
   const toast = useToast();
 
   useEffect(() => {
@@ -47,11 +49,12 @@ const CrudForm = ({ fields, initialValues, onSubmit, onCancel }) => {
     setValues((prev) => ({ ...prev, [fieldName]: previewUrl }));
 
     setUploading((prev) => ({ ...prev, [fieldName]: true }));
+    setUploadProgress((prev) => ({ ...prev, [fieldName]: 0 }));
     try {
       const fd = new FormData();
-      fd.append("file", file);
       fd.append("path", "ADMIN_UPLOAD");
-      const res = await authService.uploadFile(fd);
+      fd.append("file", file);
+      const res = await authService.uploadFile(fd, (pct) => setUploadProgress((prev) => ({ ...prev, [fieldName]: pct })));
       const raw = res.data?.url || res.data?.data?.url || res.data?.virtualPath || res.data?.fileUrl || "";
       const url = resolveUploadUrl(raw);
       if (url) {
@@ -66,6 +69,7 @@ const CrudForm = ({ fields, initialValues, onSubmit, onCancel }) => {
     } finally {
       URL.revokeObjectURL(previewUrl);
       setUploading((prev) => ({ ...prev, [fieldName]: false }));
+      setUploadProgress((prev) => ({ ...prev, [fieldName]: 0 }));
     }
   }, [toast]);
 
@@ -141,7 +145,7 @@ const CrudForm = ({ fields, initialValues, onSubmit, onCancel }) => {
                     disabled={uploading[field.name]}
                   />
                   <div className="form-text">JPG, PNG, WEBP, or GIF.</div>
-                  {uploading[field.name] && <div className="form-text">Uploading...</div>}
+                  {uploading[field.name] && <UploadProgressBar percent={uploadProgress[field.name] || 0} />}
                 </div>
                 <div className="col-md-6">
                   <input

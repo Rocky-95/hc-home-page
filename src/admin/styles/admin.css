@@ -479,6 +479,24 @@
 .admin-toggle-cell-label { font-size: 12px; color: var(--hc-ink-soft); font-weight: 600; }
 
 /* =========================================================
+   Upload progress bar (shown while a file is uploading)
+   ========================================================= */
+.admin-upload-progress { display: flex; align-items: center; gap: 8px; }
+.admin-upload-progress-track {
+  flex: 1;
+  height: 6px;
+  border-radius: 4px;
+  background: #ece9e2;
+  overflow: hidden;
+}
+.admin-upload-progress-fill {
+  height: 100%;
+  background: var(--hc-primary);
+  transition: width 0.15s ease;
+}
+.admin-upload-progress-label { font-size: 12px; color: var(--hc-ink-soft); white-space: nowrap; }
+
+/* =========================================================
    Alerts
    ========================================================= */
 .admin-shell .alert {

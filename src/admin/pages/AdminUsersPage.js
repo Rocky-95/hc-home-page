@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { FiChevronUp, FiChevronDown } from "react-icons/fi";
-import apiClient from "../../services/apiClient";
+import apiClient from "../services/api";
 import { useToast } from "../components/ToastProvider";
 import { useConfirm } from "../components/ConfirmProvider";
 import ActiveToggle from "../components/ActiveToggle";

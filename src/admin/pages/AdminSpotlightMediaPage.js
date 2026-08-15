@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import apiClient from "../../services/apiClient";
+import apiClient from "../services/api";
 import authService from "../../services/authService";
 import { useToast } from "../components/ToastProvider";
 import { useConfirm } from "../components/ConfirmProvider";
@@ -7,6 +7,7 @@ import Modal from "../components/Modal";
 import { validateMediaFile } from "../utils/mediaValidation";
 import { resolveUploadUrl } from "../utils/resolveUploadUrl";
 import ActiveToggle from "../components/ActiveToggle";
+import UploadProgressBar from "../components/UploadProgressBar";
 
 const RCU = "ADMIN_PORTAL";
 const unwrap = (res) => res.data?.data || res.data || [];
@@ -101,6 +102,7 @@ const SpotlightEntryWorkspace = ({ entry, onClose, toast, confirm }) => {
   const [mediaAlt, setMediaAlt] = useState("");
   const [mediaPrimary, setMediaPrimary] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [mediaPreview, setMediaPreview] = useState(null);
 
   const loadMedia = useCallback(async (id) => {
@@ -145,11 +147,12 @@ const SpotlightEntryWorkspace = ({ entry, onClose, toast, confirm }) => {
     setMediaPreview({ url: previewUrl, isVideo: file.type.startsWith("video") });
 
     setUploading(true);
+    setUploadProgress(0);
     try {
       const fd = new FormData();
-      fd.append("file", file);
       fd.append("path", "SPOTLIGHT_MEDIA");
-      const uploadRes = await authService.uploadFile(fd);
+      fd.append("file", file);
+      const uploadRes = await authService.uploadFile(fd, setUploadProgress);
       const raw = uploadRes.data?.url || uploadRes.data?.data?.url || uploadRes.data?.virtualPath || "";
       const url = resolveUploadUrl(raw);
       if (!url) throw new Error("Upload succeeded but no file URL was returned.");
@@ -170,6 +173,7 @@ const SpotlightEntryWorkspace = ({ entry, onClose, toast, confirm }) => {
       toast.error(err.response?.data?.message || err.message || "Upload failed.");
     } finally {
       setUploading(false);
+      setUploadProgress(0);
       URL.revokeObjectURL(previewUrl);
       setMediaPreview(null);
       e.target.value = "";
@@ -237,9 +241,9 @@ const SpotlightEntryWorkspace = ({ entry, onClose, toast, confirm }) => {
                     ) : (
                       <img src={mediaPreview.url} alt="preview" style={{ height: 90, borderRadius: 6, objectFit: "cover" }} />
                     )}
-                    {uploading && <div className="form-text">Uploading...</div>}
                   </div>
                 )}
+                {uploading && <UploadProgressBar percent={uploadProgress} />}
               </div>
             </div>
             <div className="row g-3">
