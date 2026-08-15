@@ -1,8 +1,10 @@
 import React from "react";
 import { FiInbox } from "react-icons/fi";
 import ActiveToggle from "./ActiveToggle";
+import MediaPreviewButton from "./MediaPreviewButton";
 
 const ACTIVE_FIELD_NAMES = ["isactive", "is_active"];
+const MEDIA_FIELD_TYPES = ["image", "video", "media"];
 
 const DataTable = ({ fields, data, onEdit, onDelete, onToggleActive, loading, idField = "id" }) => {
   if (loading) {
@@ -45,6 +47,8 @@ const DataTable = ({ fields, data, onEdit, onDelete, onToggleActive, loading, id
                   let display;
                   if (field.format) {
                     display = field.format(value, row);
+                  } else if (MEDIA_FIELD_TYPES.includes(field.type)) {
+                    display = <MediaPreviewButton url={value} kind={field.type === "media" ? undefined : field.type} />;
                   } else if (ACTIVE_FIELD_NAMES.includes(field.name) && onToggleActive) {
                     const active = value === true || value === 1;
                     display = <ActiveToggle active={active} onToggle={(next) => onToggleActive(row, next)} />;

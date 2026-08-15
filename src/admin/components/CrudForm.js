@@ -4,6 +4,9 @@ import { validateMediaFile } from "../utils/mediaValidation";
 import { resolveUploadUrl } from "../utils/resolveUploadUrl";
 import { useToast } from "./ToastProvider";
 import UploadProgressBar from "./UploadProgressBar";
+import MediaPreviewButton from "./MediaPreviewButton";
+
+const MEDIA_FIELD_TYPES = ["image", "video", "media"];
 
 const CrudForm = ({ fields, initialValues, onSubmit, onCancel }) => {
   const [values, setValues] = useState({});
@@ -11,6 +14,7 @@ const CrudForm = ({ fields, initialValues, onSubmit, onCancel }) => {
   const [uploading, setUploading] = useState({});
   const [uploadProgress, setUploadProgress] = useState({});
   const [mediaKind, setMediaKind] = useState({});
+  const [showUrlInput, setShowUrlInput] = useState({});
   const toast = useToast();
 
   useEffect(() => {
@@ -79,6 +83,11 @@ const CrudForm = ({ fields, initialValues, onSubmit, onCancel }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const missingMedia = fields.find(
+      (field) => field.required && MEDIA_FIELD_TYPES.includes(field.type) && !values[field.name]
+    );
+    if (missingMedia) { toast.error(`${missingMedia.label} is required.`); return; }
+
     const normalized = { ...values };
     fields.forEach((field) => {
       if (field.type === "checkbox") {
@@ -92,6 +101,53 @@ const CrudForm = ({ fields, initialValues, onSubmit, onCancel }) => {
   };
 
   const isUploading = Object.values(uploading).some(Boolean);
+
+  const renderMediaField = (field, kind) => {
+    const accept =
+      kind === "image" ? "image/jpeg,image/png,image/webp,image/gif"
+      : kind === "video" ? "video/mp4,video/webm,video/quicktime"
+      : "image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime";
+    const hint =
+      kind === "image" ? "JPG, PNG, WEBP, or GIF."
+      : kind === "video" ? "MP4, WEBM, or MOV."
+      : "JPG, PNG, WEBP, GIF images or MP4, WEBM, MOV videos.";
+    const previewKind = kind === "media" ? mediaKind[field.name] : kind;
+
+    return (
+      <div>
+        <div className="d-flex align-items-center gap-2 flex-wrap">
+          <input
+            type="file"
+            accept={accept}
+            className="form-control"
+            style={{ maxWidth: 280 }}
+            onChange={(e) => handleMediaUpload(field.name, kind, e)}
+            disabled={uploading[field.name]}
+          />
+          <MediaPreviewButton url={values[field.name]} kind={previewKind} />
+          <button
+            type="button"
+            className="btn btn-sm btn-link px-0"
+            onClick={() => setShowUrlInput((p) => ({ ...p, [field.name]: !p[field.name] }))}
+          >
+            {showUrlInput[field.name] ? "Hide manual URL" : "Enter URL manually"}
+          </button>
+        </div>
+        <div className="form-text">{hint}</div>
+        {uploading[field.name] && <UploadProgressBar percent={uploadProgress[field.name] || 0} />}
+        {showUrlInput[field.name] && (
+          <input
+            className="form-control mt-2"
+            type="text"
+            name={field.name}
+            value={values[field.name] ?? ""}
+            onChange={handleChange}
+            placeholder="Paste an external URL (e.g. a YouTube link)"
+          />
+        )}
+      </div>
+    );
+  };
 
   return (
     <form onSubmit={handleSubmit}>
@@ -139,121 +195,11 @@ const CrudForm = ({ fields, initialValues, onSubmit, onCancel }) => {
                 </label>
               </div>
             ) : field.type === "image" ? (
-              <div className="row g-2">
-                <div className="col-md-6">
-                  <input
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp,image/gif"
-                    className="form-control"
-                    onChange={(e) => handleMediaUpload(field.name, "image", e)}
-                    disabled={uploading[field.name]}
-                  />
-                  <div className="form-text">JPG, PNG, WEBP, or GIF.</div>
-                  {uploading[field.name] && <UploadProgressBar percent={uploadProgress[field.name] || 0} />}
-                </div>
-                <div className="col-md-6">
-                  <input
-                    className="form-control"
-                    type="text"
-                    name={field.name}
-                    value={values[field.name] ?? ""}
-                    onChange={handleChange}
-                    placeholder="Or enter URL"
-                    required={field.required}
-                  />
-                </div>
-                {values[field.name] && (
-                  <div className="col-12">
-                    <img
-                      src={values[field.name]}
-                      alt="preview"
-                      style={{ height: 80, objectFit: "cover", borderRadius: 6 }}
-                      onError={(e) => (e.target.style.display = "none")}
-                    />
-                  </div>
-                )}
-              </div>
+              renderMediaField(field, "image")
             ) : field.type === "video" ? (
-              <div className="row g-2">
-                <div className="col-md-6">
-                  <input
-                    type="file"
-                    accept="video/mp4,video/webm,video/quicktime"
-                    className="form-control"
-                    onChange={(e) => handleMediaUpload(field.name, "video", e)}
-                    disabled={uploading[field.name]}
-                  />
-                  <div className="form-text">MP4, WEBM, or MOV.</div>
-                  {uploading[field.name] && <UploadProgressBar percent={uploadProgress[field.name] || 0} />}
-                </div>
-                <div className="col-md-6">
-                  <input
-                    className="form-control"
-                    type="text"
-                    name={field.name}
-                    value={values[field.name] ?? ""}
-                    onChange={handleChange}
-                    placeholder="Or enter URL"
-                    required={field.required}
-                  />
-                </div>
-                {values[field.name] && (
-                  <div className="col-12">
-                    <video
-                      src={values[field.name]}
-                      controls
-                      muted
-                      style={{ height: 120, borderRadius: 6 }}
-                      onError={(e) => (e.target.style.display = "none")}
-                    />
-                  </div>
-                )}
-              </div>
+              renderMediaField(field, "video")
             ) : field.type === "media" ? (
-              <div className="row g-2">
-                <div className="col-md-6">
-                  <input
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime"
-                    className="form-control"
-                    onChange={(e) => handleMediaUpload(field.name, "media", e)}
-                    disabled={uploading[field.name]}
-                  />
-                  <div className="form-text">JPG, PNG, WEBP, GIF images or MP4, WEBM, MOV videos.</div>
-                  {uploading[field.name] && <UploadProgressBar percent={uploadProgress[field.name] || 0} />}
-                </div>
-                <div className="col-md-6">
-                  <input
-                    className="form-control"
-                    type="text"
-                    name={field.name}
-                    value={values[field.name] ?? ""}
-                    onChange={handleChange}
-                    placeholder="Or enter URL"
-                    required={field.required}
-                  />
-                </div>
-                {values[field.name] && (
-                  <div className="col-12">
-                    {mediaKind[field.name] === "video" ? (
-                      <video
-                        src={values[field.name]}
-                        controls
-                        muted
-                        style={{ height: 120, borderRadius: 6 }}
-                        onError={(e) => (e.target.style.display = "none")}
-                      />
-                    ) : (
-                      <img
-                        src={values[field.name]}
-                        alt="preview"
-                        style={{ height: 80, objectFit: "cover", borderRadius: 6 }}
-                        onError={(e) => (e.target.style.display = "none")}
-                      />
-                    )}
-                  </div>
-                )}
-              </div>
+              renderMediaField(field, "media")
             ) : (
               <input
                 className="form-control"
