@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState, useEffect } from "react";
-import { BrowserRouter, Route, Routes, useLocation, Navigate } from "react-router-dom";
+import { HashRouter, Route, Routes, useLocation, Navigate } from "react-router-dom";
 import PrivateRoute from "./shared/components/PrivateRoute";
 import LoginPopup from "./shared/components/LoginPopup";
 import ErrorBoundary from "./shared/components/ErrorBoundary";
@@ -369,12 +369,12 @@ function App() {
 
   return (
     <CartProvider>
-      <BrowserRouter>
+      <HashRouter>
         <AppRoutes
           splashDismissed={splashDismissed}
           onSplashComplete={() => setSplashDismissed(true)}
         />
-      </BrowserRouter>
+      </HashRouter>
     </CartProvider>
   );
 }
