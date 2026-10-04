@@ -1,0 +1,2 @@
+"use strict";(globalThis.webpackChunkhc_home_page=globalThis.webpackChunkhc_home_page||[]).push([[1106],{844(e,a,n){n.r(a),n.d(a,{default:()=>r});n(5043);var t=n(1829);const i=n.p+"static/media/88BannerNew.7bbef097efdd3a65f97c.jpeg";var c=n(579);const r=()=>(0,c.jsx)(t.A,{category:"cigarette",title:"88 Cigarettes",eyebrow:"The signature line",description:"A sharp, directional collection built around sleek lines, confident color, and unmistakable evening presence.",bannerImage:i})}}]);
+//# sourceMappingURL=1106.da4d2a93.chunk.js.map

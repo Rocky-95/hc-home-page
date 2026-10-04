@@ -1,0 +1,2 @@
+"use strict";(globalThis.webpackChunkhc_home_page=globalThis.webpackChunkhc_home_page||[]).push([[9731],{2058(e,r,o){o.r(r),o.d(r,{default:()=>i});o(5043);var t=o(1829),a=o(4796),n=o(579);const i=()=>(0,n.jsx)(t.A,{category:"extreme-poppins",title:"Extreme Poppins",eyebrow:"Statement tailoring",description:"Bold proportions, rich fabrics, and modern ceremonial dressing for the gentleman who prefers to be remembered.",bannerImage:a})}}]);
+//# sourceMappingURL=9731.27747c57.chunk.js.map

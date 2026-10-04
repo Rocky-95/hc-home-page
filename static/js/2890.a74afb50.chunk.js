@@ -1,0 +1,2 @@
+"use strict";(globalThis.webpackChunkhc_home_page=globalThis.webpackChunkhc_home_page||[]).push([[2890],{1422(e,a,n){n.r(a),n.d(a,{default:()=>s});n(5043);var i=n(1829),o=n(5795),r=n(579);const s=()=>(0,r.jsx)(i.A,{category:"tuxedo",title:"Tuxedo",eyebrow:"Evening refinement",description:"Precision tailoring and expressive details for black-tie evenings, receptions, and landmark celebrations.",bannerImage:o})}}]);
+//# sourceMappingURL=2890.a74afb50.chunk.js.map

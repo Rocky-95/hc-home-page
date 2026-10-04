@@ -1,0 +1,2 @@
+"use strict";(globalThis.webpackChunkhc_home_page=globalThis.webpackChunkhc_home_page||[]).push([[1771],{1970(e,a,i){i.r(a),i.d(a,{default:()=>t});i(5043);var n=i(1829),s=i(7595),r=i(579);const t=()=>(0,r.jsx)(n.A,{category:"linen",title:"Linen Shirts & Trousers",eyebrow:"Relaxed sophistication",description:"Breathable natural texture meets clean tailoring in pieces designed for warm celebrations and refined escapes.",bannerImage:s})}}]);
+//# sourceMappingURL=1771.92ec10b0.chunk.js.map

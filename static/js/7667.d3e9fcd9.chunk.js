@@ -1,0 +1,2 @@
+"use strict";(globalThis.webpackChunkhc_home_page=globalThis.webpackChunkhc_home_page||[]).push([[7667],{6650(e,a,r){r.r(a),r.d(a,{default:()=>i});r(5043);var s=r(1829),o=r(1281),t=r(579);const i=()=>(0,t.jsx)(s.A,{category:"gurkha-trousers",title:"Gurkha Trousers",eyebrow:"A tailoring icon",description:"High-waisted silhouettes, signature waist detailing, and an assured drape shaped for contemporary wardrobes.",bannerImage:o})}}]);
+//# sourceMappingURL=7667.d3e9fcd9.chunk.js.map
