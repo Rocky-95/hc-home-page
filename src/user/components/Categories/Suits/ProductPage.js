@@ -37,7 +37,7 @@ const ProductPage = () => {
         const allSizes = sizesRes.status === "fulfilled" ? (sizesRes.value.data?.data || sizesRes.value.data || []) : [];
 
         const matched =
-          products.find((p) => p.product_slug === id || p.product_id === id) ||
+          products.find((p) => String(p.product_slug) === String(id) || String(p.product_id) === String(id)) ||
           products.find((p) =>
             (p.product_name || "").toLowerCase().replace(/\s+/g, "-") === id.toLowerCase()
           );
