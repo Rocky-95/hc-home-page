@@ -32,6 +32,7 @@ const NewArrivalsPage = lazy(() => import("./user/pages/NewArrivalsPage"));
 const HCSpotlightPage = lazy(() => import("./user/pages/HCSpotlightPage"));
 const TheVisionPage = lazy(() => import("./user/pages/TheVisionPage"));
 const ComingSoonPage = lazy(() => import("./user/pages/ComingSoonPage"));
+const MaintenancePage = lazy(() => import("./user/pages/MaintenancePage"));
 const StyleByHCPage = lazy(() => import("./user/pages/StyleByHCPage"));
 const EmbroideryPage = lazy(() => import("./user/pages/EmbroideryPage"));
 const AlterationsPage = lazy(() => import("./user/pages/AlterationsPage"));
@@ -243,8 +244,11 @@ function AppRoutes({ splashDismissed, onSplashComplete }) {
       )}
     <ErrorBoundary>
       <Suspense fallback={<RouteFallback />}>
-        <Routes>
-          {/* ADMIN */}
+         <Routes>
+          {/* Standalone maintenance mode: no UserLayout, navbar, footer, or site access. */}
+          <Route path="/maintenance" element={<MaintenancePage />} />
+
+           {/* ADMIN */}
           <Route
             path="/admin"
             element={
@@ -328,7 +332,7 @@ function AppRoutes({ splashDismissed, onSplashComplete }) {
           <Route path="/gurkha-trousers" element={<GurkhaTrouserCollection />} />
           <Route path="/linen-shirts-trousers" element={<LinenCollection />} />
           <Route path="/cigarettes" element={<CigaretteCollection />} />
-          <Route path="/coming-soon" element={<ComingSoonPage />} />
+           <Route path="/coming-soon" element={<ComingSoonPage />} />
 
           <Route path="/services" element={<ServicePage />} />
           <Route path="/embroidery" element={<EmbroideryPage />} />
