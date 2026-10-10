@@ -225,6 +225,14 @@ function AppRoutes({ splashDismissed, onSplashComplete }) {
     }
   }, [location.pathname]);
 
+  // Global maintenance lock: while the storefront is offline, every route
+  // (including the homepage, admin, auth, and deep links) shows only the
+  // standalone maintenance screen. The maintenance route remains the sole
+  // reachable page until this gate is removed.
+  if (location.pathname !== "/maintenance") {
+    return <MaintenancePage />;
+  }
+
   if (isRoot && !splashDismissed) {
     return <SplashScreen onComplete={onSplashComplete} />;
   }
