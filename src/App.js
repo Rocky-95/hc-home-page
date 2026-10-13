@@ -180,15 +180,20 @@ const RouteFallback = () => (
   </div>
 );
 
+const GUEST_POPUP_DISMISSED_KEY = "hc_guest_popup_dismissed";
+
 function AppRoutes({ splashDismissed, onSplashComplete }) {
   const location = useLocation();
   const isRoot = location.pathname === "/";
   const roleCode = localStorage.getItem("hc_role") || "";
   const isLoggedIn = !!(localStorage.getItem("hc_token") || localStorage.getItem("hc_session"));
   const [showLoginPopup, setShowLoginPopup] = useState(false);
+  const [guestPopupDismissed, setGuestPopupDismissed] = useState(() =>
+    sessionStorage.getItem(GUEST_POPUP_DISMISSED_KEY) === "1"
+  );
 
   useEffect(() => {
-    if (!splashDismissed || isLoggedIn) return;
+    if (!splashDismissed || isLoggedIn || guestPopupDismissed) return;
 
     let scrolled = false;
     let timerDone = false;
@@ -216,7 +221,13 @@ function AppRoutes({ splashDismissed, onSplashComplete }) {
       clearTimeout(timer);
       window.removeEventListener("scroll", onScroll);
     };
-  }, [splashDismissed, isLoggedIn]);
+  }, [splashDismissed, isLoggedIn, guestPopupDismissed]);
+
+  const continueAsGuest = () => {
+    sessionStorage.setItem(GUEST_POPUP_DISMISSED_KEY, "1");
+    setGuestPopupDismissed(true);
+    setShowLoginPopup(false);
+  };
 
   // Hide popup when user navigates to /login
   useEffect(() => {
@@ -246,7 +257,7 @@ function AppRoutes({ splashDismissed, onSplashComplete }) {
     <>
       {showLoginPopup && (
         <LoginPopup
-          onSkip={() => setShowLoginPopup(false)}
+          onSkip={continueAsGuest}
           onLogin={() => setShowLoginPopup(false)}
         />
       )}

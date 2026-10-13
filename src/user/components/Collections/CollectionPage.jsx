@@ -266,7 +266,7 @@ const CollectionPage = ({
                     loading="lazy"
                   />
                   <span className="collection-card__view">
-                    View piece <FaArrowRight />
+                    View Product <FaArrowRight />
                   </span>
                 </div>
 

@@ -166,12 +166,12 @@ const HomeFooter = () => {
                   <i className="bi bi-facebook fs-5"></i>
                 </a>
                 <a
-                  href="https://www.instagram.com/harryclinton_official/"
+                  href="https://www.instagram.com/harryclinton_official"
                   className="text-light me-3"
                   target="_blank"
                   rel="noreferrer"
                 >
-                  <i className="bi bi-instagram fs-5"></i>
+                  <i className="bi bi-instagram fs-5" aria-label="Instagram"></i>
                 </a>
                 <a
                   href="https://www.youtube.com/@HarryClintonHC"
